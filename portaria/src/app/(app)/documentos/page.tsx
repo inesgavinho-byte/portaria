@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentTenant } from "@/lib/supabase/tenant";
+import { DownloadButton } from "@/components/app/download-button";
 import type { Documento } from "@/types/database";
 
 const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
@@ -24,13 +25,11 @@ export default async function DocumentosPage() {
     .order("upload_em", { ascending: false });
 
   // Agrupar por categoria
-  const porCategoria = (documentos ?? []).reduce<Record<string, Documento[]>>(
-    (acc, doc) => {
-      (acc[doc.categoria] ||= []).push(doc);
-      return acc;
-    },
-    {}
-  );
+  const docs: Documento[] = documentos ?? [];
+  const porCategoria = docs.reduce<Record<string, Documento[]>>((acc, doc) => {
+    (acc[doc.categoria] ||= []).push(doc);
+    return acc;
+  }, {});
 
   return (
     <div>
@@ -84,18 +83,8 @@ function DocumentoLinha({ doc }: { doc: Documento }) {
       </div>
       <div className="flex items-center gap-6 text-xs font-body text-oliveGray">
         {doc.ano && <span>{doc.ano}</span>}
-        <DownloadButton path={doc.ficheiro_path} />
+        <DownloadButton documentoId={doc.id} />
       </div>
     </li>
-  );
-}
-
-function DownloadButton({ path }: { path: string }) {
-  // Implementação detalhada: gerar URL assinado via Server Action.
-  // Por agora, link simples — TODO na próxima iteração.
-  return (
-    <span className="text-warmBeige tracking-widest uppercase">
-      Descarregar
-    </span>
   );
 }

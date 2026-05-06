@@ -41,9 +41,6 @@ export default async function AvisosPage() {
                 <h2 className="font-title text-h3 text-ink">{aviso.titulo}</h2>
                 <PrioridadeBadge prioridade={aviso.prioridade} />
               </div>
-              <p className="font-body text-ink whitespace-pre-wrap mb-4">
-                {aviso.conteudo}
-              </p>
               <p className="font-body text-xs text-oliveGray">
                 {new Date(aviso.publicado_em).toLocaleDateString("pt-PT", {
                   year: "numeric",
@@ -51,6 +48,10 @@ export default async function AvisosPage() {
                   day: "numeric",
                 })}
               </p>
+              <div
+                className="prose prose-sm max-w-none mt-4 font-body text-ink prose-headings:font-title prose-a:text-warmBeige hover:prose-a:text-oliveGray"
+                dangerouslySetInnerHTML={{ __html: aviso.conteudo }}
+              />
             </article>
           ))}
         </div>
