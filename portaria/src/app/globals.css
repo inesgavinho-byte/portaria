@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ======================================================================
+ * Fontes — Google Fonts via @import
+ * Em produção, considerar self-hosting para performance
+ * ====================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Quattrocento+Sans:wght@400;700&display=swap');
+
+@layer base {
+  :root {
+    --font-title: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Quattrocento Sans', system-ui, sans-serif;
+
+    /* Variáveis de tema do tenant — preenchidas dinamicamente.
+     * Defaults são paleta GAVINHO. */
+    --color-primary: #ADAA96;
+    --color-secondary: #F2F0E7;
+    --color-accent: #8B8670;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body;
+    font-feature-settings: 'kern', 'liga', 'calt';
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-title;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* Hierarquia tipográfica */
+  h1 { @apply text-h1 md:text-display; }
+  h2 { @apply text-h2 md:text-h1; }
+  h3 { @apply text-h3 md:text-h2; }
+}
+
+@layer components {
+  .container-prose {
+    @apply max-w-3xl mx-auto px-6;
+  }
+
+  .container-page {
+    @apply max-w-6xl mx-auto px-6;
+  }
+}
