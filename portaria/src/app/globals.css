@@ -1,12 +1,14 @@
+/* ======================================================================
+ * Fontes — Google Fonts via @import
+ * O @import TEM de vir antes de qualquer outra regra (incluindo @tailwind),
+ * caso contrário os browsers ignoram-no e as fontes não carregam.
+ * Em produção, considerar self-hosting para performance.
+ * ====================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Quattrocento+Sans:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* ======================================================================
- * Fontes — Google Fonts via @import
- * Em produção, considerar self-hosting para performance
- * ====================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Quattrocento+Sans:wght@400;700&display=swap');
 
 @layer base {
   :root {

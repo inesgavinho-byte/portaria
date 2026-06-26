@@ -9,18 +9,21 @@ import { NextResponse, type NextRequest } from "next/server";
  * 2. Identificar o tenant pelo hostname e passá-lo via header para a app
  */
 export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: { headers: request.headers },
-  });
-
   // ----- 1. Identificação do tenant pelo hostname -----
   // Em produção: edificioeuropa.pt → tenant "europa"
   // Em dev local: localhost → tenant default ("europa") para teste
   const hostname = request.headers.get("host") ?? "";
   const tenantSlug = resolveTenantFromHostname(hostname);
 
-  // Passa o slug do tenant para os Server Components via header
-  response.headers.set("x-tenant-slug", tenantSlug);
+  // O slug tem de ir nos headers do PEDIDO (não da resposta) para que os
+  // Server Components o consigam ler via `headers()`. Os headers da resposta
+  // só chegam ao browser, não ao render server-side.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-tenant-slug", tenantSlug);
+
+  let response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
 
   // ----- 2. Refresh da sessão Supabase -----
   const supabase = createServerClient(
@@ -35,8 +38,9 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          response = NextResponse.next({ request });
-          response.headers.set("x-tenant-slug", tenantSlug);
+          response = NextResponse.next({
+            request: { headers: requestHeaders },
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options)
           );
