@@ -20,6 +20,7 @@ export function AppHeader({ user, tenant, membership }: AppHeaderProps) {
   const navItems = [
     { href: "/avisos", label: "Avisos" },
     { href: "/documentos", label: "Documentos" },
+    { href: "/ocorrencias", label: "Ocorrências" },
   ];
 
   if (membership.role === "admin") {
