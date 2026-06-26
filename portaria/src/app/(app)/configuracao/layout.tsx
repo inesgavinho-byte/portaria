@@ -6,7 +6,9 @@ import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
  * Layout das páginas de configuração (admin).
  *
  * Proteção dupla:
- * 1. Middleware Supabase já garante que existe sessão (senão redirecciona)
+ * 1. O middleware refresca a sessão Supabase em cada request (renova tokens).
+ *    A imposição de autenticação acontece aqui e no layout (app): sem sessão
+ *    válida ou sem pertencer ao tenant, redirecciona-se.
  * 2. Esta verificação confirma que o utilizador tem role 'admin' no tenant
  *
  * Note-se que a proteção real está nas políticas RLS do Supabase: mesmo que
