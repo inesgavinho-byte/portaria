@@ -12,8 +12,9 @@ const CATEGORIAS = [
   { value: "conta", label: "Contas / Orçamento" },
   { value: "contrato", label: "Contrato" },
   { value: "regulamento", label: "Regulamento" },
+  { value: "obra", label: "Obras" },
+  { value: "seguro", label: "Seguro" },
   { value: "manual", label: "Manual" },
-  { value: "apolice", label: "Apólice" },
   { value: "outro", label: "Outro" },
 ];
 

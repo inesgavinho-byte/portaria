@@ -7,7 +7,8 @@ import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import type { Documento } from "@/types/database";
 
 const CATEGORIAS_VALIDAS: Documento["categoria"][] = [
-  "ata", "conta", "contrato", "regulamento", "manual", "apolice", "outro",
+  "ata", "conta", "contrato", "regulamento", "manual",
+  "apolice", "seguro", "obra", "outro",
 ];
 
 const TAMANHO_MAXIMO_MB = 25;

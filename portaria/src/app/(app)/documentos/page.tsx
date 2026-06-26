@@ -8,8 +8,10 @@ const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
   conta: "Contas e Orçamentos",
   contrato: "Contratos",
   regulamento: "Regulamento",
-  manual: "Manuais",
+  obra: "Obras",
+  seguro: "Seguros",
   apolice: "Apólices",
+  manual: "Manuais",
   outro: "Outros",
 };
 
