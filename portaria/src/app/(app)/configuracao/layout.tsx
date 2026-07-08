@@ -33,6 +33,7 @@ export default async function ConfiguracaoLayout({
         <nav className="flex gap-6 mt-3">
           <ConfigNavLink href="/configuracao/avisos">Avisos</ConfigNavLink>
           <ConfigNavLink href="/configuracao/documentos">Documentos</ConfigNavLink>
+          <ConfigNavLink href="/configuracao/ocorrencias">Ocorrências</ConfigNavLink>
         </nav>
       </div>
       {children}
