@@ -48,6 +48,47 @@ export type Aviso = {
   ativo: boolean;
 };
 
+export type Ocorrencia = {
+  id: string;
+  tenant_id: string;
+  titulo: string;
+  descricao: string;
+  categoria:
+    | "agua"
+    | "eletricidade"
+    | "elevadores"
+    | "limpeza"
+    | "seguranca"
+    | "espacos_comuns"
+    | "outro";
+  fracao: string | null;
+  estado: "novo" | "em_curso" | "aguarda_fornecedor" | "resolvido" | "arquivado";
+  criado_por: string;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type OcorrenciaEvento = {
+  id: string;
+  tenant_id: string;
+  ocorrencia_id: string;
+  tipo: "criada" | "fotografia" | "estado" | "nota";
+  estado_anterior: Ocorrencia["estado"] | null;
+  estado_novo: Ocorrencia["estado"] | null;
+  nota: string | null;
+  autor: string;
+  criado_em: string;
+};
+
+export type OcorrenciaFotografia = {
+  id: string;
+  tenant_id: string;
+  ocorrencia_id: string;
+  ficheiro_path: string;
+  criado_por: string;
+  criado_em: string;
+};
+
 export type Documento = {
   id: string;
   tenant_id: string;
