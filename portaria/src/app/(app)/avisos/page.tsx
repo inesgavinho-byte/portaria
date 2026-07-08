@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentTenant } from "@/lib/supabase/tenant";
+import { sanitizarHtml } from "@/lib/sanitize";
 import type { Aviso } from "@/types/database";
 
 export default async function AvisosPage() {
@@ -50,7 +51,9 @@ export default async function AvisosPage() {
               </p>
               <div
                 className="prose prose-sm max-w-none mt-4 font-body text-ink prose-headings:font-title prose-a:text-warmBeige hover:prose-a:text-oliveGray"
-                dangerouslySetInnerHTML={{ __html: aviso.conteudo }}
+                // Sanitizado também na leitura: cobre conteúdo gravado
+                // antes da sanitização na escrita existir
+                dangerouslySetInnerHTML={{ __html: sanitizarHtml(aviso.conteudo) }}
               />
             </article>
           ))}

@@ -8,6 +8,7 @@ import {
   CATEGORIAS,
   ESTADOS,
   FOTOS_MAX,
+  FOTOS_TOTAL_MAX,
   FOTO_MAX_MB,
   FOTO_TIPOS_VALIDOS,
 } from "@/lib/ocorrencias";
@@ -233,6 +234,21 @@ export async function adicionarFotografias(
   const erroFotos = validarFotografias(files);
   if (erroFotos) {
     return { fieldErrors: { fotografias: erroFotos } };
+  }
+
+  // Teto acumulado por ocorrência (o limite por envio não chega:
+  // envios repetidos permitiriam crescimento sem limite)
+  const { count } = await supabase
+    .from("ocorrencia_fotografias")
+    .select("id", { count: "exact", head: true })
+    .eq("ocorrencia_id", ocorrenciaId);
+
+  if ((count ?? 0) + files.length > FOTOS_TOTAL_MAX) {
+    return {
+      fieldErrors: {
+        fotografias: `Limite de ${FOTOS_TOTAL_MAX} fotografias por ocorrência.`,
+      },
+    };
   }
 
   const erroUpload = await guardarFotografias(

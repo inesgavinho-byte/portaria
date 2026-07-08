@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { htmlVazio, sanitizarHtml } from "@/lib/sanitize";
 import type { Aviso } from "@/types/database";
 
 export type AvisoFormState = {
@@ -24,7 +25,9 @@ export async function criarAviso(
   }
 
   const titulo = String(formData.get("titulo") ?? "").trim();
-  const conteudo = String(formData.get("conteudo") ?? "").trim();
+  // Sanitização server-side: whitelist de tags do editor; remove
+  // scripts, handlers e atributos perigosos antes de gravar
+  const conteudo = sanitizarHtml(String(formData.get("conteudo") ?? "").trim());
   const prioridade = String(formData.get("prioridade") ?? "normal");
 
   // Validação básica server-side (defesa em profundidade — o HTML
@@ -32,7 +35,7 @@ export async function criarAviso(
   const fieldErrors: AvisoFormState["fieldErrors"] = {};
   if (!titulo) fieldErrors.titulo = "O título é obrigatório.";
   if (titulo.length > 200) fieldErrors.titulo = "Título demasiado longo (máx. 200).";
-  if (!conteudo || conteudo === "<p></p>") fieldErrors.conteudo = "O conteúdo é obrigatório.";
+  if (htmlVazio(conteudo)) fieldErrors.conteudo = "O conteúdo é obrigatório.";
   if (!["normal", "importante", "urgente"].includes(prioridade)) {
     fieldErrors.prioridade = "Prioridade inválida.";
   }
@@ -73,12 +76,18 @@ export async function atualizarAviso(
   }
 
   const titulo = String(formData.get("titulo") ?? "").trim();
-  const conteudo = String(formData.get("conteudo") ?? "").trim();
+  const conteudo = sanitizarHtml(String(formData.get("conteudo") ?? "").trim());
   const prioridade = String(formData.get("prioridade") ?? "normal");
 
+  // Mesmas validações da criação (antes divergiam: o update não
+  // validava comprimento do título nem whitelist de prioridade)
   const fieldErrors: AvisoFormState["fieldErrors"] = {};
   if (!titulo) fieldErrors.titulo = "O título é obrigatório.";
-  if (!conteudo || conteudo === "<p></p>") fieldErrors.conteudo = "O conteúdo é obrigatório.";
+  if (titulo.length > 200) fieldErrors.titulo = "Título demasiado longo (máx. 200).";
+  if (htmlVazio(conteudo)) fieldErrors.conteudo = "O conteúdo é obrigatório.";
+  if (!["normal", "importante", "urgente"].includes(prioridade)) {
+    fieldErrors.prioridade = "Prioridade inválida.";
+  }
   if (Object.keys(fieldErrors).length > 0) {
     return { fieldErrors };
   }

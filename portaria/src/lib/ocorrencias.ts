@@ -31,5 +31,6 @@ export const CATEGORIAS = Object.keys(
 ) as Ocorrencia["categoria"][];
 
 export const FOTOS_MAX = 5;
+export const FOTOS_TOTAL_MAX = 20;
 export const FOTO_MAX_MB = 5;
 export const FOTO_TIPOS_VALIDOS = ["image/jpeg", "image/png", "image/webp"];
