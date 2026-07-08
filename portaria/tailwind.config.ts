@@ -16,6 +16,9 @@ const config: Config = {
         // Sistema neutro
         ink: "#1A1A1A",
         paper: "#FFFFFF",
+        // Tons escuros da landing
+        night: "#0A0A0D",
+        nightSoft: "#121217",
         // Variantes funcionais
         success: "#5A7A5A",
         alert: "#8B3A3A",
