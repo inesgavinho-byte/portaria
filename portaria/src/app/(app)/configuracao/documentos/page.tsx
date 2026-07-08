@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Plus, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
@@ -17,12 +18,13 @@ const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
 
 export default async function ConfigDocumentosPage() {
   const ctx = await getCurrentUserInTenant();
-  const supabase = await createClient();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   const { data: documentos } = await supabase
     .from("documentos")
     .select("*")
-    .eq("tenant_id", ctx!.tenant.id)
+    .eq("tenant_id", ctx.tenant.id)
     .order("upload_em", { ascending: false });
 
   return (

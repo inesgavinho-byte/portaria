@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { Plus } from "lucide-react";
@@ -7,13 +8,14 @@ import { AvisoActions } from "@/components/admin/aviso-actions";
 
 export default async function ConfigAvisosPage() {
   const ctx = await getCurrentUserInTenant();
-  const supabase = await createClient();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   // Admins veem todos os avisos (ativos e inativos), graças à política RLS
   const { data: avisos } = await supabase
     .from("avisos")
     .select("*")
-    .eq("tenant_id", ctx!.tenant.id)
+    .eq("tenant_id", ctx.tenant.id)
     .order("publicado_em", { ascending: false });
 
   return (

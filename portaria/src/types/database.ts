@@ -16,6 +16,7 @@ export type Tenant = {
   num_fracoes: number | null;
   ano_construcao: number | null;
   tema: TenantTheme | null;
+  dominios: string[];
   created_at: string;
 };
 

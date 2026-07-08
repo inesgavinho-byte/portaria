@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { requireAdmin } from "@/lib/supabase/tenant";
 import { htmlVazio, sanitizarHtml } from "@/lib/sanitize";
 import type { Aviso } from "@/types/database";
 
@@ -19,8 +19,8 @@ export async function criarAviso(
   _prev: AvisoFormState,
   formData: FormData
 ): Promise<AvisoFormState> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     return { error: "Sem permissões para esta operação." };
   }
 
@@ -70,8 +70,8 @@ export async function atualizarAviso(
   _prev: AvisoFormState,
   formData: FormData
 ): Promise<AvisoFormState> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     return { error: "Sem permissões para esta operação." };
   }
 
@@ -116,8 +116,8 @@ export async function atualizarAviso(
  * Marca aviso como inativo (soft delete — não apaga, fica no histórico).
  */
 export async function desativarAviso(id: string) {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     throw new Error("Sem permissões");
   }
 
@@ -138,8 +138,8 @@ export async function desativarAviso(id: string) {
  * Reativa um aviso desativado.
  */
 export async function reativarAviso(id: string) {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     throw new Error("Sem permissões");
   }
 

@@ -1,5 +1,6 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentTenant } from "@/lib/supabase/tenant";
+import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { DownloadButton } from "@/components/app/download-button";
 import type { Documento } from "@/types/database";
 
@@ -14,13 +15,14 @@ const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
 };
 
 export default async function DocumentosPage() {
-  const supabase = await createClient();
-  const tenant = await getCurrentTenant();
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   const { data: documentos } = await supabase
     .from("documentos")
     .select("*")
-    .eq("tenant_id", tenant!.id)
+    .eq("tenant_id", ctx.tenant.id)
     .order("ano", { ascending: false, nullsFirst: false })
     .order("upload_em", { ascending: false });
 

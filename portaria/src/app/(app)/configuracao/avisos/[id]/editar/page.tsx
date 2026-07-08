@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
@@ -13,13 +13,14 @@ export default async function EditarAvisoPage({
 }) {
   const { id } = await params;
   const ctx = await getCurrentUserInTenant();
-  const supabase = await createClient();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   const { data: aviso } = await supabase
     .from("avisos")
     .select("*")
     .eq("id", id)
-    .eq("tenant_id", ctx!.tenant.id)
+    .eq("tenant_id", ctx.tenant.id)
     .single();
 
   if (!aviso) notFound();

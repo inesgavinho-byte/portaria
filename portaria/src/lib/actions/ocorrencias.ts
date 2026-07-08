@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { getCurrentUserInTenant, requireAdmin } from "@/lib/supabase/tenant";
 import {
   CATEGORIAS,
   ESTADOS,
@@ -272,8 +272,8 @@ export async function alterarEstadoOcorrencia(
   _prev: OcorrenciaFormState,
   formData: FormData
 ): Promise<OcorrenciaFormState> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     return { error: "Sem permissões para esta operação." };
   }
 
@@ -331,8 +331,8 @@ export async function adicionarNotaInterna(
   _prev: OcorrenciaFormState,
   formData: FormData
 ): Promise<OcorrenciaFormState> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     return { error: "Sem permissões para esta operação." };
   }
 
