@@ -48,6 +48,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      // O default do Next é 1 MB — rejeitava qualquer upload maior ANTES
+      // de a Server Action correr (500 + "unexpected response" no cliente).
+      // Alinha com o máximo que a UI de documentos promete (25 MB).
+      // Nota: a função serverless do hosting pode ter o seu próprio limite
+      // de payload; ficheiros muito grandes podem exigir upload direto ao
+      // Storage no futuro (ver docs/living-lab.md).
+      bodySizeLimit: "25mb",
+    },
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
