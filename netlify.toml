@@ -1,0 +1,13 @@
+# Configuração de deploy Netlify.
+#
+# A aplicação Next.js vive na subpasta `portaria/` (não na raiz do
+# repositório) — sem `base` definido, a Netlify tenta o build na raiz,
+# não encontra package.json e publica um site vazio (404 em tudo).
+
+[build]
+  base = "portaria"
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
