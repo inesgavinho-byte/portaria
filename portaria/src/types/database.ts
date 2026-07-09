@@ -134,6 +134,20 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Contacto = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  tipo: "fornecedor" | "empresa" | "pessoa" | "outro";
+  papel: string | null;
+  empresa: string | null;
+  email: string | null;
+  telefone: string | null;
+  notas: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Conversa = {
   id: string;
   tenant_id: string;
