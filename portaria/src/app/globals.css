@@ -54,6 +54,27 @@
   }
 
   /* ------------------------------------------------------------------
+   * Tabelas (editor de avisos e vista do condómino — ambos usam .prose)
+   * ------------------------------------------------------------------ */
+  .prose table {
+    @apply w-full border-collapse my-4 text-sm;
+  }
+  .prose th,
+  .prose td {
+    @apply border border-warmBeige/40 px-3 py-2 text-left align-top;
+  }
+  .prose th {
+    @apply bg-softCream/60 font-body font-bold;
+  }
+  /* Ajuda de edição no ProseMirror (Tiptap) */
+  .ProseMirror table {
+    table-layout: fixed;
+  }
+  .ProseMirror .selectedCell {
+    @apply bg-warmBeige/15;
+  }
+
+  /* ------------------------------------------------------------------
    * Landing — superfícies glass sobre fundo escuro
    * ------------------------------------------------------------------ */
   .glass-card {
