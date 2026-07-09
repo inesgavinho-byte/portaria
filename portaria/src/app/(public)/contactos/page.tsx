@@ -37,6 +37,21 @@ export default async function ContactosPage() {
                   {tenant.morada}
                 </p>
               )}
+              {tenant.telefone && (
+                <p className="font-body text-sm text-oliveGray mt-1">
+                  {tenant.telefone}
+                </p>
+              )}
+              {tenant.email && (
+                <p className="font-body text-sm text-oliveGray">
+                  <a
+                    href={`mailto:${tenant.email}`}
+                    className="text-warmBeige hover:text-oliveGray transition-colors"
+                  >
+                    {tenant.email}
+                  </a>
+                </p>
+              )}
             </div>
 
             <div>
