@@ -98,3 +98,21 @@ create policy "ocorrencias fotos download"
       )
     )
   );
+
+-- Delete: em falta na 0002 — sem ela, o cleanup de uploads falhados
+-- (guardarFotografias) falha silenciosamente e deixa ficheiros órfãos.
+-- Mesmo âmbito do upload: admin do tenant ou criador da ocorrência.
+create policy "ocorrencias fotos delete"
+  on storage.objects for delete
+  using (
+    bucket_id = 'ocorrencias'
+    and (
+      public.is_tenant_admin((storage.foldername(name))[1]::uuid)
+      or exists (
+        select 1 from public.ocorrencias o
+        where o.id = (storage.foldername(name))[2]::uuid
+          and o.criado_por = auth.uid()
+          and o.tenant_id = (storage.foldername(name))[1]::uuid
+      )
+    )
+  );
