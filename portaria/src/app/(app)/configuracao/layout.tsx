@@ -30,7 +30,8 @@ export default async function ConfiguracaoLayout({
         <p className="font-body text-xs tracking-widest uppercase text-oliveGray mb-1">
           Configuração · Administração
         </p>
-        <nav className="flex gap-6 mt-3">
+        <nav className="flex gap-6 mt-3 flex-wrap">
+          <ConfigNavLink href="/configuracao/perfil">Perfil</ConfigNavLink>
           <ConfigNavLink href="/configuracao/avisos">Avisos</ConfigNavLink>
           <ConfigNavLink href="/configuracao/documentos">Documentos</ConfigNavLink>
           <ConfigNavLink href="/configuracao/ocorrencias">Ocorrências</ConfigNavLink>

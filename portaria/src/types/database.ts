@@ -17,7 +17,22 @@ export type Tenant = {
   ano_construcao: number | null;
   tema: TenantTheme | null;
   dominios: string[];
+  email: string | null;
+  telefone: string | null;
   created_at: string;
+};
+
+export type TenantPerfil = {
+  tenant_id: string;
+  seguradora_nome: string | null;
+  seguradora_apolice: string | null;
+  seguradora_contacto: string | null;
+  seguradora_validade: string | null;
+  administrador_nome: string | null;
+  administrador_empresa: string | null;
+  administrador_email: string | null;
+  administrador_telefone: string | null;
+  atualizado_em: string;
 };
 
 export type TenantTheme = {

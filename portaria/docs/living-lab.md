@@ -57,3 +57,18 @@ plataforma ainda virgem (0 dados reais).
 **Nota:** primeira fricção esperada durante a configuração do Perfil do
 Condomínio (Slice 01). A partir daqui, cada sessão de uso real deve deixar
 pelo menos uma entrada — mesmo que seja "correu tudo bem".
+
+### 2026-07-09 — Slice 01 concluído (Perfil do Condomínio)
+
+**Teste do Living Lab:** *"Se amanhã eu administrasse o Europa, teria aberto
+esta funcionalidade esta semana?"* → **Sim.** É o primeiro ecrã a abrir:
+pôr a casa em ordem (morada, contactos, seguradora, administrador) antes de
+a habitar. Sem a Portaria, estes dados viveriam num Word ou na memória de
+alguém.
+**Decisão de âmbito:** "Documentos institucionais" não gerou um segundo
+sistema de documentos — o Perfil dá um atalho para a biblioteca (Documentos),
+onde o regulamento/apólice/escritura já vivem. Evita duplicação (constituição:
+o contexto vale mais do que o documento; um só sítio para documentos).
+**Fricção a observar no uso real:** a validade da apólice é hoje um campo
+solto — quando existir Calendário (Slice 11), deve gerar um lembrete
+automático de renovação. Registar aqui se a Inês sentir falta disso antes.
