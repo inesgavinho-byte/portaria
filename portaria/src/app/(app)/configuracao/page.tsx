@@ -1,80 +1,20 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen, Gavel, MessageSquare, Contact, ScrollText, History, CalendarDays } from "lucide-react";
+import { Building2, Users, ArrowRight } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
 const SECCOES = [
   {
     href: "/configuracao/perfil",
     icon: Building2,
-    titulo: "Perfil",
-    descricao: "Dados do condomínio, seguradora e administrador.",
-  },
-  {
-    href: "/configuracao/fracoes",
-    icon: DoorOpen,
-    titulo: "Frações",
-    descricao: "Frações, proprietários, inquilinos e permilagens.",
-  },
-  {
-    href: "/configuracao/avisos",
-    icon: Bell,
-    titulo: "Avisos",
-    descricao: "Publicar e gerir comunicações aos condóminos.",
-  },
-  {
-    href: "/configuracao/documentos",
-    icon: FileText,
-    titulo: "Documentos",
-    descricao: "Atas, contas, contratos e documentação.",
-  },
-  {
-    href: "/configuracao/ocorrencias",
-    icon: AlertCircle,
-    titulo: "Ocorrências",
-    descricao: "Acompanhar e resolver ocorrências reportadas.",
-  },
-  {
-    href: "/configuracao/assembleias",
-    icon: Gavel,
-    titulo: "Assembleias",
-    descricao: "Convocatórias, ordens de trabalhos e atas.",
-  },
-  {
-    href: "/configuracao/conversas",
-    icon: MessageSquare,
-    titulo: "Conversas",
-    descricao: "Histórico por assunto — notas, chamadas, contactos.",
-  },
-  {
-    href: "/configuracao/contactos",
-    icon: Contact,
-    titulo: "Contactos",
-    descricao: "Fornecedores, empresas e pessoas.",
-  },
-  {
-    href: "/configuracao/contratos",
-    icon: ScrollText,
-    titulo: "Contratos",
-    descricao: "Contratos, datas e renovações.",
-  },
-  {
-    href: "/configuracao/timeline",
-    icon: History,
-    titulo: "Timeline",
-    descricao: "A história do condomínio numa linha temporal.",
-  },
-  {
-    href: "/configuracao/calendario",
-    icon: CalendarDays,
-    titulo: "Calendário",
-    descricao: "Obrigações futuras: assembleias, contratos, seguro.",
+    titulo: "Perfil do condomínio",
+    descricao: "Dados gerais, seguradora e administrador responsável.",
   },
   {
     href: "/configuracao/membros",
     icon: Users,
     titulo: "Membros",
-    descricao: "Convidar e gerir quem tem acesso.",
+    descricao: "Convidar e gerir quem tem acesso à plataforma.",
   },
 ];
 
@@ -83,11 +23,12 @@ export default async function ConfiguracaoPage() {
   if (!ctx) redirect("/login");
 
   return (
-    <div>
+    <div className="max-w-3xl">
       <div className="mb-8">
         <h1 className="font-title text-h1 text-ink mb-2">Configuração</h1>
         <p className="font-body text-oliveGray">
-          Administração do {ctx.tenant.nome}.
+          Definições do {ctx.tenant.nome}. As áreas de trabalho estão no menu
+          lateral.
         </p>
       </div>
 

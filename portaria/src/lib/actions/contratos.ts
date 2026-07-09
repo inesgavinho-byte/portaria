@@ -71,8 +71,8 @@ export async function criarContrato(
     return { error: "Erro ao criar o contrato." };
   }
 
-  revalidatePath("/configuracao/contratos");
-  redirect("/configuracao/contratos");
+  revalidatePath("/contratos");
+  redirect("/contratos");
 }
 
 export async function atualizarContrato(
@@ -97,8 +97,8 @@ export async function atualizarContrato(
     return { error: "Erro ao atualizar o contrato." };
   }
 
-  revalidatePath("/configuracao/contratos");
-  redirect("/configuracao/contratos");
+  revalidatePath("/contratos");
+  redirect("/contratos");
 }
 
 export async function apagarContrato(id: string) {
@@ -113,5 +113,5 @@ export async function apagarContrato(id: string) {
     .eq("tenant_id", ctx.tenant.id);
   if (error) throw new Error("Erro ao apagar o contrato.");
 
-  revalidatePath("/configuracao/contratos");
+  revalidatePath("/contratos");
 }

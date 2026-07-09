@@ -23,7 +23,7 @@ export function ContratoActions({ contratoId }: { contratoId: string }) {
 
   return (
     <div className="flex items-center gap-2 shrink-0">
-      <Link href={`/configuracao/contratos/${contratoId}/editar`}
+      <Link href={`/contratos/${contratoId}/editar`}
         className="p-2 text-oliveGray hover:text-ink hover:bg-softCream/50 rounded transition-colors"
         title="Editar" aria-label="Editar">
         <Pencil className="w-4 h-4" />

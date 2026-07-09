@@ -160,7 +160,7 @@ export function FracaoForm({ fracao }: { fracao?: Fracao }) {
           {pending ? "A guardar..." : isEdit ? "Guardar alterações" : "Criar fração"}
         </button>
         <Link
-          href="/configuracao/fracoes"
+          href="/fracoes"
           className="px-8 py-3 font-body text-sm tracking-widest uppercase text-oliveGray hover:text-ink transition-colors"
         >
           Cancelar

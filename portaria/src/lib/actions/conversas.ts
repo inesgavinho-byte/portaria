@@ -61,8 +61,8 @@ export async function criarConversa(
     });
   }
 
-  revalidatePath("/configuracao/conversas");
-  redirect(`/configuracao/conversas/${conversa.id}`);
+  revalidatePath("/conversas");
+  redirect(`/conversas/${conversa.id}`);
 }
 
 export async function adicionarMensagem(
@@ -90,7 +90,7 @@ export async function adicionarMensagem(
     .eq("id", conversaId)
     .eq("tenant_id", ctx.tenant.id);
 
-  revalidatePath(`/configuracao/conversas/${conversaId}`);
+  revalidatePath(`/conversas/${conversaId}`);
 }
 
 export async function apagarConversa(id: string) {
@@ -105,6 +105,6 @@ export async function apagarConversa(id: string) {
     .eq("tenant_id", ctx.tenant.id);
   if (error) throw new Error("Erro ao apagar a conversa.");
 
-  revalidatePath("/configuracao/conversas");
-  redirect("/configuracao/conversas");
+  revalidatePath("/conversas");
+  redirect("/conversas");
 }

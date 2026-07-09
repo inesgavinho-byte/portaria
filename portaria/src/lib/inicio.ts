@@ -94,7 +94,7 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
         contratosARenovar === 1
           ? "1 contrato a renovar nos próximos 30 dias"
           : `${contratosARenovar} contratos a renovar nos próximos 30 dias`,
-      href: "/configuracao/contratos",
+      href: "/contratos",
     });
   }
 

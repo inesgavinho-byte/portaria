@@ -55,7 +55,7 @@ export function ConversaNovaForm({
           className="px-8 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50">
           {pending ? "A criar..." : "Criar conversa"}
         </button>
-        <Link href="/configuracao/conversas"
+        <Link href="/conversas"
           className="px-8 py-3 font-body text-sm tracking-widest uppercase text-oliveGray hover:text-ink transition-colors">
           Cancelar
         </Link>

@@ -12,7 +12,7 @@ export function PesquisaInput({ inicial }: { inicial: string }) {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     startTransition(() =>
-      router.replace(`/configuracao/pesquisa?q=${encodeURIComponent(valor)}`)
+      router.replace(`/pesquisa?q=${encodeURIComponent(valor)}`)
     );
   }
 

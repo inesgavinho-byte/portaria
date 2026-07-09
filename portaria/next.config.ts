@@ -62,6 +62,23 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  async redirects() {
+    // Secções operacionais movidas de /configuracao/* para o topo.
+    // Redirecionamento permanente evita links quebrados (bookmarks, emails).
+    const movidas = [
+      "fracoes",
+      "contactos",
+      "contratos",
+      "conversas",
+      "timeline",
+      "calendario",
+      "pesquisa",
+    ];
+    return movidas.flatMap((seg) => [
+      { source: `/configuracao/${seg}`, destination: `/${seg}`, permanent: true },
+      { source: `/configuracao/${seg}/:path*`, destination: `/${seg}/:path*`, permanent: true },
+    ]);
+  },
   // Multi-tenant: domínios próprios por prédio apontam para a mesma app.
   // O middleware (src/middleware.ts) identifica o tenant pelo hostname
   // via lookup à tabela `tenants` (coluna dominios), com cache.

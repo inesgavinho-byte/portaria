@@ -14,9 +14,6 @@ export async function PublicHeader() {
           <Link href="/historia" className="text-ink hover:text-warmBeige transition-colors">
             História
           </Link>
-          <Link href="/contactos" className="text-ink hover:text-warmBeige transition-colors">
-            Contactos
-          </Link>
           <Link
             href="/login"
             className="px-5 py-2 bg-ink text-paper hover:bg-oliveGray transition-colors text-xs tracking-widest uppercase"

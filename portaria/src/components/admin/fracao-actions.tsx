@@ -24,7 +24,7 @@ export function FracaoActions({ fracaoId }: { fracaoId: string }) {
   return (
     <div className="flex items-center gap-2 shrink-0">
       <Link
-        href={`/configuracao/fracoes/${fracaoId}/editar`}
+        href={`/fracoes/${fracaoId}/editar`}
         className="p-2 text-oliveGray hover:text-ink hover:bg-softCream/50 rounded transition-colors"
         title="Editar"
         aria-label="Editar"

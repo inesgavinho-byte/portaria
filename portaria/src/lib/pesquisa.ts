@@ -47,7 +47,7 @@ export async function pesquisar(
     grupos.push({ tipo: "Assembleias", itens: asms.data.map((a) => ({ titulo: a.titulo, href: `/configuracao/assembleias/${a.id}` })) });
   }
   if (cts.data?.length) {
-    grupos.push({ tipo: "Contactos", itens: cts.data.map((c) => ({ titulo: c.nome, detalhe: c.empresa ?? undefined, href: `/configuracao/contactos/${c.id}/editar` })) });
+    grupos.push({ tipo: "Contactos", itens: cts.data.map((c) => ({ titulo: c.nome, detalhe: c.empresa ?? undefined, href: `/contactos/${c.id}/editar` })) });
   }
   if (avs.data?.length) {
     grupos.push({ tipo: "Avisos", itens: avs.data.map((a) => ({ titulo: a.titulo, href: "/configuracao/avisos" })) });
