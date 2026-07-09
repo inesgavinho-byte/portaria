@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen, Gavel, MessageSquare } from "lucide-react";
+import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen, Gavel, MessageSquare, Contact } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
 const SECCOES = [
@@ -45,6 +45,12 @@ const SECCOES = [
     icon: MessageSquare,
     titulo: "Conversas",
     descricao: "Histórico por assunto — notas, chamadas, contactos.",
+  },
+  {
+    href: "/configuracao/contactos",
+    icon: Contact,
+    titulo: "Contactos",
+    descricao: "Fornecedores, empresas e pessoas.",
   },
   {
     href: "/configuracao/membros",
