@@ -39,6 +39,7 @@ export default async function ConfiguracaoLayout({
           <ConfigNavLink href="/configuracao/assembleias">Assembleias</ConfigNavLink>
           <ConfigNavLink href="/configuracao/conversas">Conversas</ConfigNavLink>
           <ConfigNavLink href="/configuracao/contactos">Contactos</ConfigNavLink>
+          <ConfigNavLink href="/configuracao/contratos">Contratos</ConfigNavLink>
           <ConfigNavLink href="/configuracao/membros">Membros</ConfigNavLink>
         </nav>
       </div>

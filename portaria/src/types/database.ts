@@ -134,6 +134,21 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Contrato = {
+  id: string;
+  tenant_id: string;
+  titulo: string;
+  contacto_id: string | null;
+  descricao: string | null;
+  data_inicio: string | null;
+  data_fim: string | null;
+  renovacao_automatica: boolean;
+  valor: number | null;
+  notas: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Contacto = {
   id: string;
   tenant_id: string;

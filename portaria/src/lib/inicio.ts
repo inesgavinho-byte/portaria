@@ -20,10 +20,14 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
   const supabase = await createClient();
   const acoes: AcaoImportante[] = [];
 
+  const daqui30 = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  const hoje = new Date().toISOString().slice(0, 10);
+
   const [
     { count: ocorrenciasAbertas },
     { count: convitesPendentes },
     { count: assembleiasRascunho },
+    { count: contratosARenovar },
   ] = await Promise.all([
     supabase
       .from("ocorrencias")
@@ -41,6 +45,13 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
       .select("id", { count: "exact", head: true })
       .eq("tenant_id", tenantId)
       .eq("estado", "rascunho"),
+    supabase
+      .from("contratos")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .not("data_fim", "is", null)
+      .gte("data_fim", hoje)
+      .lte("data_fim", daqui30),
   ]);
 
   if (ocorrenciasAbertas && ocorrenciasAbertas > 0) {
@@ -73,6 +84,17 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
           ? "1 assembleia por publicar"
           : `${assembleiasRascunho} assembleias por publicar`,
       href: "/configuracao/assembleias",
+    });
+  }
+
+  if (contratosARenovar && contratosARenovar > 0) {
+    acoes.push({
+      chave: "contratos",
+      texto:
+        contratosARenovar === 1
+          ? "1 contrato a renovar nos próximos 30 dias"
+          : `${contratosARenovar} contratos a renovar nos próximos 30 dias`,
+      href: "/configuracao/contratos",
     });
   }
 
