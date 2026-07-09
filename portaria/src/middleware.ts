@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseUrl, getSupabaseAnonKey } from "@/lib/supabase/env";
 
 /**
  * Middleware central — corre em cada request.
@@ -33,8 +34,8 @@ export async function middleware(request: NextRequest) {
 
   // ----- 2. Refresh da sessão Supabase -----
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getSupabaseUrl(),
+    getSupabaseAnonKey(),
     {
       cookies: {
         getAll() {
@@ -103,8 +104,8 @@ async function resolveTenantFromHostname(
  * (migration 0003), pelo que a anon key chega.
  */
 async function lookupTenantSlug(host: string): Promise<string | null> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = getSupabaseUrl();
+  const anonKey = getSupabaseAnonKey();
   if (!url || !anonKey) return null;
 
   try {
