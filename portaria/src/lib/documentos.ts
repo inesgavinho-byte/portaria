@@ -17,3 +17,18 @@ export const DOCUMENTO_TIPOS_VALIDOS: Record<string, string> = {
 
 /** Valor para o atributo accept do input de ficheiro. */
 export const DOCUMENTO_ACCEPT = Object.keys(DOCUMENTO_TIPOS_VALIDOS).join(",");
+
+/** Rótulos das categorias — fonte única (antes duplicado em 3 sítios). */
+export const CATEGORIA_LABEL = {
+  ata: "Atas",
+  conta: "Contas e Orçamentos",
+  contrato: "Contratos",
+  regulamento: "Regulamento",
+  manual: "Manuais",
+  apolice: "Apólices",
+  outro: "Outros",
+} as const;
+
+export const CATEGORIAS = Object.keys(
+  CATEGORIA_LABEL
+) as (keyof typeof CATEGORIA_LABEL)[];
