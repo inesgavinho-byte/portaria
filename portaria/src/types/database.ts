@@ -134,6 +134,25 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Conversa = {
+  id: string;
+  tenant_id: string;
+  assunto: string;
+  ocorrencia_id: string | null;
+  criado_por: string;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type ConversaMensagem = {
+  id: string;
+  tenant_id: string;
+  conversa_id: string;
+  corpo: string;
+  autor: string;
+  criado_em: string;
+};
+
 export type Assembleia = {
   id: string;
   tenant_id: string;
