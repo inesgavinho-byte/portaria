@@ -115,3 +115,22 @@ cálculo.
 **Fricção antecipada:** inserir 26 frações uma a uma pode ser tedioso. Se a
 Inês sentir, considerar importação em massa (candidato a melhoria, não slice).
 **Prioridade sentida:** —
+
+### 2026-07-09 — Lote Fase I–III (Slices 03–11)
+
+**Contexto:** pedido para avançar todos os slices sem parar. Entregues
+03 (Centro de Trabalho), 04 (Biblioteca c/ pesquisa), 05 (Assembleias),
+06 (Conversas), 07 (Contactos), 08 (Contratos), 09 (Timeline),
+10 (Pesquisa Global), 11 (Calendário).
+**Verificação:** cada slice com `tsc --noEmit` + `next build` verdes e
+migrations aplicadas no Supabase real. **NÃO** houve teste de UI em
+produção com sessão real (o ambiente de desenvolvimento não alcança o
+Supabase) — a validação end-to-end fica para a Inês, pelo checklist.
+**Tensão registada (importante):** entregar 9 slices sem a Inês testar
+nenhum contraria a regra do Living Lab (usar → registar → reordenar). O
+risco é construir para uma forma de dados que o uso real não confirmou.
+Recomendação: **usar o Europa a sério agora** e deixar o uso ditar se a
+ordem de 12+ muda.
+**Retidos deliberadamente:** 12 (workspace — prematuro/arquitetónico),
+13 (email — infra), 14/15 (IA — chaves). Ver estado no roadmap.
+**Prioridade sentida:** —

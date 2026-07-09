@@ -240,6 +240,35 @@ história do condomínio sem depender da transmissão oral.
 - Timeline (09, passado) precede o Calendário (11, futuro) — partilham a
   estrutura de eventos.
 
+## Estado de execução
+
+*(Atualizado 2026-07-09.)*
+
+- ✅ **Slice 01** — Perfil do Condomínio
+- ✅ **Slice 02** — Frações e Proprietários
+- ✅ **Slice 03** — Centro de Trabalho
+- ✅ **Slice 04** — Biblioteca Documental (pesquisa/filtro)
+- ✅ **Slice 05** — Assembleias v1
+- ✅ **Slice 06** — Conversas *(anexos e email adiados p/ Slice 13)*
+- ✅ **Slice 07** — Contactos
+- ✅ **Slice 08** — Contratos
+- ✅ **Slice 09** — Timeline do Condomínio
+- ✅ **Slice 10** — Pesquisa Global
+- ✅ **Slice 11** — Calendário
+- ⏸️ **Slice 12** — Workspace Multi-condomínio — *retido: mudança
+  arquitetónica de routing (ADR-007) prematura com um só condomínio e que
+  exige DNS + teste real; fazer quando existir o 2.º condomínio.*
+- ⏸️ **Slice 13** — Inbox Portaria — *retido: exige infraestrutura de
+  email de entrada (domínio, inbound parsing).*
+- ⏸️ **Slice 14** — Assistente Contextual — *retido: exige chaves de LLM.*
+- ⏸️ **Slice 15** — Centro de Conhecimento — *retido: exige LLM +
+  embeddings.*
+
+Migrations aplicadas no Supabase real: 0007 (perfil), 0008 (frações),
+0009 (assembleias), 0010 (conversas), 0011 (contactos), 0012 (contratos).
+Slices 03, 04, 09, 10, 11 não têm migration (leem/agregam dados
+existentes).
+
 ## Histórico de reordenações
 
 *(Registar aqui cada alteração à ordem, com data e a entrada de
