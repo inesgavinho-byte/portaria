@@ -29,7 +29,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/avisos");
+    router.push("/inicio");
     router.refresh();
   }
 
