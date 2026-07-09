@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen } from "lucide-react";
+import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen, Gavel } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
 const SECCOES = [
@@ -33,6 +33,12 @@ const SECCOES = [
     icon: AlertCircle,
     titulo: "Ocorrências",
     descricao: "Acompanhar e resolver ocorrências reportadas.",
+  },
+  {
+    href: "/configuracao/assembleias",
+    icon: Gavel,
+    titulo: "Assembleias",
+    descricao: "Convocatórias, ordens de trabalhos e atas.",
   },
   {
     href: "/configuracao/membros",
