@@ -72,3 +72,24 @@ o contexto vale mais do que o documento; um só sítio para documentos).
 **Fricção a observar no uso real:** a validade da apólice é hoje um campo
 solto — quando existir Calendário (Slice 11), deve gerar um lembrete
 automático de renovação. Registar aqui se a Inês sentir falta disso antes.
+
+### 2026-07-09 — Bug: upload de documento falhava (500)
+
+**Contexto:** tentar carregar um documento em /configuracao/documentos/novo
+(uso real: pôr um documento institucional na plataforma).
+**Fricção:** ecrã branco + "Application error"; 500 no submit. Causa: o
+limite default das Server Actions do Next é 1 MB — qualquer documento real
+excede-o e é rejeitado antes de a action correr, apesar de a UI prometer
+25 MB.
+**Fiz isto à mão?** Sim — o documento continuaria numa pasta/email. É
+exatamente o que a Portaria deve substituir; por isso é bloqueante.
+**Correção:** `serverActions.bodySizeLimit = 25mb` no next.config; criada
+também a página índice /configuracao (matava 404 de prefetch).
+**Seguimento (candidato a slice):** a função serverless do hosting tem o
+seu próprio limite de payload (tipicamente ~6 MB). Ficheiros grandes
+(atas digitalizadas com muitas páginas) podem ainda falhar. A solução
+robusta é **upload direto ao Supabase Storage** a partir do browser
+(signed upload URL), que tira o ficheiro do corpo da função. Aplica-se
+também às fotografias de ocorrências. Priorizar se o uso real bater no
+teto.
+**Prioridade sentida:** alta (bloqueava o Slice 04 / uso diário).
