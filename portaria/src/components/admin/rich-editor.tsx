@@ -4,6 +4,10 @@ import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableHeader from "@tiptap/extension-table-header";
+import TableCell from "@tiptap/extension-table-cell";
 import {
   Bold,
   Italic,
@@ -13,6 +17,7 @@ import {
   Heading2,
   Heading3,
   Link as LinkIcon,
+  Table as TableIcon,
   Undo2,
   Redo2,
 } from "lucide-react";
@@ -48,6 +53,10 @@ export function RichEditor({
         openOnClick: false,
         HTMLAttributes: { rel: "noopener noreferrer", target: "_blank" },
       }),
+      Table.configure({ resizable: false }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: initialContent,
     immediatelyRender: false, // evita warning de hydration em Next.js
@@ -158,6 +167,20 @@ function Toolbar({ editor }: { editor: Editor }) {
         label="Link"
       >
         <LinkIcon className="w-4 h-4" />
+      </ToolbarButton>
+
+      <ToolbarButton
+        onClick={() =>
+          editor
+            .chain()
+            .focus()
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run()
+        }
+        active={editor.isActive("table")}
+        label="Inserir tabela"
+      >
+        <TableIcon className="w-4 h-4" />
       </ToolbarButton>
 
       <div className="flex-1" />

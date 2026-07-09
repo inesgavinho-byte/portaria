@@ -28,9 +28,20 @@ const OPCOES: sanitizeHtml.IOptions = {
     "li",
     "blockquote",
     "a",
+    // Tabelas (extensão Tiptap Table)
+    "table",
+    "thead",
+    "tbody",
+    "tr",
+    "th",
+    "td",
+    "colgroup",
+    "col",
   ],
   allowedAttributes: {
     a: ["href", "target", "rel"],
+    th: ["colspan", "rowspan"],
+    td: ["colspan", "rowspan"],
   },
   allowedSchemes: ["http", "https", "mailto"],
   transformTags: {
