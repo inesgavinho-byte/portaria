@@ -49,6 +49,18 @@ export type Aviso = {
   ativo: boolean;
 };
 
+export type Convite = {
+  id: string;
+  tenant_id: string;
+  email: string;
+  fracao: string | null;
+  role: "admin" | "comissao" | "condomino";
+  criado_por: string;
+  criado_em: string;
+  expira_em: string;
+  aceite_em: string | null;
+};
+
 export type Ocorrencia = {
   id: string;
   tenant_id: string;

@@ -109,10 +109,64 @@ path (via `storage.foldername(name)[1]`) e validem acesso.
 
 ---
 
+## ADR-007: Workspace da Administração separado dos portais de condomínio
+
+**Decisão:** O administrador trabalha num **workspace multi-condomínio**
+num domínio do produto (`app.portaria.pt`). Cada condomínio continua a
+existir como **contexto operacional** (tenant, âmbito de RLS, dono dos
+dados) e, no seu domínio próprio, como site público e — futuramente —
+portal do condómino.
+
+O ADR-002 é reinterpretado, não revogado: os domínios próprios por prédio
+servem os **portais** (condóminos e público), nunca o trabalho da
+administração.
+
+**Contexto:** O Operating Model define o administrador como utilizador
+principal, que gere vários edifícios e "nunca deve saltar entre
+aplicações" (princípio 2). A tenancy por hostname obrigá-lo-ia a trocar
+de domínio (e de sessão) por cada prédio — a antítese do Centro de
+Trabalho. O modelo de dados já suporta a decisão (`user_tenants` é N:N;
+o RLS filtra por membership, não por hostname).
+
+**Alternativas consideradas:**
+- Admin continua a trabalhar no domínio de cada prédio — rejeitado:
+  viola o Operating Model e impossibilita o Centro de Trabalho
+  multi-condomínio.
+- Um único domínio para tudo, com paths por tenant — rejeitado para os
+  portais: perde-se a perceção white-label que o ADR-002 protege.
+- Adiar a decisão — rejeitado: convites e recuperação de password devem
+  nascer já alinhados com a arquitetura definitiva.
+
+**Decisões subsidiárias:**
+1. No workspace, o condomínio ativo é **explícito no URL**
+   (`app.portaria.pt/{slug}/…`), nunca estado escondido num switcher:
+   links partilháveis, "onde estou?" sempre respondido (Design Language,
+   §1), e deep-linking para a memória operacional.
+2. Sessões são por domínio (workspace e portais têm sessões separadas).
+   Aceitável: na prática são públicos distintos, e o Supabase Auth é o
+   mesmo.
+3. O RLS mantém-se exatamente como está — é o que torna um workspace
+   cross-tenant seguro por construção.
+4. No middleware, o domínio do workspace é um host **sem tenant por
+   hostname** (como o domínio do produto); o tenant vem do path.
+
+**Consequências:**
+- O Centro de Trabalho será a homepage do workspace.
+- `/configuracao` migrará por fases do portal para o workspace; até lá,
+  a administração continua funcional nos domínios atuais.
+- Toda a funcionalidade nova nasce **domain-agnostic** (URLs de email e
+  redirects derivados do host da request, nunca hardcoded).
+- Requer DNS + configuração de `app.portaria.pt` quando o workspace
+  nascer; até lá, nada muda em produção.
+
+---
+
 ## Próximas decisões a tomar
 
 - [ ] Estratégia de migrations: usar Supabase CLI ou apenas SQL Editor?
-- [ ] Sistema de envio de emails transacionais (convites, recuperação de password):
-      Supabase Auth nativo, Resend, ou outro?
+- [x] Sistema de envio de emails transacionais (convites, recuperação de
+      password): **Supabase Auth nativo na Foundation** (templates de
+      convite e recovery). Resend ou similar só quando existirem
+      comunicações próprias da plataforma (Conversas, Fase Seguinte).
 - [ ] CI/CD: testes automáticos no Netlify? Linting obrigatório no PR?
 - [ ] i18n: por agora pt-PT only; quando acrescentar EN?
