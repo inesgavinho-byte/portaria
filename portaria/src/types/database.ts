@@ -51,6 +51,7 @@ export type UserTenant = {
   fracao: string | null;
   fracao_id: string | null;
   role: "admin" | "comissao" | "condomino";
+  notificacoes_email: boolean;
   created_at: string;
 };
 

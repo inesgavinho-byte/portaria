@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, Users, ArrowRight } from "lucide-react";
+import { Building2, Users, Bell, ArrowRight } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
 const SECCOES = [
@@ -15,6 +15,12 @@ const SECCOES = [
     icon: Users,
     titulo: "Membros",
     descricao: "Convidar e gerir quem tem acesso à plataforma.",
+  },
+  {
+    href: "/configuracao/notificacoes",
+    icon: Bell,
+    titulo: "Notificações",
+    descricao: "Escolha se recebe avisos por email deste condomínio.",
   },
 ];
 

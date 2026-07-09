@@ -12,6 +12,10 @@ import {
   FOTO_MAX_MB,
   FOTO_TIPOS_VALIDOS,
 } from "@/lib/ocorrencias";
+import {
+  notificarNovaOcorrencia,
+  notificarEstadoOcorrencia,
+} from "@/lib/notificacoes";
 import type { Ocorrencia } from "@/types/database";
 
 export type OcorrenciaFormState = {
@@ -178,6 +182,13 @@ export async function criarOcorrencia(
     console.error("Erro evento criada:", eventoError);
   }
 
+  // Avisa a administração da nova ocorrência (nunca quebra o fluxo).
+  await notificarNovaOcorrencia(ctx.tenant, {
+    id: ocorrencia.id,
+    titulo,
+    categoria,
+  });
+
   if (files.length > 0) {
     const erroUpload = await guardarFotografias(
       supabase,
@@ -286,7 +297,7 @@ export async function alterarEstadoOcorrencia(
   const supabase = await createClient();
   const { data: ocorrencia } = await supabase
     .from("ocorrencias")
-    .select("estado")
+    .select("estado, titulo, criado_por")
     .eq("id", ocorrenciaId)
     .eq("tenant_id", ctx.tenant.id)
     .single();
@@ -319,6 +330,13 @@ export async function alterarEstadoOcorrencia(
   if (eventoError) {
     console.error("Erro evento estado:", eventoError);
   }
+
+  // Avisa quem abriu a ocorrência da mudança de estado.
+  await notificarEstadoOcorrencia(
+    ctx.tenant,
+    { id: ocorrenciaId, titulo: ocorrencia.titulo, criado_por: ocorrencia.criado_por },
+    estado
+  );
 
   revalidarOcorrencia(ocorrenciaId);
   return {};
