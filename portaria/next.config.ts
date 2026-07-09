@@ -1,5 +1,42 @@
 import type { NextConfig } from "next";
 
+// Content-Security-Policy:
+// - script-src precisa de 'unsafe-inline' (runtime inline do Next.js);
+//   em dev precisa também de 'unsafe-eval' (react-refresh)
+// - connect-src/img-src incluem o Supabase (auth, PostgREST, Storage)
+// - style-src/font-src incluem Google Fonts (importadas em globals.css)
+// Segunda linha de defesa contra XSS: mesmo que HTML malicioso escape à
+// sanitização, scripts externos e iframes são bloqueados pelo browser.
+const scriptSrc =
+  process.env.NODE_ENV === "development"
+    ? "'self' 'unsafe-inline' 'unsafe-eval'"
+    : "'self' 'unsafe-inline'";
+
+const csp = [
+  "default-src 'self'",
+  `script-src ${scriptSrc}`,
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https://*.supabase.co",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=31536000; includeSubDomains",
+  },
+];
+
 const nextConfig: NextConfig = {
   // Imagens hospedadas no Supabase Storage
   images: {
@@ -11,8 +48,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Multi-tenant: domínios próprios por prédio apontam para a mesma app
-  // O middleware (em src/middleware.ts) identifica o tenant pelo hostname
+  async headers() {
+    return [{ source: "/(.*)", headers: securityHeaders }];
+  },
+  // Multi-tenant: domínios próprios por prédio apontam para a mesma app.
+  // O middleware (src/middleware.ts) identifica o tenant pelo hostname
+  // via lookup à tabela `tenants` (coluna dominios), com cache.
 };
 
 export default nextConfig;

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import type { Tenant } from "@/types/database";
@@ -9,9 +10,12 @@ import type { Tenant } from "@/types/database";
  * coloca o slug no header `x-tenant-slug`. Esta função lê esse header
  * e busca os dados completos do tenant no Supabase.
  *
+ * Memoizada com React.cache(): dentro da mesma request, layouts,
+ * páginas e metadata partilham o mesmo resultado — uma única query.
+ *
  * USAR APENAS EM SERVER COMPONENTS / ROUTE HANDLERS / SERVER ACTIONS.
  */
-export async function getCurrentTenant(): Promise<Tenant | null> {
+export const getCurrentTenant = cache(async (): Promise<Tenant | null> => {
   const headerList = await headers();
   const slug = headerList.get("x-tenant-slug");
 
@@ -30,13 +34,16 @@ export async function getCurrentTenant(): Promise<Tenant | null> {
   }
 
   return data as Tenant;
-}
+});
 
 /**
  * Obtém o utilizador autenticado e verifica que pertence ao tenant atual.
  * Retorna null se não autenticado ou não pertence ao tenant.
+ *
+ * Memoizada com React.cache(): o layout, a página e as actions da mesma
+ * request partilham o resultado.
  */
-export async function getCurrentUserInTenant() {
+export const getCurrentUserInTenant = cache(async () => {
   const supabase = await createClient();
   const tenant = await getCurrentTenant();
 
@@ -56,4 +63,14 @@ export async function getCurrentUserInTenant() {
   if (!membership) return null;
 
   return { user, tenant, membership };
+});
+
+/**
+ * Contexto do utilizador se (e só se) for admin do tenant atual.
+ * Fonte única da verificação de role nas Server Actions e páginas admin.
+ */
+export async function requireAdmin() {
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx || ctx.membership.role !== "admin") return null;
+  return ctx;
 }

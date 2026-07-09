@@ -6,6 +6,7 @@ import {
   criarDocumento,
   type DocumentoFormState,
 } from "@/lib/actions/documentos";
+import { DOCUMENTO_ACCEPT } from "@/lib/documentos";
 
 const CATEGORIAS = [
   { value: "ata", label: "Ata" },
@@ -137,6 +138,7 @@ export function DocumentoForm() {
           name="ficheiro"
           type="file"
           required
+          accept={DOCUMENTO_ACCEPT}
           className="w-full file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-warmBeige file:text-paper file:font-body file:text-sm file:tracking-widest file:uppercase hover:file:bg-oliveGray file:transition-colors font-body text-sm text-oliveGray"
         />
         <p className="mt-2 text-xs text-oliveGray font-body">

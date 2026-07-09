@@ -1,17 +1,20 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentTenant } from "@/lib/supabase/tenant";
+import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { sanitizarHtml } from "@/lib/sanitize";
 import type { Aviso } from "@/types/database";
 
 export default async function AvisosPage() {
-  const supabase = await createClient();
-  const tenant = await getCurrentTenant();
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   // RLS já garante que só vemos avisos do tenant a que pertencemos —
   // mas filtramos explicitamente por boa prática
   const { data: avisos } = await supabase
     .from("avisos")
     .select("*")
-    .eq("tenant_id", tenant!.id)
+    .eq("tenant_id", ctx.tenant.id)
     .eq("ativo", true)
     .order("publicado_em", { ascending: false });
 
@@ -50,7 +53,9 @@ export default async function AvisosPage() {
               </p>
               <div
                 className="prose prose-sm max-w-none mt-4 font-body text-ink prose-headings:font-title prose-a:text-warmBeige hover:prose-a:text-oliveGray"
-                dangerouslySetInnerHTML={{ __html: aviso.conteudo }}
+                // Sanitizado também na leitura: cobre conteúdo gravado
+                // antes da sanitização na escrita existir
+                dangerouslySetInnerHTML={{ __html: sanitizarHtml(aviso.conteudo) }}
               />
             </article>
           ))}

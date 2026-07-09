@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { sanitizarHtml } from "@/lib/sanitize";
 import { AvisoForm } from "@/components/admin/aviso-form";
 
 export default async function EditarAvisoPage({
@@ -12,13 +13,14 @@ export default async function EditarAvisoPage({
 }) {
   const { id } = await params;
   const ctx = await getCurrentUserInTenant();
-  const supabase = await createClient();
+  if (!ctx) redirect("/login");
 
+  const supabase = await createClient();
   const { data: aviso } = await supabase
     .from("avisos")
     .select("*")
     .eq("id", id)
-    .eq("tenant_id", ctx!.tenant.id)
+    .eq("tenant_id", ctx.tenant.id)
     .single();
 
   if (!aviso) notFound();
@@ -36,7 +38,9 @@ export default async function EditarAvisoPage({
       <p className="font-body text-oliveGray mb-8">
         Atualize o conteúdo do aviso.
       </p>
-      <AvisoForm aviso={aviso} />
+      {/* Conteúdo sanitizado antes de chegar ao Tiptap, que faz parse
+          do HTML no browser (conteúdo antigo pode ser pré-sanitização) */}
+      <AvisoForm aviso={{ ...aviso, conteudo: sanitizarHtml(aviso.conteudo) }} />
     </div>
   );
 }

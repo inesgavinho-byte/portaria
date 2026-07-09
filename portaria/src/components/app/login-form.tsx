@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -79,6 +80,15 @@ export function LoginForm() {
       >
         {loading ? "A entrar..." : "Entrar"}
       </button>
+
+      <p className="text-center">
+        <Link
+          href="/recuperar"
+          className="font-body text-sm text-oliveGray hover:text-ink transition-colors"
+        >
+          Esqueceu a palavra-passe?
+        </Link>
+      </p>
     </form>
   );
 }

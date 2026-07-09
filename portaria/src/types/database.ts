@@ -16,6 +16,7 @@ export type Tenant = {
   num_fracoes: number | null;
   ano_construcao: number | null;
   tema: TenantTheme | null;
+  dominios: string[];
   created_at: string;
 };
 
@@ -46,6 +47,18 @@ export type Aviso = {
   publicado_em: string;
   publicado_por: string;
   ativo: boolean;
+};
+
+export type Convite = {
+  id: string;
+  tenant_id: string;
+  email: string;
+  fracao: string | null;
+  role: "admin" | "comissao" | "condomino";
+  criado_por: string;
+  criado_em: string;
+  expira_em: string;
+  aceite_em: string | null;
 };
 
 export type Ocorrencia = {

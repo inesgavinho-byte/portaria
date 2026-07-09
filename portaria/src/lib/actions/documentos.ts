@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { getCurrentUserInTenant, requireAdmin } from "@/lib/supabase/tenant";
+import { DOCUMENTO_TIPOS_VALIDOS } from "@/lib/documentos";
 import type { Documento } from "@/types/database";
 
 const CATEGORIAS_VALIDAS: Documento["categoria"][] = [
@@ -30,8 +31,8 @@ export async function criarDocumento(
   _prev: DocumentoFormState,
   formData: FormData
 ): Promise<DocumentoFormState> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     return { error: "Sem permissões para esta operação." };
   }
 
@@ -52,6 +53,8 @@ export async function criarDocumento(
     fieldErrors.ficheiro = "Selecione um ficheiro.";
   } else if (file.size > TAMANHO_MAXIMO_BYTES) {
     fieldErrors.ficheiro = `Ficheiro demasiado grande (máx. ${TAMANHO_MAXIMO_MB} MB).`;
+  } else if (!DOCUMENTO_TIPOS_VALIDOS[file.type]) {
+    fieldErrors.ficheiro = "Tipo não suportado. Use PDF, Word, Excel ou imagem.";
   }
 
   let ano: number | null = null;
@@ -64,7 +67,7 @@ export async function criarDocumento(
     }
   }
 
-  if (Object.keys(fieldErrors).length > 0) {
+  if (Object.keys(fieldErrors).length > 0 || !file) {
     return { fieldErrors };
   }
 
@@ -80,8 +83,8 @@ export async function criarDocumento(
       categoria: categoria as Documento["categoria"],
       ano,
       ficheiro_path: "pending", // Atualizado a seguir
-      ficheiro_tamanho: file!.size,
-      ficheiro_tipo: file!.type,
+      ficheiro_tamanho: file.size,
+      ficheiro_tipo: file.type,
       upload_por: ctx.user.id,
     })
     .select()
@@ -92,17 +95,17 @@ export async function criarDocumento(
     return { error: "Erro ao criar registo." };
   }
 
-  // 2. Sanitiza nome do ficheiro (remove acentos, espaços, etc.)
-  const nomeOriginal = file!.name;
-  const extensao = nomeOriginal.split(".").pop()?.toLowerCase() ?? "bin";
+  // 2. Nome seguro: timestamp + extensão derivada do MIME validado
+  //    (nunca do nome original do ficheiro)
+  const extensao = DOCUMENTO_TIPOS_VALIDOS[file.type];
   const nomeSeguro = `${Date.now()}.${extensao}`;
   const path = `${ctx.tenant.id}/${documento.id}/${nomeSeguro}`;
 
   // 3. Upload para Storage
   const { error: uploadError } = await supabase.storage
     .from("documentos")
-    .upload(path, file!, {
-      contentType: file!.type,
+    .upload(path, file, {
+      contentType: file.type,
       cacheControl: "3600",
       upsert: false,
     });
@@ -134,8 +137,8 @@ export async function criarDocumento(
  * Apaga um documento (DB row + ficheiro Storage).
  */
 export async function apagarDocumento(id: string) {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx || ctx.membership.role !== "admin") {
+  const ctx = await requireAdmin();
+  if (!ctx) {
     throw new Error("Sem permissões");
   }
 

@@ -5,21 +5,27 @@ import { NextResponse, type NextRequest } from "next/server";
  * Middleware central — corre em cada request.
  *
  * Tem duas responsabilidades:
- * 1. Refrescar a sessão Supabase (renova tokens automaticamente)
- * 2. Identificar o tenant pelo hostname e passá-lo via header para a app
+ * 1. Identificar o tenant pelo hostname (lookup à tabela `tenants`,
+ *    com cache em memória) e passá-lo via header para a app
+ * 2. Refrescar a sessão Supabase (renova tokens automaticamente)
  */
 export async function middleware(request: NextRequest) {
   // ----- 1. Identificação do tenant pelo hostname -----
-  // Em produção: edificioeuropa.pt → tenant "europa"
-  // Em dev local: localhost → tenant default ("europa") para teste
   const hostname = request.headers.get("host") ?? "";
-  const tenantSlug = resolveTenantFromHostname(hostname);
+  const tenantSlug = await resolveTenantFromHostname(hostname);
 
   // O slug tem de ir nos headers do PEDIDO (não da resposta) para que os
-  // Server Components o consigam ler via `headers()`. Os headers da resposta
-  // só chegam ao browser, não ao render server-side.
+  // Server Components o consigam ler via `headers()`. Sobrepõe-se sempre
+  // o valor (mesmo que vazio) para que um cliente malicioso não consiga
+  // injetar o seu próprio x-tenant-slug.
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-tenant-slug", tenantSlug);
+  if (tenantSlug) {
+    requestHeaders.set("x-tenant-slug", tenantSlug);
+  } else {
+    // Host sem tenant (ex.: domínio do produto): modo landing.
+    // As páginas de tenant tratam a ausência como notFound/redirect.
+    requestHeaders.delete("x-tenant-slug");
+  }
 
   let response = NextResponse.next({
     request: { headers: requestHeaders },
@@ -55,35 +61,72 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
-/**
- * Mapeia hostname para slug de tenant.
- *
- * Estratégia recomendada (Opção 2 do plano): cada prédio tem domínio próprio,
- * todos apontam para a mesma app, e este mapeamento decide qual é qual.
- *
- * Para já: hardcoded; quando houver mais prédios, mover para tabela `tenants`
- * no Supabase e fazer cache desta resolução.
- */
-function resolveTenantFromHostname(hostname: string): string {
+// ----------------------------------------------------------------------
+// Resolução hostname → slug de tenant
+//
+// Fonte: coluna tenants.dominios (migration 0004). Cache em memória por
+// instância, com TTL — o lookup só toca na base de dados uma vez por
+// host a cada 5 minutos.
+//
+// Host desconhecido → null (modo landing do produto). NUNCA se deriva
+// um slug do próprio hostname: um atacante que aponte um domínio
+// arbitrário à app não obtém o site de nenhum tenant.
+// ----------------------------------------------------------------------
+
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const tenantCache = new Map<string, { slug: string | null; expira: number }>();
+
+async function resolveTenantFromHostname(
+  hostname: string
+): Promise<string | null> {
   // Remove porta (localhost:3000 → localhost)
   const host = hostname.split(":")[0].toLowerCase();
 
-  // Mapeamento estático (substituir por lookup à tabela `tenants` no futuro)
-  const map: Record<string, string> = {
-    "edificioeuropa.pt": "europa",
-    "www.edificioeuropa.pt": "europa",
-    // Adicionar futuros prédios aqui
-  };
-
-  if (map[host]) return map[host];
-
-  // Localhost / preview Netlify → tenant default para desenvolvimento
+  // Desenvolvimento local e previews Netlify: tenant default para teste
   if (host === "localhost" || host.endsWith(".netlify.app")) {
     return "europa";
   }
 
-  // Fallback: extrair primeiro segmento (ex: outropredio.com → outropredio)
-  return host.split(".")[0];
+  const emCache = tenantCache.get(host);
+  if (emCache && emCache.expira > Date.now()) {
+    return emCache.slug;
+  }
+
+  const slug = await lookupTenantSlug(host);
+  tenantCache.set(host, { slug, expira: Date.now() + CACHE_TTL_MS });
+  return slug;
+}
+
+/**
+ * Consulta PostgREST diretamente (mais leve no middleware do que um
+ * cliente Supabase completo). A tabela tenants é publicamente legível
+ * (migration 0003), pelo que a anon key chega.
+ */
+async function lookupTenantSlug(host: string): Promise<string | null> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return null;
+
+  try {
+    const query = `${url}/rest/v1/tenants?select=slug&dominios=cs.${encodeURIComponent(
+      `{"${host}"}`
+    )}&limit=1`;
+
+    const res = await fetch(query, {
+      headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+    });
+
+    if (!res.ok) {
+      console.error(`Lookup de tenant falhou (${res.status}) para: ${host}`);
+      return null;
+    }
+
+    const rows: { slug: string }[] = await res.json();
+    return rows[0]?.slug ?? null;
+  } catch (error) {
+    console.error(`Erro no lookup de tenant para: ${host}`, error);
+    return null;
+  }
 }
 
 export const config = {
