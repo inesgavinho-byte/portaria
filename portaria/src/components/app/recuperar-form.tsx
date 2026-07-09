@@ -4,7 +4,6 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export function RecuperarForm() {
-  const supabase = createClient();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [enviado, setEnviado] = useState(false);
@@ -13,6 +12,9 @@ export function RecuperarForm() {
     e.preventDefault();
     setLoading(true);
 
+    // Cliente criado no submit, não no render: esta página é estática e
+    // seria pré-renderizada no build, onde as env vars podem não existir
+    const supabase = createClient();
     await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/confirm?next=/recuperar/confirmar`,
     });
