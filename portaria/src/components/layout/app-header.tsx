@@ -21,6 +21,7 @@ export function AppHeader({ user, tenant, membership }: AppHeaderProps) {
     { href: "/avisos", label: "Avisos" },
     { href: "/documentos", label: "Documentos" },
     { href: "/ocorrencias", label: "Ocorrências" },
+    { href: "/assembleias", label: "Assembleias" },
   ];
 
   if (membership.role === "admin") {

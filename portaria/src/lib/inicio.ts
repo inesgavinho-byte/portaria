@@ -20,20 +20,28 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
   const supabase = await createClient();
   const acoes: AcaoImportante[] = [];
 
-  const [{ count: ocorrenciasAbertas }, { count: convitesPendentes }] =
-    await Promise.all([
-      supabase
-        .from("ocorrencias")
-        .select("id", { count: "exact", head: true })
-        .eq("tenant_id", tenantId)
-        .in("estado", ["novo", "em_curso", "aguarda_fornecedor"]),
-      supabase
-        .from("convites")
-        .select("id", { count: "exact", head: true })
-        .eq("tenant_id", tenantId)
-        .is("aceite_em", null)
-        .gt("expira_em", new Date().toISOString()),
-    ]);
+  const [
+    { count: ocorrenciasAbertas },
+    { count: convitesPendentes },
+    { count: assembleiasRascunho },
+  ] = await Promise.all([
+    supabase
+      .from("ocorrencias")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .in("estado", ["novo", "em_curso", "aguarda_fornecedor"]),
+    supabase
+      .from("convites")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .is("aceite_em", null)
+      .gt("expira_em", new Date().toISOString()),
+    supabase
+      .from("assembleias")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", tenantId)
+      .eq("estado", "rascunho"),
+  ]);
 
   if (ocorrenciasAbertas && ocorrenciasAbertas > 0) {
     acoes.push({
@@ -54,6 +62,17 @@ export async function reunirAcoes(tenantId: string): Promise<AcaoImportante[]> {
           ? "1 convite por aceitar"
           : `${convitesPendentes} convites por aceitar`,
       href: "/configuracao/membros",
+    });
+  }
+
+  if (assembleiasRascunho && assembleiasRascunho > 0) {
+    acoes.push({
+      chave: "assembleias",
+      texto:
+        assembleiasRascunho === 1
+          ? "1 assembleia por publicar"
+          : `${assembleiasRascunho} assembleias por publicar`,
+      href: "/configuracao/assembleias",
     });
   }
 

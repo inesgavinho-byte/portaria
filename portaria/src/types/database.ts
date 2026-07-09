@@ -134,6 +134,31 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Assembleia = {
+  id: string;
+  tenant_id: string;
+  tipo: "ordinaria" | "extraordinaria";
+  titulo: string;
+  data_hora: string | null;
+  local: string | null;
+  convocatoria: string | null;
+  ata: string | null;
+  estado: "rascunho" | "agendada" | "realizada" | "cancelada";
+  criado_por: string;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type AssembleiaPonto = {
+  id: string;
+  tenant_id: string;
+  assembleia_id: string;
+  ordem: number;
+  titulo: string;
+  descricao: string | null;
+  criado_em: string;
+};
+
 export type Documento = {
   id: string;
   tenant_id: string;
