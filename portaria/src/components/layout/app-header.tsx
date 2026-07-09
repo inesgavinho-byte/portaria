@@ -24,6 +24,7 @@ export function AppHeader({ user, tenant, membership }: AppHeaderProps) {
   ];
 
   if (membership.role === "admin") {
+    navItems.unshift({ href: "/inicio", label: "Início" });
     navItems.push({ href: "/configuracao", label: "Configuração" });
   }
 
