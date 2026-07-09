@@ -32,7 +32,12 @@ const GRUPOS_ADMIN: NavGrupo[] = [
       { href: "/pesquisa", label: "Pesquisa" },
     ],
   },
-  { itens: [{ href: "/configuracao", label: "Configuração" }] },
+  {
+    itens: [
+      { href: "/integracoes", label: "Integrações" },
+      { href: "/configuracao", label: "Configuração" },
+    ],
+  },
 ];
 
 const GRUPOS_CONDOMINO: NavGrupo[] = [
