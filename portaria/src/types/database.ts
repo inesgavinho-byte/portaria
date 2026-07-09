@@ -49,8 +49,24 @@ export type UserTenant = {
   user_id: string;
   tenant_id: string;
   fracao: string | null;
+  fracao_id: string | null;
   role: "admin" | "comissao" | "condomino";
   created_at: string;
+};
+
+export type Fracao = {
+  id: string;
+  tenant_id: string;
+  codigo: string;
+  descricao: string | null;
+  permilagem: number | null;
+  piso: string | null;
+  tipologia: string | null;
+  proprietario_nome: string | null;
+  proprietario_email: string | null;
+  proprietario_telefone: string | null;
+  inquilino_nome: string | null;
+  criado_em: string;
 };
 
 export type Aviso = {
@@ -90,6 +106,7 @@ export type Ocorrencia = {
     | "espacos_comuns"
     | "outro";
   fracao: string | null;
+  fracao_id: string | null;
   estado: "novo" | "em_curso" | "aguarda_fornecedor" | "resolvido" | "arquivado";
   criado_por: string;
   criado_em: string;

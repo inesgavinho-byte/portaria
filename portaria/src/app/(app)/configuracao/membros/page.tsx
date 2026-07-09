@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { MembroActions, ConviteActions } from "@/components/admin/membro-actions";
+import { MembroFracaoSelect } from "@/components/admin/membro-fracao-select";
 import type { Convite, UserTenant } from "@/types/database";
 
 const ROLE_LABEL: Record<UserTenant["role"], string> = {
@@ -18,22 +19,29 @@ export default async function MembrosPage() {
   if (!ctx) redirect("/login");
 
   const supabase = await createClient();
-  const [{ data: membros }, { data: convites }] = await Promise.all([
-    supabase
-      .from("user_tenants")
-      .select("*")
-      .eq("tenant_id", ctx.tenant.id)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("convites")
-      .select("*")
-      .eq("tenant_id", ctx.tenant.id)
-      .is("aceite_em", null)
-      .order("criado_em", { ascending: false }),
-  ]);
+  const [{ data: membros }, { data: convites }, { data: fracoes }] =
+    await Promise.all([
+      supabase
+        .from("user_tenants")
+        .select("*")
+        .eq("tenant_id", ctx.tenant.id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("convites")
+        .select("*")
+        .eq("tenant_id", ctx.tenant.id)
+        .is("aceite_em", null)
+        .order("criado_em", { ascending: false }),
+      supabase
+        .from("fracoes")
+        .select("id, codigo")
+        .eq("tenant_id", ctx.tenant.id)
+        .order("codigo", { ascending: true }),
+    ]);
 
   const listaMembros: UserTenant[] = membros ?? [];
   const listaConvites: Convite[] = convites ?? [];
+  const listaFracoes = fracoes ?? [];
   const emails = await emailsPorUserId(listaMembros.map((m) => m.user_id));
 
   return (
@@ -99,9 +107,13 @@ export default async function MembrosPage() {
                 </p>
                 <p className="font-body text-xs text-oliveGray mt-1">
                   {ROLE_LABEL[membro.role]}
-                  {membro.fracao && ` · ${membro.fracao}`}
                 </p>
               </div>
+              <MembroFracaoSelect
+                membershipId={membro.id}
+                fracaoId={membro.fracao_id}
+                fracoes={listaFracoes}
+              />
               <MembroActions
                 membershipId={membro.id}
                 isSelf={membro.user_id === ctx.user.id}

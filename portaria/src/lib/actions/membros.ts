@@ -214,6 +214,42 @@ export async function removerMembro(membershipId: string) {
 }
 
 /**
+ * Define (ou limpa) a fração de um membro. Guarda o FK e o rótulo
+ * denormalizado (fracao texto) que o próprio condómino vê.
+ */
+export async function definirFracaoMembro(
+  membershipId: string,
+  fracaoId: string | null
+) {
+  const ctx = await requireAdmin();
+  if (!ctx) throw new Error("Sem permissões");
+
+  const supabase = await createClient();
+
+  let codigo: string | null = null;
+  if (fracaoId) {
+    const { data: fracao } = await supabase
+      .from("fracoes")
+      .select("codigo")
+      .eq("id", fracaoId)
+      .eq("tenant_id", ctx.tenant.id)
+      .single();
+    if (!fracao) throw new Error("Fração não encontrada.");
+    codigo = fracao.codigo;
+  }
+
+  const { error } = await supabase
+    .from("user_tenants")
+    .update({ fracao_id: fracaoId, fracao: codigo })
+    .eq("id", membershipId)
+    .eq("tenant_id", ctx.tenant.id);
+
+  if (error) throw new Error("Erro ao definir a fração.");
+
+  revalidatePath("/configuracao/membros");
+}
+
+/**
  * Anula um convite pendente.
  */
 export async function anularConvite(conviteId: string) {
