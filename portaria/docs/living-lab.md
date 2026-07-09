@@ -93,3 +93,25 @@ robusta é **upload direto ao Supabase Storage** a partir do browser
 também às fotografias de ocorrências. Priorizar se o uso real bater no
 teto.
 **Prioridade sentida:** alta (bloqueava o Slice 04 / uso diário).
+
+### 2026-07-09 — Slice 02 concluído (Frações e Proprietários)
+
+**Teste do Living Lab:** *"Se amanhã eu administrasse o Europa, teria aberto
+esta funcionalidade esta semana?"* → **Sim.** Registar as 26 frações com
+proprietários e permilagens é trabalho de base — hoje viveria num Excel.
+**Critério "faria isto à mão?":** Sim — a lista de frações/permilagens é a
+espinha do condomínio (voto em assembleia, quotas). Substitui uma folha de
+cálculo.
+**Decisões de âmbito:**
+- `fracoes` é admin-only (contactos de proprietários são sensíveis); o
+  condómino vê só a sua fração via rótulo denormalizado no membership.
+- Proprietário/inquilino ficam como campos na fração, não como entidade
+  Pessoa — isso é o Slice 07 (Contactos). Quando chegar, normaliza-se.
+- Ocorrência liga a UMA fração (a do autor, via checkbox). Muitas-para-
+  muitas (uma infiltração em várias frações) fica para quando o uso pedir.
+- Aviso↔fração e assembleia↔fração: a entidade está pronta a ser
+  referenciada; ligam-se quando esses slices tocarem no tema (assembleias
+  ainda não existem).
+**Fricção antecipada:** inserir 26 frações uma a uma pode ser tedioso. Se a
+Inês sentir, considerar importação em massa (candidato a melhoria, não slice).
+**Prioridade sentida:** —

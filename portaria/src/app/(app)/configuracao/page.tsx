@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight } from "lucide-react";
+import { Building2, Bell, FileText, AlertCircle, Users, ArrowRight, DoorOpen } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
 const SECCOES = [
@@ -9,6 +9,12 @@ const SECCOES = [
     icon: Building2,
     titulo: "Perfil",
     descricao: "Dados do condomínio, seguradora e administrador.",
+  },
+  {
+    href: "/configuracao/fracoes",
+    icon: DoorOpen,
+    titulo: "Frações",
+    descricao: "Frações, proprietários, inquilinos e permilagens.",
   },
   {
     href: "/configuracao/avisos",

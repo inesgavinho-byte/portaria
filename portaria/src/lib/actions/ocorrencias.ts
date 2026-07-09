@@ -154,6 +154,7 @@ export async function criarOcorrencia(
       descricao,
       categoria: categoria as Ocorrencia["categoria"],
       fracao: associarFracao ? ctx.membership.fracao : null,
+      fracao_id: associarFracao ? ctx.membership.fracao_id : null,
       criado_por: ctx.user.id,
     })
     .select()
