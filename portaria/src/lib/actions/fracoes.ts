@@ -82,8 +82,8 @@ export async function criarFracao(
     return { error: "Erro ao criar a fração. Tente novamente." };
   }
 
-  revalidatePath("/configuracao/fracoes");
-  redirect("/configuracao/fracoes");
+  revalidatePath("/fracoes");
+  redirect("/fracoes");
 }
 
 export async function atualizarFracao(
@@ -119,9 +119,9 @@ export async function atualizarFracao(
     .eq("fracao_id", id)
     .eq("tenant_id", ctx.tenant.id);
 
-  revalidatePath("/configuracao/fracoes");
+  revalidatePath("/fracoes");
   revalidatePath("/configuracao/membros");
-  redirect("/configuracao/fracoes");
+  redirect("/fracoes");
 }
 
 export async function apagarFracao(id: string) {
@@ -137,5 +137,5 @@ export async function apagarFracao(id: string) {
 
   if (error) throw new Error("Erro ao apagar a fração.");
 
-  revalidatePath("/configuracao/fracoes");
+  revalidatePath("/fracoes");
 }

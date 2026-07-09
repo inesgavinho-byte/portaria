@@ -134,3 +134,27 @@ ordem de 12+ muda.
 **Retidos deliberadamente:** 12 (workspace — prematuro/arquitetónico),
 13 (email — infra), 14/15 (IA — chaves). Ver estado no roadmap.
 **Prioridade sentida:** —
+
+### 2026-07-09 — Fricção real: navegação (sidebar + toggle de vista)
+
+**Contexto:** a administradora testou e sentiu que Frações/Contactos (e
+outras secções de trabalho) estavam "escondidas" dentro de /configuracao,
+a parecer área técnica.
+**Fiz isto à mão?** Sim — sem navegação clara, saltava-se entre menus; a
+sidebar resolve o acesso diário.
+**Feito:** sidebar lateral permanente (desktop) + drawer mobile,
+role-aware. Movidas para o topo, com redirects permanentes: Frações,
+Contactos, Contratos, Conversas, Timeline, Calendário, Pesquisa.
+/configuracao ficou só Perfil + Membros. Removida a página pública
+/contactos (colidia com o diretório interno; era placeholder).
+**Toggle de vista:** admin que também é condómino (tem fracao_id) alterna
+Administração ↔ Condómino; persiste em cookie; não altera autorização
+(RLS manda). Condómino puro nunca vê o toggle.
+**Nota:** a Inês ainda não tem fracao_id (limpámos nos testes), por isso
+o toggle só aparece depois de se associar a uma fração — comportamento
+correto por definição.
+**Dívida assumida:** as secções de dupla vista (Avisos/Documentos/
+Ocorrências/Assembleias) mantêm a gestão em /configuracao/*; unificá-las
+numa página role-aware (uma só rota para condómino+admin) é o passo
+seguinte de navegação, adiado por ser mudança de design maior.
+**Prioridade sentida:** alta (era a fricção nº1 do uso real).

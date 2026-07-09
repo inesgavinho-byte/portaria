@@ -62,8 +62,8 @@ export async function criarContacto(
     return { error: "Erro ao criar o contacto." };
   }
 
-  revalidatePath("/configuracao/contactos");
-  redirect("/configuracao/contactos");
+  revalidatePath("/contactos");
+  redirect("/contactos");
 }
 
 export async function atualizarContacto(
@@ -88,8 +88,8 @@ export async function atualizarContacto(
     return { error: "Erro ao atualizar o contacto." };
   }
 
-  revalidatePath("/configuracao/contactos");
-  redirect("/configuracao/contactos");
+  revalidatePath("/contactos");
+  redirect("/contactos");
 }
 
 export async function apagarContacto(id: string) {
@@ -104,5 +104,5 @@ export async function apagarContacto(id: string) {
     .eq("tenant_id", ctx.tenant.id);
   if (error) throw new Error("Erro ao apagar o contacto.");
 
-  revalidatePath("/configuracao/contactos");
+  revalidatePath("/contactos");
 }

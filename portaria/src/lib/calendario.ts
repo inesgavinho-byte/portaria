@@ -47,7 +47,7 @@ export async function reunirCalendario(tenantId: string): Promise<EventoFuturo[]
   }
   for (const c of contratos.data ?? []) {
     if (c.data_fim) {
-      eventos.push({ data: c.data_fim, tipo: "contrato", titulo: `Fim/renovação: ${c.titulo}`, href: "/configuracao/contratos" });
+      eventos.push({ data: c.data_fim, tipo: "contrato", titulo: `Fim/renovação: ${c.titulo}`, href: "/contratos" });
     }
   }
   const val = perfil.data?.seguradora_validade;

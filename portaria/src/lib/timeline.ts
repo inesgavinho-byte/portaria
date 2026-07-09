@@ -60,7 +60,7 @@ export async function reunirTimeline(
     eventos.push({ data: d.upload_em, tipo: "documento", titulo: d.titulo, href: "/configuracao/documentos" });
   }
   for (const c of contratos.data ?? []) {
-    eventos.push({ data: c.criado_em, tipo: "contrato", titulo: c.titulo, href: "/configuracao/contratos" });
+    eventos.push({ data: c.criado_em, tipo: "contrato", titulo: c.titulo, href: "/contratos" });
   }
 
   eventos.sort((a, b) => (a.data < b.data ? 1 : a.data > b.data ? -1 : 0));

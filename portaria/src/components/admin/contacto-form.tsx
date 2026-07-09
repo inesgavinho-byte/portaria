@@ -83,7 +83,7 @@ export function ContactoForm({ contacto }: { contacto?: Contacto }) {
           className="px-8 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50">
           {pending ? "A guardar..." : isEdit ? "Guardar alterações" : "Criar contacto"}
         </button>
-        <Link href="/configuracao/contactos"
+        <Link href="/contactos"
           className="px-8 py-3 font-body text-sm tracking-widest uppercase text-oliveGray hover:text-ink transition-colors">
           Cancelar
         </Link>
