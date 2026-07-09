@@ -41,6 +41,14 @@ export async function criarDocumento(
   const categoria = String(formData.get("categoria") ?? "");
   const anoStr = String(formData.get("ano") ?? "").trim();
   const file = formData.get("ficheiro") as File | null;
+  // Associações opcionais (upload a partir do detalhe de fornecedor/contrato)
+  const fornecedorId = String(formData.get("fornecedor_id") ?? "").trim() || null;
+  const contratoId = String(formData.get("contrato_id") ?? "").trim() || null;
+  const rawRedirect = String(formData.get("redirect_to") ?? "").trim();
+  const redirectTo =
+    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/configuracao/documentos";
 
   // Validações
   const fieldErrors: DocumentoFormState["fieldErrors"] = {};
@@ -86,6 +94,8 @@ export async function criarDocumento(
       ficheiro_tamanho: file.size,
       ficheiro_tipo: file.type,
       upload_por: ctx.user.id,
+      fornecedor_id: fornecedorId,
+      contrato_id: contratoId,
     })
     .select()
     .single();
@@ -130,7 +140,9 @@ export async function criarDocumento(
 
   revalidatePath("/documentos");
   revalidatePath("/configuracao/documentos");
-  redirect("/configuracao/documentos");
+  if (fornecedorId) revalidatePath(`/fornecedores/${fornecedorId}`);
+  if (contratoId) revalidatePath(`/contratos/${contratoId}`);
+  redirect(redirectTo);
 }
 
 /**

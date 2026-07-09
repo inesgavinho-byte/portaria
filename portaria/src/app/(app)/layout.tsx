@@ -19,6 +19,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
     titulo: "Registos",
     itens: [
       { href: "/fracoes", label: "Frações" },
+      { href: "/fornecedores", label: "Fornecedores" },
       { href: "/contactos", label: "Contactos" },
       { href: "/contratos", label: "Contratos" },
       { href: "/conversas", label: "Conversas" },

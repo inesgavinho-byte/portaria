@@ -134,16 +134,36 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Fornecedor = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  categoria: string | null;
+  contacto_nome: string | null;
+  telefone: string | null;
+  email: string | null;
+  nif: string | null;
+  morada: string | null;
+  notas: string | null;
+  ativo: boolean;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Contrato = {
   id: string;
   tenant_id: string;
   titulo: string;
   contacto_id: string | null;
+  fornecedor_id: string | null;
   descricao: string | null;
   data_inicio: string | null;
   data_fim: string | null;
   renovacao_automatica: boolean;
   valor: number | null;
+  valor_anual: number | null;
+  referencia: string | null;
+  notas_internas: string | null;
   notas: string | null;
   criado_em: string;
   atualizado_em: string;
@@ -219,4 +239,7 @@ export type Documento = {
   ficheiro_tipo: string | null;
   upload_em: string;
   upload_por: string;
+  assembleia_id: string | null;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
 };

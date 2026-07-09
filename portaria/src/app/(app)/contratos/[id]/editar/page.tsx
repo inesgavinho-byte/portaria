@@ -16,21 +16,21 @@ export default async function EditarContratoPage({
   if (!ctx) redirect("/login");
 
   const supabase = await createClient();
-  const [{ data: contrato }, { data: contactos }] = await Promise.all([
+  const [{ data: contrato }, { data: fornecedores }] = await Promise.all([
     supabase.from("contratos").select("*").eq("id", id).eq("tenant_id", ctx.tenant.id).single(),
-    supabase.from("contactos").select("id, nome").eq("tenant_id", ctx.tenant.id).order("nome"),
+    supabase.from("fornecedores").select("id, nome").eq("tenant_id", ctx.tenant.id).eq("ativo", true).order("nome"),
   ]);
 
   if (!contrato) notFound();
 
   return (
     <div>
-      <Link href="/contratos"
+      <Link href={`/contratos/${id}`}
         className="inline-flex items-center gap-1 font-body text-xs tracking-widest uppercase text-oliveGray hover:text-ink mb-4 transition-colors">
         <ChevronLeft className="w-3 h-3" /> Voltar
       </Link>
       <h1 className="font-title text-h1 text-ink mb-8">Editar contrato</h1>
-      <ContratoForm contrato={contrato as Contrato} contactos={contactos ?? []} />
+      <ContratoForm contrato={contrato as Contrato} fornecedores={fornecedores ?? []} />
     </div>
   );
 }
