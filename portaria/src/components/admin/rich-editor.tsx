@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -43,6 +44,11 @@ export function RichEditor({
   name,
   placeholder = "Escreva aqui...",
 }: RichEditorProps) {
+  // Fonte da verdade para o input submetido. Sincronizada em cada
+  // transação do editor (onUpdate) — garante que estruturas como tabelas
+  // ficam sempre capturadas, sem depender do re-render do useEditor.
+  const [html, setHtml] = useState(initialContent);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -60,6 +66,7 @@ export function RichEditor({
     ],
     content: initialContent,
     immediatelyRender: false, // evita warning de hydration em Next.js
+    onUpdate: ({ editor }) => setHtml(editor.getHTML()),
     editorProps: {
       attributes: {
         class:
@@ -83,8 +90,9 @@ export function RichEditor({
     <div className="border border-warmBeige/40 bg-paper">
       <Toolbar editor={editor} />
       <EditorContent editor={editor} />
-      {/* Hidden input que carrega o HTML para o FormData */}
-      <input type="hidden" name={name} value={editor.getHTML()} />
+      {/* Hidden input que carrega o HTML para o FormData.
+          O valor vem do estado sincronizado em onUpdate. */}
+      <input type="hidden" name={name} value={html} readOnly />
     </div>
   );
 }
