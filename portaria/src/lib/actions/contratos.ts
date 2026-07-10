@@ -17,37 +17,44 @@ function ler(fd: FormData): {
   valores: Record<string, unknown>;
 } {
   const titulo = String(fd.get("titulo") ?? "").trim();
-  const contactoId = String(fd.get("contacto_id") ?? "").trim() || null;
+  const fornecedorId = String(fd.get("fornecedor_id") ?? "").trim() || null;
   const descricao = String(fd.get("descricao") ?? "").trim() || null;
+  const referencia = String(fd.get("referencia") ?? "").trim() || null;
+  const notasInternas = String(fd.get("notas_internas") ?? "").trim() || null;
   const dataInicio = String(fd.get("data_inicio") ?? "").trim();
   const dataFim = String(fd.get("data_fim") ?? "").trim();
   const renovacao = fd.get("renovacao_automatica") === "on";
   const valorStr = String(fd.get("valor") ?? "").trim();
-  const notas = String(fd.get("notas") ?? "").trim() || null;
+  const valorAnualStr = String(fd.get("valor_anual") ?? "").trim();
 
   const fieldErrors: Record<string, string> = {};
   if (!titulo) fieldErrors.titulo = "O título é obrigatório.";
   if (dataInicio && !DATA_RE.test(dataInicio)) fieldErrors.data_inicio = "Data inválida.";
   if (dataFim && !DATA_RE.test(dataFim)) fieldErrors.data_fim = "Data inválida.";
 
-  let valor: number | null = null;
-  if (valorStr) {
-    const v = Number(valorStr.replace(",", "."));
-    if (isNaN(v) || v < 0) fieldErrors.valor = "Valor inválido.";
-    else valor = v;
+  function parseValor(s: string): number | null | "erro" {
+    if (!s) return null;
+    const v = Number(s.replace(",", "."));
+    return isNaN(v) || v < 0 ? "erro" : v;
   }
+  const valor = parseValor(valorStr);
+  const valorAnual = parseValor(valorAnualStr);
+  if (valor === "erro") fieldErrors.valor = "Valor inválido.";
+  if (valorAnual === "erro") fieldErrors.valor = "Valor anual inválido.";
 
   return {
     fieldErrors,
     valores: {
       titulo,
-      contacto_id: contactoId,
+      fornecedor_id: fornecedorId,
+      referencia,
+      notas_internas: notasInternas,
       descricao,
       data_inicio: dataInicio && DATA_RE.test(dataInicio) ? dataInicio : null,
       data_fim: dataFim && DATA_RE.test(dataFim) ? dataFim : null,
       renovacao_automatica: renovacao,
-      valor,
-      notas,
+      valor: valor === "erro" ? null : valor,
+      valor_anual: valorAnual === "erro" ? null : valorAnual,
     },
   };
 }
@@ -63,16 +70,18 @@ export async function criarContrato(
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("contratos")
-    .insert({ tenant_id: ctx.tenant.id, ...valores });
-  if (error) {
+    .insert({ tenant_id: ctx.tenant.id, ...valores })
+    .select("id")
+    .single();
+  if (error || !data) {
     console.error("Erro insert contrato:", error);
     return { error: "Erro ao criar o contrato." };
   }
 
   revalidatePath("/contratos");
-  redirect("/contratos");
+  redirect(`/contratos/${data.id}`);
 }
 
 export async function atualizarContrato(
@@ -98,7 +107,8 @@ export async function atualizarContrato(
   }
 
   revalidatePath("/contratos");
-  redirect("/contratos");
+  revalidatePath(`/contratos/${id}`);
+  redirect(`/contratos/${id}`);
 }
 
 export async function apagarContrato(id: string) {

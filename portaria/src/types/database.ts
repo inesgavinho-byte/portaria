@@ -19,11 +19,14 @@ export type Tenant = {
   dominios: string[];
   email: string | null;
   telefone: string | null;
+  logo_url: string | null;
   created_at: string;
 };
 
 export type TenantPerfil = {
   tenant_id: string;
+  nif: string | null;
+  iban: string | null;
   seguradora_nome: string | null;
   seguradora_apolice: string | null;
   seguradora_contacto: string | null;
@@ -44,6 +47,17 @@ export type TenantTheme = {
   logo_url?: string;
 };
 
+export type Blueprint = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  tipo: string;
+  conteudo_template: string;
+  variaveis: string[];
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type UserTenant = {
   id: string;
   user_id: string;
@@ -51,6 +65,7 @@ export type UserTenant = {
   fracao: string | null;
   fracao_id: string | null;
   role: "admin" | "comissao" | "condomino";
+  notificacoes_email: boolean;
   created_at: string;
 };
 
@@ -134,16 +149,36 @@ export type OcorrenciaFotografia = {
   criado_em: string;
 };
 
+export type Fornecedor = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  categoria: string | null;
+  contacto_nome: string | null;
+  telefone: string | null;
+  email: string | null;
+  nif: string | null;
+  morada: string | null;
+  notas: string | null;
+  ativo: boolean;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Contrato = {
   id: string;
   tenant_id: string;
   titulo: string;
   contacto_id: string | null;
+  fornecedor_id: string | null;
   descricao: string | null;
   data_inicio: string | null;
   data_fim: string | null;
   renovacao_automatica: boolean;
   valor: number | null;
+  valor_anual: number | null;
+  referencia: string | null;
+  notas_internas: string | null;
   notas: string | null;
   criado_em: string;
   atualizado_em: string;
@@ -219,4 +254,7 @@ export type Documento = {
   ficheiro_tipo: string | null;
   upload_em: string;
   upload_por: string;
+  assembleia_id: string | null;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
 };

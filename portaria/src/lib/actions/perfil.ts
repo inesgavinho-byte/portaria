@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/supabase/tenant";
 
 export type PerfilFormState = {
@@ -16,11 +17,57 @@ export type PerfilFormState = {
       | "num_fracoes"
       | "ano_construcao"
       | "seguradora_validade"
-      | "administrador_email",
+      | "administrador_email"
+      | "logo",
       string
     >
   >;
 };
+
+const LOGO_TIPOS = ["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
+const LOGO_EXT: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/svg+xml": "svg",
+};
+const LOGO_MAX_MB = 2;
+
+/**
+ * Carrega o logótipo para o bucket público e devolve o URL público
+ * (com cache-buster). Usa o cliente service-role para não depender de
+ * políticas de storage no bucket novo. Devolve {url} ou {erro}.
+ */
+async function guardarLogo(
+  file: File,
+  tenantId: string
+): Promise<{ url?: string; erro?: string }> {
+  if (!LOGO_TIPOS.includes(file.type)) {
+    return { erro: "O logótipo tem de ser PNG, JPEG, WebP ou SVG." };
+  }
+  if (file.size > LOGO_MAX_MB * 1024 * 1024) {
+    return { erro: `O logótipo excede o máximo de ${LOGO_MAX_MB} MB.` };
+  }
+
+  const admin = createAdminClient();
+  if (!admin) {
+    return { erro: "Upload indisponível — service-role não configurado." };
+  }
+
+  const ext = LOGO_EXT[file.type] ?? "png";
+  const path = `${tenantId}/logo.${ext}`;
+  const { error } = await admin.storage
+    .from("publico")
+    .upload(path, file, { contentType: file.type, upsert: true });
+  if (error) {
+    console.error("Erro upload logótipo:", error);
+    return { erro: "Erro ao carregar o logótipo." };
+  }
+
+  const { data } = admin.storage.from("publico").getPublicUrl(path);
+  // Cache-buster para refletir a nova versão no mesmo caminho.
+  return { url: `${data.publicUrl}?v=${Date.now()}` };
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -76,6 +123,10 @@ export async function atualizarPerfilCondominio(
     }
   }
 
+  // ----- Identidade fiscal (interna) -----
+  const nif = texto(formData, "nif", 20);
+  const iban = texto(formData, "iban", 34);
+
   // ----- Perfil interno (seguradora + administrador) -----
   const seguradoraNome = texto(formData, "seguradora_nome", 200);
   const seguradoraApolice = texto(formData, "seguradora_apolice", 100);
@@ -105,6 +156,15 @@ export async function atualizarPerfilCondominio(
     return { fieldErrors };
   }
 
+  // ----- Logótipo (opcional) -----
+  const logoFile = formData.get("logo");
+  let logoUrl: string | undefined;
+  if (logoFile instanceof File && logoFile.size > 0) {
+    const res = await guardarLogo(logoFile, ctx.tenant.id);
+    if (res.erro) return { fieldErrors: { logo: res.erro } };
+    logoUrl = res.url;
+  }
+
   const supabase = await createClient();
 
   const { error: tenantError } = await supabase
@@ -116,6 +176,7 @@ export async function atualizarPerfilCondominio(
       telefone,
       num_fracoes: numFracoes,
       ano_construcao: anoConstrucao,
+      ...(logoUrl ? { logo_url: logoUrl } : {}),
     })
     .eq("id", ctx.tenant.id);
 
@@ -127,6 +188,8 @@ export async function atualizarPerfilCondominio(
   const { error: perfilError } = await supabase.from("tenant_perfil").upsert(
     {
       tenant_id: ctx.tenant.id,
+      nif,
+      iban,
       seguradora_nome: seguradoraNome,
       seguradora_apolice: seguradoraApolice,
       seguradora_contacto: seguradoraContacto,

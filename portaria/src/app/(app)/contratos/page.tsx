@@ -21,14 +21,14 @@ export default async function ContratosPage() {
   if (!ctx) redirect("/avisos");
 
   const supabase = await createClient();
-  const [{ data: contratos }, { data: contactos }] = await Promise.all([
+  const [{ data: contratos }, { data: fornecedores }] = await Promise.all([
     supabase.from("contratos").select("*").eq("tenant_id", ctx.tenant.id)
       .order("data_fim", { ascending: true, nullsFirst: false }),
-    supabase.from("contactos").select("id, nome").eq("tenant_id", ctx.tenant.id),
+    supabase.from("fornecedores").select("id, nome").eq("tenant_id", ctx.tenant.id),
   ]);
 
   const lista: Contrato[] = contratos ?? [];
-  const nomeContacto = new Map((contactos ?? []).map((c) => [c.id, c.nome]));
+  const nomeFornecedor = new Map((fornecedores ?? []).map((f) => [f.id, f.nome]));
 
   return (
     <div>
@@ -59,14 +59,14 @@ export default async function ContratosPage() {
             const estado = estadoContrato(c);
             return (
               <div key={c.id} className="p-4 flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <h2 className="font-title text-lg text-ink truncate">{c.titulo}</h2>
+                <Link href={`/contratos/${c.id}`} className="flex-1 min-w-0 group">
+                  <h2 className="font-title text-lg text-ink truncate group-hover:text-warmBeige transition-colors">{c.titulo}</h2>
                   <p className="font-body text-xs text-oliveGray mt-1">
-                    {c.contacto_id && nomeContacto.get(c.contacto_id)}
+                    {c.fornecedor_id && nomeFornecedor.get(c.fornecedor_id)}
                     {c.data_fim && ` · até ${new Date(c.data_fim).toLocaleDateString("pt-PT")}`}
                     {c.renovacao_automatica && " · renovação automática"}
                   </p>
-                </div>
+                </Link>
                 <span className={`font-body text-xs tracking-widest uppercase ${estado.classe}`}>
                   {estado.label}
                 </span>

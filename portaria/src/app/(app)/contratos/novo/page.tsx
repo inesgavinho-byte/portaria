@@ -10,10 +10,11 @@ export default async function NovoContratoPage() {
   if (!ctx) redirect("/login");
 
   const supabase = await createClient();
-  const { data: contactos } = await supabase
-    .from("contactos")
+  const { data: fornecedores } = await supabase
+    .from("fornecedores")
     .select("id, nome")
     .eq("tenant_id", ctx.tenant.id)
+    .eq("ativo", true)
     .order("nome", { ascending: true });
 
   return (
@@ -23,8 +24,10 @@ export default async function NovoContratoPage() {
         <ChevronLeft className="w-3 h-3" /> Voltar
       </Link>
       <h1 className="font-title text-h1 text-ink mb-2">Novo contrato</h1>
-      <p className="font-body text-oliveGray mb-8">Registe um contrato do condomínio.</p>
-      <ContratoForm contactos={contactos ?? []} />
+      <p className="font-body text-oliveGray mb-8">
+        Registe o contrato; a seguir pode anexar o PDF no detalhe.
+      </p>
+      <ContratoForm fornecedores={fornecedores ?? []} />
     </div>
   );
 }

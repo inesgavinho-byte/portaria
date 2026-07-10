@@ -13,12 +13,14 @@ const GRUPOS_ADMIN: NavGrupo[] = [
       { href: "/configuracao/assembleias", label: "Assembleias" },
       { href: "/configuracao/documentos", label: "Documentos" },
       { href: "/configuracao/avisos", label: "Avisos" },
+      { href: "/blueprints", label: "Modelos" },
     ],
   },
   {
     titulo: "Registos",
     itens: [
       { href: "/fracoes", label: "Frações" },
+      { href: "/fornecedores", label: "Fornecedores" },
       { href: "/contactos", label: "Contactos" },
       { href: "/contratos", label: "Contratos" },
       { href: "/conversas", label: "Conversas" },
