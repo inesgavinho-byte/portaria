@@ -19,11 +19,14 @@ export type Tenant = {
   dominios: string[];
   email: string | null;
   telefone: string | null;
+  logo_url: string | null;
   created_at: string;
 };
 
 export type TenantPerfil = {
   tenant_id: string;
+  nif: string | null;
+  iban: string | null;
   seguradora_nome: string | null;
   seguradora_apolice: string | null;
   seguradora_contacto: string | null;
@@ -42,6 +45,17 @@ export type TenantTheme = {
   fonte_titulos?: string;
   fonte_corpo?: string;
   logo_url?: string;
+};
+
+export type Blueprint = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  tipo: string;
+  conteudo_template: string;
+  variaveis: string[];
+  criado_em: string;
+  atualizado_em: string;
 };
 
 export type UserTenant = {

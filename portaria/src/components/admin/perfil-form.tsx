@@ -125,6 +125,64 @@ export function PerfilForm({ tenant, perfil }: PerfilFormProps) {
         </p>
       </section>
 
+      {/* ---- Identidade ---- */}
+      <section className="space-y-6 pt-8 border-t border-warmBeige/20">
+        <h2 className="font-title text-h3 text-warmBeige">Identidade</h2>
+
+        <Campo id="logo" label="Logótipo" erro={state.fieldErrors?.logo}>
+          <div className="flex items-center gap-4">
+            {tenant.logo_url && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tenant.logo_url}
+                alt="Logótipo atual"
+                className="h-16 w-16 object-contain border border-warmBeige/30 bg-softCream/40 p-1"
+              />
+            )}
+            <input
+              id="logo"
+              name="logo"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="font-body text-sm text-ink file:mr-4 file:py-2 file:px-4 file:border file:border-warmBeige/40 file:bg-softCream/60 file:font-body file:text-xs file:tracking-widest file:uppercase file:text-oliveGray hover:file:border-warmBeige"
+            />
+          </div>
+          <p className="mt-2 font-body text-xs text-oliveGray">
+            PNG, JPEG, WebP ou SVG, até 2 MB. Aparece nos documentos e páginas
+            do condomínio.
+          </p>
+        </Campo>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Campo id="nif" label="NIF do condomínio">
+            <input
+              id="nif"
+              name="nif"
+              type="text"
+              maxLength={20}
+              defaultValue={perfil?.nif ?? ""}
+              className={inputClass}
+              placeholder="500 000 000"
+            />
+          </Campo>
+          <Campo id="iban" label="IBAN do condomínio">
+            <input
+              id="iban"
+              name="iban"
+              type="text"
+              maxLength={34}
+              defaultValue={perfil?.iban ?? ""}
+              className={inputClass}
+              placeholder="PT50 0000 0000 0000 0000 0000 0"
+            />
+          </Campo>
+        </div>
+        <p className="font-body text-xs text-oliveGray">
+          O NIF e o IBAN são internos e alimentam os modelos de documento
+          (Blueprints).
+        </p>
+      </section>
+
       {/* ---- Seguradora ---- */}
       <section className="space-y-6 pt-8 border-t border-warmBeige/20">
         <h2 className="font-title text-h3 text-warmBeige">Seguradora</h2>

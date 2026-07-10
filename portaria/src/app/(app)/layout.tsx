@@ -13,6 +13,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
       { href: "/configuracao/assembleias", label: "Assembleias" },
       { href: "/configuracao/documentos", label: "Documentos" },
       { href: "/configuracao/avisos", label: "Avisos" },
+      { href: "/blueprints", label: "Modelos" },
     ],
   },
   {
