@@ -13,6 +13,7 @@ const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
   regulamento: "Regulamento",
   manual: "Manual",
   apolice: "Apólice",
+  circular: "Circular",
   outro: "Outro",
 };
 

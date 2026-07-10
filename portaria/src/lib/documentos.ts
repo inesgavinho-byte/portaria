@@ -26,6 +26,7 @@ export const CATEGORIA_LABEL = {
   regulamento: "Regulamento",
   manual: "Manuais",
   apolice: "Apólices",
+  circular: "Circulares",
   outro: "Outros",
 } as const;
 
