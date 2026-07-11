@@ -8,7 +8,7 @@ import { DOCUMENTO_TIPOS_VALIDOS } from "@/lib/documentos";
 import type { Documento } from "@/types/database";
 
 const CATEGORIAS_VALIDAS: Documento["categoria"][] = [
-  "ata", "conta", "contrato", "regulamento", "manual", "apolice", "outro",
+  "ata", "conta", "contrato", "regulamento", "manual", "apolice", "circular", "outro",
 ];
 
 const TAMANHO_MAXIMO_MB = 25;
@@ -200,7 +200,7 @@ export async function gerarLinkDownload(documentoId: string): Promise<{
   const supabase = await createClient();
   const { data: doc, error: fetchError } = await supabase
     .from("documentos")
-    .select("ficheiro_path, titulo")
+    .select("ficheiro_path, titulo, ficheiro_tipo")
     .eq("id", documentoId)
     .eq("tenant_id", ctx.tenant.id)
     .single();
@@ -208,9 +208,18 @@ export async function gerarLinkDownload(documentoId: string): Promise<{
   if (fetchError || !doc) return { error: "Documento não encontrado." };
   if (doc.ficheiro_path === "pending") return { error: "Upload incompleto." };
 
+  // Nome de download com extensão derivada do MIME (ex.: "Circular … 2026.pdf").
+  const ext = doc.ficheiro_tipo
+    ? DOCUMENTO_TIPOS_VALIDOS[doc.ficheiro_tipo]
+    : undefined;
+  const nomeDownload =
+    ext && !doc.titulo.toLowerCase().endsWith(`.${ext}`)
+      ? `${doc.titulo}.${ext}`
+      : doc.titulo;
+
   const { data, error } = await supabase.storage
     .from("documentos")
-    .createSignedUrl(doc.ficheiro_path, 60, { download: doc.titulo });
+    .createSignedUrl(doc.ficheiro_path, 60, { download: nomeDownload });
 
   if (error || !data) return { error: "Erro ao gerar link." };
 

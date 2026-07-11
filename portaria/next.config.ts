@@ -38,6 +38,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // @react-pdf/renderer usa dependências nativas (fontkit) — mantê-lo
+  // fora do bundle do servidor evita erros de empacotamento.
+  serverExternalPackages: ["@react-pdf/renderer", "react-pdf-html"],
   // Imagens hospedadas no Supabase Storage
   images: {
     remotePatterns: [

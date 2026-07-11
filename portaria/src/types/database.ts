@@ -247,7 +247,7 @@ export type Documento = {
   tenant_id: string;
   titulo: string;
   descricao: string | null;
-  categoria: "ata" | "conta" | "contrato" | "regulamento" | "manual" | "apolice" | "outro";
+  categoria: "ata" | "conta" | "contrato" | "regulamento" | "manual" | "apolice" | "circular" | "outro";
   ano: number | null;
   ficheiro_path: string;
   ficheiro_tamanho: number | null;
@@ -257,4 +257,5 @@ export type Documento = {
   assembleia_id: string | null;
   fornecedor_id: string | null;
   contrato_id: string | null;
+  blueprint_id: string | null;
 };

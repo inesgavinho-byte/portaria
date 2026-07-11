@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { FileText, ArrowRight } from "lucide-react";
+import { FileText, ArrowRight, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { BLUEPRINTS_BASE } from "@/lib/blueprints";
@@ -12,18 +12,24 @@ export default async function BlueprintsPage() {
 
   const supabase = await createClient();
 
-  // Garante que os 3 modelos base existem para este condomínio.
-  // on_conflict (tenant_id, tipo) → não duplica nem sobrepõe edições.
-  await supabase.from("blueprints").upsert(
-    BLUEPRINTS_BASE.map((b) => ({
-      tenant_id: ctx.tenant.id,
-      nome: b.nome,
-      tipo: b.tipo,
-      conteudo_template: b.conteudo_template,
-      variaveis: b.variaveis,
-    })),
-    { onConflict: "tenant_id,tipo", ignoreDuplicates: true }
-  );
+  // Sementeira dos modelos base: apenas quando o condomínio ainda não
+  // tem nenhum blueprint (onboarding). Não recria os que o admin apagar.
+  const { count } = await supabase
+    .from("blueprints")
+    .select("id", { count: "exact", head: true })
+    .eq("tenant_id", ctx.tenant.id);
+
+  if ((count ?? 0) === 0) {
+    await supabase.from("blueprints").insert(
+      BLUEPRINTS_BASE.map((b) => ({
+        tenant_id: ctx.tenant.id,
+        nome: b.nome,
+        tipo: b.tipo,
+        conteudo_template: b.conteudo_template,
+        variaveis: b.variaveis,
+      }))
+    );
+  }
 
   const { data } = await supabase
     .from("blueprints")
@@ -35,12 +41,18 @@ export default async function BlueprintsPage() {
 
   return (
     <div className="max-w-3xl">
-      <div className="mb-8">
-        <h1 className="font-title text-h1 text-ink mb-2">Modelos de documento</h1>
-        <p className="font-body text-oliveGray">
-          Modelos com os dados do {ctx.tenant.nome} já preenchidos. Abra um
-          modelo para o ver pronto a usar.
-        </p>
+      <div className="flex items-start justify-between gap-4 mb-8">
+        <div>
+          <h1 className="font-title text-h1 text-ink mb-2">Modelos de documento</h1>
+          <p className="font-body text-oliveGray">
+            Modelos com os dados do {ctx.tenant.nome} já preenchidos. Abra um
+            modelo para o ver, editar ou exportar em PDF.
+          </p>
+        </div>
+        <Link href="/blueprints/novo"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors shrink-0">
+          <Plus className="w-4 h-4" /> Novo modelo
+        </Link>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
