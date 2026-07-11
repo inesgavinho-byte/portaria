@@ -8,7 +8,15 @@ import {
   type ExportarState,
 } from "@/lib/actions/blueprints";
 
-export function ExportarBlueprint({ blueprintId }: { blueprintId: string }) {
+export function ExportarBlueprint({
+  blueprintId,
+  numero,
+  assunto,
+}: {
+  blueprintId: string;
+  numero?: string | null;
+  assunto?: string | null;
+}) {
   const action = exportarBlueprintPdf.bind(null, blueprintId);
   const [state, formAction, pending] = useActionState<ExportarState, FormData>(
     action,
@@ -18,6 +26,8 @@ export function ExportarBlueprint({ blueprintId }: { blueprintId: string }) {
   return (
     <div className="flex flex-col items-end gap-2">
       <form action={formAction}>
+        <input type="hidden" name="numero" value={numero ?? ""} />
+        <input type="hidden" name="assunto" value={assunto ?? ""} />
         <button
           type="submit"
           disabled={pending}
