@@ -35,7 +35,23 @@ export type TenantPerfil = {
   administrador_empresa: string | null;
   administrador_email: string | null;
   administrador_telefone: string | null;
+  contactos_emergencia_locais: ContactoEmergencia[];
+  regulamento_texto: string | null;
+  regulamento_pdf_path: string | null;
   atualizado_em: string;
+};
+
+export type ContactoEmergencia = { nome: string; telefone: string };
+
+export type FuncionarioAusencia = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  funcao: string | null;
+  data_inicio: string;
+  data_fim: string | null;
+  motivo: string | null;
+  criado_em: string;
 };
 
 export type TenantTheme = {
@@ -64,7 +80,7 @@ export type UserTenant = {
   tenant_id: string;
   fracao: string | null;
   fracao_id: string | null;
-  role: "admin" | "comissao" | "condomino";
+  role: "admin" | "comissao" | "condomino" | "inquilino";
   notificacoes_email: boolean;
   created_at: string;
 };
@@ -100,7 +116,7 @@ export type Convite = {
   tenant_id: string;
   email: string;
   fracao: string | null;
-  role: "admin" | "comissao" | "condomino";
+  role: "admin" | "comissao" | "condomino" | "inquilino";
   criado_por: string;
   criado_em: string;
   expira_em: string;

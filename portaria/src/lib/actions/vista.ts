@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-export type Vista = "admin" | "condomino";
+export type Vista = "admin" | "condomino" | "inquilino";
 
 /**
  * Alterna a vista (admin ↔ condómino) de um utilizador que é ambos.

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { FracaoActions } from "@/components/admin/fracao-actions";
@@ -75,6 +75,13 @@ export default async function FracoesPage() {
                     {f.inquilino_nome && ` · inquilino: ${f.inquilino_nome}`}
                   </p>
                 </div>
+                <Link
+                  href={`/configuracao/membros/novo?role=inquilino&fracao=${encodeURIComponent(f.codigo)}`}
+                  title="Convidar inquilino para esta fração"
+                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 border border-warmBeige/40 font-body text-[11px] tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors"
+                >
+                  <UserPlus className="w-3.5 h-3.5" /> Inquilino
+                </Link>
                 <FracaoActions fracaoId={f.id} />
               </div>
             ))}

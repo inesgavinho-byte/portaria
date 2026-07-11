@@ -12,6 +12,7 @@ const ROLE_LABEL: Record<UserTenant["role"], string> = {
   admin: "Administração",
   comissao: "Comissão",
   condomino: "Condómino",
+  inquilino: "Inquilino",
 };
 
 export default async function MembrosPage() {

@@ -16,7 +16,7 @@ interface AppNavProps {
   fracao: string | null;
   grupos: NavGrupo[];
   vista: Vista;
-  canToggle: boolean;
+  vistas: Vista[];
 }
 
 export function AppNav({
@@ -25,7 +25,7 @@ export function AppNav({
   fracao,
   grupos,
   vista,
-  canToggle,
+  vistas,
 }: AppNavProps) {
   const [aberto, setAberto] = useState(false);
 
@@ -77,7 +77,7 @@ export function AppNav({
           </button>
         </div>
 
-        {canToggle && <VistaToggle vista={vista} />}
+        {vistas.length > 1 && <VistaToggle vista={vista} vistas={vistas} />}
 
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           {grupos.map((grupo, gi) => (
@@ -143,7 +143,13 @@ function NavGrupoBloco({
   );
 }
 
-function VistaToggle({ vista }: { vista: Vista }) {
+const VISTA_LABEL: Record<Vista, string> = {
+  admin: "Administração",
+  condomino: "Condómino",
+  inquilino: "Inquilino",
+};
+
+function VistaToggle({ vista, vistas }: { vista: Vista; vistas: Vista[] }) {
   const [isPending, startTransition] = useTransition();
 
   function mudar(nova: Vista) {
@@ -154,24 +160,18 @@ function VistaToggle({ vista }: { vista: Vista }) {
   return (
     <div className="px-4 pt-4">
       <div className="flex rounded-full border border-warmBeige/40 p-0.5 text-xs font-body">
-        <button
-          onClick={() => mudar("admin")}
-          disabled={isPending}
-          className={`flex-1 rounded-full px-3 py-1.5 tracking-wide transition-colors ${
-            vista === "admin" ? "bg-ink text-paper" : "text-oliveGray hover:text-ink"
-          }`}
-        >
-          Administração
-        </button>
-        <button
-          onClick={() => mudar("condomino")}
-          disabled={isPending}
-          className={`flex-1 rounded-full px-3 py-1.5 tracking-wide transition-colors ${
-            vista === "condomino" ? "bg-ink text-paper" : "text-oliveGray hover:text-ink"
-          }`}
-        >
-          Condómino
-        </button>
+        {vistas.map((v) => (
+          <button
+            key={v}
+            onClick={() => mudar(v)}
+            disabled={isPending}
+            className={`flex-1 rounded-full px-2.5 py-1.5 tracking-wide transition-colors ${
+              vista === v ? "bg-ink text-paper" : "text-oliveGray hover:text-ink"
+            }`}
+          >
+            {VISTA_LABEL[v]}
+          </button>
+        ))}
       </div>
     </div>
   );
