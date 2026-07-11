@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { estadoConhecimento } from "@/lib/actions/conhecimento";
+import { estadoConhecimento } from "@/lib/ai/conhecimento-consultas";
 import { ConselheiraConfig } from "@/components/admin/conselheira-config";
 
 export default async function ConselheiraConfigPage() {

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
-import { regulamentoDoTenant } from "@/lib/actions/conhecimento";
+import { regulamentoDoTenant } from "@/lib/ai/conhecimento-consultas";
 import { DownloadRegulamento } from "@/components/condomino/download-regulamento";
 
 export default async function RegulamentoPage() {
