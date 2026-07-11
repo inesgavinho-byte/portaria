@@ -11,3 +11,25 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# ---------------------------------------------------------------------------
+# Região das Functions (performance)
+#
+# O Supabase deste projeto está em eu-west-1 (Irlanda). Por defeito as
+# Netlify Functions correm nos EUA, pelo que cada round-trip à base de
+# dados atravessa o Atlântico (~100 ms). Correr as Functions na Europa
+# corta isso para ~15 ms — a maior melhoria de latência da plataforma.
+#
+# IMPORTANTE: no Next.js, as funções de SSR são GERADAS no build pelo
+# @netlify/plugin-nextjs, por isso NÃO se lhes pode anexar região por
+# ficheiro (nem `export const config`, nem `[functions]` no netlify.toml).
+# A região tem de ser definida ao NÍVEL DO SITE, na dashboard da Netlify:
+#
+#   Project configuration → Build & deploy → Functions → Region
+#   → escolher uma região europeia (Frankfurt "eu-central-1"; ou
+#     Ireland "eu-west-1" se disponível, para coincidir com o Supabase).
+#
+# Depois de mudar, é preciso um novo deploy para as funções migrarem.
+# (A definição site-level aplica-se a TODAS as funções, incluindo as
+#  geradas pelo Next.js — que é o que precisamos.)
+# ---------------------------------------------------------------------------
