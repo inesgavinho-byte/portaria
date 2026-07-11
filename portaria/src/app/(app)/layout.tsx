@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { AppNav, type NavGrupo } from "@/components/layout/app-nav";
+import { Conselheira } from "@/components/conselheira/conselheira";
 import type { Vista } from "@/lib/actions/vista";
 
 const GRUPOS_ADMIN: NavGrupo[] = [
@@ -89,6 +90,8 @@ export default async function AppLayout({
       <main className="flex-1 min-w-0 px-6 py-10 md:px-12 max-w-5xl">
         {children}
       </main>
+      {/* Conselheira: presença proactiva para a administração */}
+      {vista === "admin" && <Conselheira />}
     </div>
   );
 }
