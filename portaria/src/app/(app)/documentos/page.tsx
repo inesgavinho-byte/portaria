@@ -14,6 +14,8 @@ export default async function DocumentosPage({
   const { q, cat } = await searchParams;
   const ctx = await getCurrentUserInTenant();
   if (!ctx) redirect("/login");
+  // Inquilinos não têm acesso a assembleias nem a documentos financeiros.
+  if (ctx.membership.role === "inquilino") redirect("/avisos");
 
   const catValida = CATEGORIAS.includes(cat as (typeof CATEGORIAS)[number])
     ? (cat as Documento["categoria"])

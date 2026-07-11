@@ -6,11 +6,18 @@ import { convidarMembro, type ConviteFormState } from "@/lib/actions/membros";
 
 const ROLES = [
   { value: "condomino", label: "Condómino" },
+  { value: "inquilino", label: "Inquilino" },
   { value: "comissao", label: "Comissão" },
   { value: "admin", label: "Administração" },
 ];
 
-export function ConviteForm() {
+export function ConviteForm({
+  fracaoInicial = "",
+  roleInicial = "condomino",
+}: {
+  fracaoInicial?: string;
+  roleInicial?: string;
+}) {
   const [state, formAction, pending] = useActionState<
     ConviteFormState,
     FormData
@@ -62,6 +69,7 @@ export function ConviteForm() {
             name="fracao"
             type="text"
             maxLength={50}
+            defaultValue={fracaoInicial}
             placeholder="Ex.: 3.º Direito"
             className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
           />
@@ -82,7 +90,7 @@ export function ConviteForm() {
           <select
             id="role"
             name="role"
-            defaultValue="condomino"
+            defaultValue={roleInicial}
             className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
           >
             {ROLES.map((role) => (

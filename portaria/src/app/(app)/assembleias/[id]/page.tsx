@@ -14,6 +14,8 @@ export default async function AssembleiaPage({
   const { id } = await params;
   const ctx = await getCurrentUserInTenant();
   if (!ctx) redirect("/login");
+  // Inquilinos não têm acesso a assembleias nem a documentos financeiros.
+  if (ctx.membership.role === "inquilino") redirect("/avisos");
 
   const supabase = await createClient();
   const [{ data: assembleia }, { data: pontos }] = await Promise.all([

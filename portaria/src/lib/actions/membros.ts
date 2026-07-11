@@ -8,7 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import type { UserTenant } from "@/types/database";
 
-const ROLES_VALIDOS: UserTenant["role"][] = ["admin", "comissao", "condomino"];
+const ROLES_VALIDOS: UserTenant["role"][] = ["admin", "comissao", "condomino", "inquilino"];
 
 export type ConviteFormState = {
   error?: string;

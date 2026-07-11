@@ -46,10 +46,22 @@ const GRUPOS_ADMIN: NavGrupo[] = [
 const GRUPOS_CONDOMINO: NavGrupo[] = [
   {
     itens: [
-      { href: "/avisos", label: "Avisos" },
+      { href: "/avisos", label: "Mural" },
       { href: "/documentos", label: "Documentos" },
       { href: "/ocorrencias", label: "Ocorrências" },
       { href: "/assembleias", label: "Assembleias" },
+      { href: "/regulamento", label: "Regulamento" },
+    ],
+  },
+];
+
+// Inquilino: mural + ocorrências + regulamento. Sem financeiro nem assembleias.
+const GRUPOS_INQUILINO: NavGrupo[] = [
+  {
+    itens: [
+      { href: "/avisos", label: "Mural" },
+      { href: "/ocorrencias", label: "Ocorrências" },
+      { href: "/regulamento", label: "Regulamento" },
     ],
   },
 ];
@@ -62,20 +74,28 @@ export default async function AppLayout({
   const ctx = await getCurrentUserInTenant();
   if (!ctx) redirect("/login");
 
-  const isAdmin = ctx.membership.role === "admin";
-  const canToggle = isAdmin && !!ctx.membership.fracao_id;
+  const role = ctx.membership.role;
+  const isAdmin = role === "admin";
+
+  // Vistas disponíveis: os admins podem pré-visualizar as três; um inquilino
+  // vê a vista de inquilino; os restantes veem a vista de condómino.
+  const vistas: Vista[] = isAdmin
+    ? ["admin", "condomino", "inquilino"]
+    : role === "inquilino"
+    ? ["inquilino"]
+    : ["condomino"];
 
   const cookieStore = await cookies();
-  const raw = cookieStore.get("portaria-vista")?.value;
-  // Vista efetiva: não-admins são sempre condómino; admins seguem o cookie
-  // (default: administração).
-  const vista: Vista = isAdmin
-    ? raw === "condomino"
-      ? "condomino"
-      : "admin"
-    : "condomino";
+  const raw = cookieStore.get("portaria-vista")?.value as Vista | undefined;
+  const vista: Vista =
+    isAdmin && raw && vistas.includes(raw) ? raw : vistas[0];
 
-  const grupos = vista === "admin" ? GRUPOS_ADMIN : GRUPOS_CONDOMINO;
+  const grupos =
+    vista === "admin"
+      ? GRUPOS_ADMIN
+      : vista === "inquilino"
+      ? GRUPOS_INQUILINO
+      : GRUPOS_CONDOMINO;
 
   return (
     <div className="min-h-screen bg-softCream/30 lg:flex">
@@ -85,7 +105,7 @@ export default async function AppLayout({
         fracao={ctx.membership.fracao}
         grupos={grupos}
         vista={vista}
-        canToggle={canToggle}
+        vistas={vistas}
       />
       <main className="flex-1 min-w-0 px-6 py-10 md:px-12 max-w-5xl">
         {children}

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireAdmin } from "@/lib/supabase/tenant";
+import { requireAdmin, getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import {
   gerarEmbedding,
   chatTexto,
@@ -179,6 +179,24 @@ export async function carregarRegulamento(
   const blocos = dividirEmBlocos(texto);
   const supabase = await createClient();
 
+  // Guarda o PDF original (para download em /regulamento) e o texto
+  // integral no perfil.
+  const path = `${ctx.tenant.id}/regulamento/regulamento.pdf`;
+  const { error: upErr } = await supabase.storage
+    .from("documentos")
+    .upload(path, Buffer.from(b64, "base64"), {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+  await supabase
+    .from("tenant_perfil")
+    .update({
+      regulamento_texto: texto,
+      regulamento_pdf_path: upErr ? null : path,
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq("tenant_id", ctx.tenant.id);
+
   // Substitui o regulamento anterior (RLS: admin do tenant).
   await supabase
     .from("conhecimento_base")
@@ -228,4 +246,56 @@ export async function estadoConhecimento(): Promise<EstadoConhecimento> {
   ]);
 
   return { openai, legislacao: leg.count ?? 0, regulamento: reg.count ?? 0 };
+}
+
+/**
+ * Texto integral do regulamento do tenant, para a página /regulamento.
+ * Acessível a qualquer membro (condómino/inquilino incluídos); lê via
+ * service-role porque o tenant_perfil está fora do RLS de não-admins.
+ */
+export async function regulamentoDoTenant(): Promise<{
+  texto: string | null;
+  temPdf: boolean;
+}> {
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx) return { texto: null, temPdf: false };
+  const admin = createAdminClient();
+  if (!admin) return { texto: null, temPdf: false };
+
+  const { data } = await admin
+    .from("tenant_perfil")
+    .select("regulamento_texto, regulamento_pdf_path")
+    .eq("tenant_id", ctx.tenant.id)
+    .single();
+
+  return {
+    texto: data?.regulamento_texto ?? null,
+    temPdf: Boolean(data?.regulamento_pdf_path),
+  };
+}
+
+/** URL assinado para descarregar o PDF do regulamento (qualquer membro). */
+export async function descarregarRegulamento(): Promise<{
+  url?: string;
+  error?: string;
+}> {
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx) return { error: "Não autenticado." };
+  const admin = createAdminClient();
+  if (!admin) return { error: "Download indisponível." };
+
+  const { data: perfil } = await admin
+    .from("tenant_perfil")
+    .select("regulamento_pdf_path")
+    .eq("tenant_id", ctx.tenant.id)
+    .single();
+
+  const path = perfil?.regulamento_pdf_path;
+  if (!path) return { error: "Regulamento não disponível." };
+
+  const { data, error } = await admin.storage
+    .from("documentos")
+    .createSignedUrl(path, 60, { download: "Regulamento.pdf" });
+  if (error || !data) return { error: "Erro ao gerar o link." };
+  return { url: data.signedUrl };
 }

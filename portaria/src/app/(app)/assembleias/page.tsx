@@ -8,6 +8,8 @@ import type { Assembleia } from "@/types/database";
 export default async function AssembleiasPage() {
   const ctx = await getCurrentUserInTenant();
   if (!ctx) redirect("/login");
+  // Inquilinos não têm acesso a assembleias nem a documentos financeiros.
+  if (ctx.membership.role === "inquilino") redirect("/avisos");
 
   // RLS mostra só as publicadas (não-rascunho) aos condóminos
   const supabase = await createClient();
