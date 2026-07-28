@@ -315,3 +315,32 @@ export type VotacaoParticipante = {
   user_id: string;
   votou_em: string | null;
 };
+
+export type ConhecimentoEmbedding = {
+  id: string;
+  tenant_id: string;
+  origem: "regulamento" | "documento" | "legislacao" | "ata" | "ocorrencia_resolvida";
+  origem_id: string;
+  conteudo: string;
+  embedding: number[] | null;
+  metadata: Record<string, unknown>;
+  criado_em: string;
+};
+
+export type ConversaIA = {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  titulo: string | null;
+  criado_em: string;
+};
+
+export type ConversaIAMensagem = {
+  id: string;
+  conversa_id: string;
+  tenant_id: string;
+  role: "user" | "assistant" | "system";
+  conteudo: string;
+  contexto: Record<string, unknown>[] | null;
+  criado_em: string;
+};
