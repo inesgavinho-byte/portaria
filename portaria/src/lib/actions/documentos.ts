@@ -146,6 +146,68 @@ export async function criarDocumento(
 }
 
 /**
+ * Atualiza um documento existente (metadados; ficheiro não é substituível).
+ */
+export async function atualizarDocumento(
+  id: string,
+  _prev: DocumentoFormState,
+  formData: FormData
+): Promise<DocumentoFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) {
+    return { error: "Sem permissões para esta operação." };
+  }
+
+  const titulo = String(formData.get("titulo") ?? "").trim();
+  const descricao = String(formData.get("descricao") ?? "").trim() || null;
+  const categoria = String(formData.get("categoria") ?? "");
+  const anoStr = String(formData.get("ano") ?? "").trim();
+
+  // Validações
+  const fieldErrors: DocumentoFormState["fieldErrors"] = {};
+  if (!titulo) fieldErrors.titulo = "O título é obrigatório.";
+  if (titulo.length > 200) fieldErrors.titulo = "Título demasiado longo.";
+  if (!CATEGORIAS_VALIDAS.includes(categoria as Documento["categoria"])) {
+    fieldErrors.categoria = "Categoria inválida.";
+  }
+
+  let ano: number | null = null;
+  if (anoStr) {
+    const parsed = parseInt(anoStr, 10);
+    if (isNaN(parsed) || parsed < 1900 || parsed > 2100) {
+      fieldErrors.ano = "Ano inválido.";
+    } else {
+      ano = parsed;
+    }
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return { fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("documentos")
+    .update({
+      titulo,
+      descricao,
+      categoria: categoria as Documento["categoria"],
+      ano,
+    })
+    .eq("id", id)
+    .eq("tenant_id", ctx.tenant.id);
+
+  if (error) {
+    console.error("Erro update documento:", error);
+    return { error: "Erro ao atualizar o documento." };
+  }
+
+  revalidatePath("/documentos");
+  revalidatePath("/configuracao/documentos");
+  redirect("/configuracao/documentos");
+}
+
+/**
  * Apaga um documento (DB row + ficheiro Storage).
  */
 export async function apagarDocumento(id: string) {
