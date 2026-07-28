@@ -369,3 +369,48 @@ export type Notificacao = {
   lida_em: string | null;
   criado_em: string;
 };
+
+export type EspacoComum = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  descricao: string | null;
+  capacidade: number | null;
+  imagem_url: string | null;
+  duracao_minima_minutos: number;
+  duracao_maxima_minutos: number;
+  antecedencia_minima_horas: number;
+  reservas_por_semana: number;
+  abertura_seg: string | null;
+  fecho_seg: string | null;
+  abertura_ter: string | null;
+  fecho_ter: string | null;
+  abertura_qua: string | null;
+  fecho_qua: string | null;
+  abertura_qui: string | null;
+  fecho_qui: string | null;
+  abertura_sex: string | null;
+  fecho_sex: string | null;
+  abertura_sab: string | null;
+  fecho_sab: string | null;
+  abertura_dom: string | null;
+  fecho_dom: string | null;
+  ativo: boolean;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type Reserva = {
+  id: string;
+  tenant_id: string;
+  espaco_id: string;
+  user_id: string;
+  fracao_id: string | null;
+  data_inicio: string;
+  data_fim: string;
+  estado: "pendente" | "confirmada" | "cancelada" | "concluida";
+  motivo: string | null;
+  num_pessoas: number | null;
+  criado_em: string;
+  atualizado_em: string;
+};
