@@ -30,6 +30,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
   {
     titulo: "Consulta",
     itens: [
+      { href: "/ia", label: "Assistente IA" },
       { href: "/votacoes", label: "Votações" },
       { href: "/calendario", label: "Calendário" },
       { href: "/timeline", label: "Timeline" },
@@ -52,6 +53,7 @@ const GRUPOS_CONDOMINO: NavGrupo[] = [
       { href: "/ocorrencias", label: "Ocorrências" },
       { href: "/assembleias", label: "Assembleias" },
       { href: "/votacoes", label: "Votações" },
+      { href: "/ia", label: "Assistente IA" },
       { href: "/regulamento", label: "Regulamento" },
     ],
   },

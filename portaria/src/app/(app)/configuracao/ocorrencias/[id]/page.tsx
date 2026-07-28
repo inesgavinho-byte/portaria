@@ -5,6 +5,7 @@ import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { getOcorrenciaDetalhe } from "@/lib/supabase/ocorrencias";
 import { OcorrenciaDetalhe } from "@/components/app/ocorrencia-detalhe";
 import { OcorrenciaAdminControls } from "@/components/admin/ocorrencia-admin-controls";
+import { SugestaoIA } from "@/components/admin/sugestao-ia";
 
 export default async function ConfigOcorrenciaPage({
   params,
@@ -34,6 +35,7 @@ export default async function ConfigOcorrenciaPage({
         fotografias={detalhe.fotografias}
         podeAdicionarFotografias
       >
+        <SugestaoIA ocorrenciaId={id} />
         <section className="bg-paper border border-warmBeige/20 p-6">
           <OcorrenciaAdminControls ocorrencia={detalhe.ocorrencia} />
         </section>
