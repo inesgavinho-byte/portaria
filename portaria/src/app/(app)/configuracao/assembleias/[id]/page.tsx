@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { AssembleiaEditor } from "@/components/admin/assembleia-editor";
+import { VotacoesLista } from "@/components/admin/votacoes-lista";
 import type { Assembleia, AssembleiaPonto } from "@/types/database";
 
 export default async function ConfigAssembleiaPage({
@@ -16,9 +17,19 @@ export default async function ConfigAssembleiaPage({
   if (!ctx) redirect("/login");
 
   const supabase = await createClient();
-  const [{ data: assembleia }, { data: pontos }] = await Promise.all([
+  const [
+    { data: assembleia },
+    { data: pontos },
+    { data: votacoes },
+  ] = await Promise.all([
     supabase.from("assembleias").select("*").eq("id", id).eq("tenant_id", ctx.tenant.id).single(),
     supabase.from("assembleia_pontos").select("*").eq("assembleia_id", id).order("ordem", { ascending: true }),
+    supabase
+      .from("votacoes")
+      .select("*, votacao_opcoes(id), votacao_participantes(id, votou_em)")
+      .eq("assembleia_id", id)
+      .eq("tenant_id", ctx.tenant.id)
+      .order("criado_em", { ascending: false }),
   ]);
 
   if (!assembleia) notFound();
@@ -34,6 +45,9 @@ export default async function ConfigAssembleiaPage({
         assembleia={assembleia as Assembleia}
         pontos={(pontos ?? []) as AssembleiaPonto[]}
       />
+      <div className="mt-12">
+        <VotacoesLista votacoes={votacoes ?? []} assembleiaId={id} />
+      </div>
     </div>
   );
 }

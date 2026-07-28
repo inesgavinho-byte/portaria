@@ -275,3 +275,43 @@ export type Documento = {
   contrato_id: string | null;
   blueprint_id: string | null;
 };
+
+export type Votacao = {
+  id: string;
+  tenant_id: string;
+  assembleia_id: string | null;
+  titulo: string;
+  descricao: string | null;
+  estado: "rascunho" | "aberta" | "encerrada" | "cancelada";
+  tipo_quorum: "maioria_simples" | "maioria_qualificada" | "unanimidade";
+  peso_por_permilagem: boolean;
+  aberta_em: string | null;
+  encerrada_em: string | null;
+  criado_por: string;
+  criado_em: string;
+};
+
+export type VotacaoOpcao = {
+  id: string;
+  votacao_id: string;
+  tenant_id: string;
+  texto: string;
+  ordem: number;
+};
+
+export type Voto = {
+  id: string;
+  votacao_id: string;
+  tenant_id: string;
+  opcao_id: string;
+  voto_hash: string;
+  criado_em: string;
+};
+
+export type VotacaoParticipante = {
+  id: string;
+  votacao_id: string;
+  tenant_id: string;
+  user_id: string;
+  votou_em: string | null;
+};
