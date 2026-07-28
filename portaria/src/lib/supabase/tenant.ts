@@ -45,12 +45,16 @@ export const getCurrentTenant = cache(async (): Promise<Tenant | null> => {
  */
 export const getCurrentUserInTenant = cache(async () => {
   const supabase = await createClient();
-  const tenant = await getCurrentTenant();
 
-  if (!tenant) return null;
+  // O lookup do tenant (pelo header) e a validação do utilizador são
+  // independentes — corrê-los em paralelo poupa um round-trip por
+  // navegação (relevante quando as Functions estão longe do Supabase).
+  const [tenant, { data: { user } }] = await Promise.all([
+    getCurrentTenant(),
+    supabase.auth.getUser(),
+  ]);
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!tenant || !user) return null;
 
   // Verifica que o utilizador está associado a este tenant
   const { data: membership } = await supabase
