@@ -4,9 +4,12 @@ import { useActionState } from "react";
 import Link from "next/link";
 import {
   criarDocumento,
+  atualizarDocumento,
   type DocumentoFormState,
 } from "@/lib/actions/documentos";
 import { DOCUMENTO_ACCEPT } from "@/lib/documentos";
+import type { Documento } from "@/types/database";
+import { FileText } from "lucide-react";
 
 const CATEGORIAS = [
   { value: "ata", label: "Ata" },
@@ -15,14 +18,29 @@ const CATEGORIAS = [
   { value: "regulamento", label: "Regulamento" },
   { value: "manual", label: "Manual" },
   { value: "apolice", label: "Apólice" },
+  { value: "circular", label: "Circular" },
   { value: "outro", label: "Outro" },
 ];
 
-export function DocumentoForm() {
+interface DocumentoFormProps {
+  /**
+   * Se fornecido, é edição (pré-preenche e usa atualizarDocumento).
+   * Se omitido, é criação.
+   */
+  documento?: Documento;
+}
+
+export function DocumentoForm({ documento }: DocumentoFormProps) {
+  const isEdit = !!documento;
+
+  const action = isEdit
+    ? atualizarDocumento.bind(null, documento.id)
+    : criarDocumento;
+
   const [state, formAction, pending] = useActionState<
     DocumentoFormState,
     FormData
-  >(criarDocumento, {});
+  >(action, {});
 
   return (
     <form action={formAction} className="space-y-6">
@@ -45,6 +63,7 @@ export function DocumentoForm() {
           type="text"
           required
           maxLength={200}
+          defaultValue={documento?.titulo ?? ""}
           className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
           placeholder="Ex.: Ata da Assembleia Geral Ordinária 2026"
         />
@@ -67,7 +86,7 @@ export function DocumentoForm() {
             id="categoria"
             name="categoria"
             required
-            defaultValue=""
+            defaultValue={documento?.categoria ?? ""}
             className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
           >
             <option value="" disabled>
@@ -91,7 +110,10 @@ export function DocumentoForm() {
             htmlFor="ano"
             className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
           >
-            Ano <span className="normal-case tracking-normal text-oliveGray/60">(opcional)</span>
+            Ano{" "}
+            <span className="normal-case tracking-normal text-oliveGray/60">
+              (opcional)
+            </span>
           </label>
           <input
             id="ano"
@@ -100,6 +122,7 @@ export function DocumentoForm() {
             min={1900}
             max={2100}
             placeholder="2026"
+            defaultValue={documento?.ano ?? ""}
             className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
           />
           {state.fieldErrors?.ano && (
@@ -115,41 +138,67 @@ export function DocumentoForm() {
           htmlFor="descricao"
           className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
         >
-          Descrição <span className="normal-case tracking-normal text-oliveGray/60">(opcional)</span>
+          Descrição{" "}
+          <span className="normal-case tracking-normal text-oliveGray/60">
+            (opcional)
+          </span>
         </label>
         <textarea
           id="descricao"
           name="descricao"
           rows={3}
           maxLength={500}
+          defaultValue={documento?.descricao ?? ""}
           className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige resize-none"
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="ficheiro"
-          className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
-        >
-          Ficheiro
-        </label>
-        <input
-          id="ficheiro"
-          name="ficheiro"
-          type="file"
-          required
-          accept={DOCUMENTO_ACCEPT}
-          className="w-full file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-warmBeige file:text-paper file:font-body file:text-sm file:tracking-widest file:uppercase hover:file:bg-oliveGray file:transition-colors font-body text-sm text-oliveGray"
-        />
-        <p className="mt-2 text-xs text-oliveGray font-body">
-          PDF, Word, Excel ou imagem. Máximo 25 MB.
-        </p>
-        {state.fieldErrors?.ficheiro && (
-          <p className="mt-2 text-sm text-alert font-body">
-            {state.fieldErrors.ficheiro}
+      {isEdit ? (
+        <div className="bg-softCream/30 border border-warmBeige/20 p-4">
+          <label className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2">
+            Ficheiro
+          </label>
+          <div className="flex items-center gap-3">
+            <FileText className="w-5 h-5 text-warmBeige shrink-0" />
+            <div>
+              <p className="font-body text-sm text-ink">
+                {documento?.ficheiro_tipo && documento.ficheiro_tamanho
+                  ? `${documento.ficheiro_tipo} · ${(documento.ficheiro_tamanho / 1024 / 1024).toFixed(1)} MB`
+                  : "Ficheiro carregado"}
+              </p>
+              <p className="font-body text-xs text-oliveGray">
+                Não é possível substituir o ficheiro. Apague e carregue um novo
+                se necessário.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <label
+            htmlFor="ficheiro"
+            className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
+          >
+            Ficheiro
+          </label>
+          <input
+            id="ficheiro"
+            name="ficheiro"
+            type="file"
+            required
+            accept={DOCUMENTO_ACCEPT}
+            className="w-full file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-warmBeige file:text-paper file:font-body file:text-sm file:tracking-widest file:uppercase hover:file:bg-oliveGray file:transition-colors font-body text-sm text-oliveGray"
+          />
+          <p className="mt-2 text-xs text-oliveGray font-body">
+            PDF, Word, Excel ou imagem. Máximo 25 MB.
           </p>
-        )}
-      </div>
+          {state.fieldErrors?.ficheiro && (
+            <p className="mt-2 text-sm text-alert font-body">
+              {state.fieldErrors.ficheiro}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center gap-4 pt-4 border-t border-warmBeige/20">
         <button
@@ -157,7 +206,11 @@ export function DocumentoForm() {
           disabled={pending}
           className="px-8 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50"
         >
-          {pending ? "A carregar..." : "Carregar documento"}
+          {pending
+            ? "A guardar..."
+            : isEdit
+            ? "Guardar alterações"
+            : "Carregar documento"}
         </button>
         <Link
           href="/configuracao/documentos"
