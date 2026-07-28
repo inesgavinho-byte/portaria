@@ -344,3 +344,28 @@ export type ConversaIAMensagem = {
   contexto: Record<string, unknown>[] | null;
   criado_em: string;
 };
+
+export type Notificacao = {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  tipo:
+    | "ocorrencia_criada"
+    | "ocorrencia_atualizada"
+    | "ocorrencia_resolvida"
+    | "aviso_publicado"
+    | "votacao_aberta"
+    | "votacao_encerrada"
+    | "assembleia_agendada"
+    | "documento_publicado"
+    | "convite_aceite"
+    | "sistema";
+  titulo: string;
+  corpo: string | null;
+  entidade_tipo: string | null;
+  entidade_id: string | null;
+  metadata: Record<string, unknown>;
+  lida: boolean;
+  lida_em: string | null;
+  criado_em: string;
+};

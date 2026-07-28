@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { definirVista, type Vista } from "@/lib/actions/vista";
+import { NotificacoesBadge } from "@/components/layout/notificacoes-badge";
 
 export type NavItem = { href: string; label: string };
 export type NavGrupo = { titulo?: string; itens: NavItem[] };
@@ -36,13 +37,16 @@ export function AppNav({
         <Link href="/" className="font-title text-lg text-ink">
           {tenantNome}
         </Link>
-        <button
-          onClick={() => setAberto(true)}
-          aria-label="Abrir menu"
-          className="p-2 text-oliveGray hover:text-ink"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificacoesBadge />
+          <button
+            onClick={() => setAberto(true)}
+            aria-label="Abrir menu"
+            className="p-2 text-oliveGray hover:text-ink"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Overlay mobile */}
@@ -68,13 +72,16 @@ export function AppNav({
           >
             {tenantNome}
           </Link>
-          <button
-            onClick={() => setAberto(false)}
-            aria-label="Fechar menu"
-            className="lg:hidden p-1 text-oliveGray hover:text-ink"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <NotificacoesBadge />
+            <button
+              onClick={() => setAberto(false)}
+              aria-label="Fechar menu"
+              className="lg:hidden p-1 text-oliveGray hover:text-ink"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {vistas.length > 1 && <VistaToggle vista={vista} vistas={vistas} />}
