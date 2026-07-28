@@ -15,6 +15,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
       { href: "/configuracao/documentos", label: "Documentos" },
       { href: "/configuracao/avisos", label: "Avisos" },
       { href: "/blueprints", label: "Modelos" },
+      { href: "/configuracao/reservas", label: "Reservas" },
     ],
   },
   {
@@ -53,6 +54,7 @@ const GRUPOS_CONDOMINO: NavGrupo[] = [
       { href: "/ocorrencias", label: "Ocorrências" },
       { href: "/assembleias", label: "Assembleias" },
       { href: "/votacoes", label: "Votações" },
+      { href: "/reservas", label: "Reservas" },
       { href: "/ia", label: "Assistente IA" },
       { href: "/regulamento", label: "Regulamento" },
     ],
