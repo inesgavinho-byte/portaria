@@ -366,13 +366,21 @@ ${contexto || "(nenhum documento encontrado)"}`;
     conteudo: c.conteudo.slice(0, 200),
   }));
 
-  await supabase.from("conversas_ia_mensagens").insert({
-    conversa_id: conversaId,
-    tenant_id: ctx.tenant.id,
-    role: "assistant",
-    conteudo: resposta,
-    contexto: fontes as unknown as Record<string, unknown>[],
-  });
+  // S10: mensagens `assistant` só podem ser escritas pelo servidor. O RLS
+  // (migração 0029) restringe os INSERT do cliente a role='user'; a resposta
+  // do assistente é persistida via service role para não poder ser forjada.
+  const adminMsg = createAdminClient();
+  if (adminMsg) {
+    await adminMsg.from("conversas_ia_mensagens").insert({
+      conversa_id: conversaId,
+      tenant_id: ctx.tenant.id,
+      role: "assistant",
+      conteudo: resposta,
+      contexto: fontes as unknown as Record<string, unknown>[],
+    });
+  } else {
+    console.error("[ia-rag] service role indisponível: resposta não persistida.");
+  }
 
   // 9. Se for a primeira mensagem, gerar título
   const { count } = await supabase
