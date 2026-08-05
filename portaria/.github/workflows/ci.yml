@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancela runs antigos do mesmo ref (poupa minutos)
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: portaria
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: portaria/package-lock.json
+
+      - name: Instalar dependências (lockfile)
+        run: npm ci
+
+      - name: Type-check
+        run: npm run type-check
+
+      - name: Lint (não bloqueante se não configurado)
+        run: npm run lint --if-present
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        env:
+          # Valores placeholder — o build não liga ao Supabase, só precisa que
+          # as variáveis existam. NUNCA usar credenciais de produção aqui.
+          NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder-anon-key"
+
+      # ---- Supabase local + testes de RLS contra PostgREST ----
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Arrancar Supabase local (aplica migrações 0001→NNNN)
+        run: supabase start
+
+      - name: Exportar credenciais do Supabase local
+        run: |
+          supabase status -o env > .sb.env
+          echo "SUPABASE_URL=$(grep '^API_URL=' .sb.env | cut -d= -f2- | tr -d '\"')" >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=$(grep '^ANON_KEY=' .sb.env | cut -d= -f2- | tr -d '\"')" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .sb.env | cut -d= -f2- | tr -d '\"')" >> "$GITHUB_ENV"
+          rm -f .sb.env
+
+      - name: Testes de segurança RLS (PostgREST direto)
+        run: npm run test:security
+
+      - name: Diagnóstico em caso de falha
+        if: failure()
+        run: |
+          supabase status || true
+          supabase db lint || true
