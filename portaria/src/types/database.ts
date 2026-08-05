@@ -97,6 +97,7 @@ export type Fracao = {
   proprietario_email: string | null;
   proprietario_telefone: string | null;
   inquilino_nome: string | null;
+  quota_mensal_cents: number | null;
   criado_em: string;
 };
 
@@ -413,4 +414,90 @@ export type Reserva = {
   num_pessoas: number | null;
   criado_em: string;
   atualizado_em: string;
+};
+
+// ============================================================================
+// TIPOS FINANCEIROS (Migration 0027)
+// ============================================================================
+
+export type ConfiguracaoFinanceira = {
+  tenant_id: string;
+  dia_vencimento_padrao: number;
+  metodo_pagamento_padrao: string;
+  iban: string | null;
+  mbway_telefone: string | null;
+  email_financeiro: string | null;
+  moeda: string;
+  taxa_juros_mora: number | null;
+  ultimo_numero_recibo: number;
+  atualizado_em: string;
+};
+
+export type QuotaMensal = {
+  id: string;
+  tenant_id: string;
+  fracao_id: string;
+  ano: number;
+  mes: number;
+  valor_cents: number;
+  estado: "pendente" | "pago" | "parcial" | "isento";
+  vencimento: string | null;
+  notas: string | null;
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type Pagamento = {
+  id: string;
+  tenant_id: string;
+  fracao_id: string;
+  quota_ids: string[];
+  valor_cents: number;
+  metodo: "transferencia" | "mbway" | "dinheiro" | "debito_direto" | "outro";
+  data_pagamento: string;
+  referencia: string | null;
+  comprovativo_url: string | null;
+  notas: string | null;
+  registado_por: string | null;
+  criado_em: string;
+};
+
+export type Recibo = {
+  id: string;
+  tenant_id: string;
+  fracao_id: string;
+  pagamento_id: string | null;
+  numero: string;
+  valor_cents: number;
+  periodo_inicio: string | null;
+  periodo_fim: string | null;
+  pdf_url: string | null;
+  estado: "emitido" | "anulado";
+  emitido_em: string;
+  anulado_em: string | null;
+  anulado_por: string | null;
+  motivo_anulacao: string | null;
+};
+
+export type VwQuotasResumoMes = {
+  tenant_id: string;
+  ano: number;
+  mes: number;
+  pendentes: number;
+  pagas: number;
+  parciais: number;
+  isentos: number;
+  total_a_receber: number;
+  total_recebido: number;
+};
+
+export type VwInadimplencia = {
+  fracao_id: string;
+  tenant_id: string;
+  codigo: string;
+  proprietario_nome: string | null;
+  divida_total: number;
+  meses_pendentes: number;
+  ultimo_vencimento: string | null;
 };
