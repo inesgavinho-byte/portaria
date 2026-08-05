@@ -58,7 +58,7 @@ export default async function IAConfigPage({
           <div className="flex items-center justify-between">
             <span className="font-body text-sm text-oliveGray flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Documentos
+              Documentos <span className="text-xs text-oliveGray/70">(só título e descrição)</span>
             </span>
             <span className="font-title text-lg text-ink">{dados.documento ?? 0}</span>
           </div>
@@ -84,9 +84,14 @@ export default async function IAConfigPage({
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
-            Reindexar todos os documentos
+            Reindexar regulamento e ocorrências
           </button>
         </form>
+        <p className="font-body text-xs text-oliveGray/80">
+          A pesquisa do assistente cobre o texto integral do regulamento. Dos
+          documentos apenas o título e a descrição são indexados — o conteúdo
+          dos PDF não é lido.
+        </p>
 
         <p className="font-body text-xs text-oliveGray">
           A reindexação apaga todos os embeddings existentes e recria-os a partir do regulamento e ocorrências resolvidas.
