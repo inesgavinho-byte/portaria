@@ -105,12 +105,16 @@ export async function atualizarPreferenciaNotificacoes(
   const ativo = formData.get("notificacoes_email") === "on";
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from("user_tenants")
-    .update({ notificacoes_email: ativo })
+    .update({ notificacoes_email: ativo }, { count: "exact" })
     .eq("user_id", ctx.user.id)
     .eq("tenant_id", ctx.tenant.id);
 
   if (error) return { error: "Erro ao guardar preferência." };
+  // S7: confirmar que a linha foi de facto atualizada. Antes, o RLS de
+  // user_tenants só permitia UPDATE a admins, pelo que um condómino recebia
+  // ok:true sem gravar nada (0 linhas afetadas, sem erro).
+  if (!count) return { error: "Não foi possível guardar a preferência." };
   return { ok: true };
 }

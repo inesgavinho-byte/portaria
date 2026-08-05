@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 import { ChevronLeft, Plus } from "lucide-react";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
-import { listarEspacos, listarReservas } from "@/lib/actions/reservas";
+import { listarEspacos, listarReservasAdmin } from "@/lib/actions/reservas";
 
 export default async function ConfigReservasPage() {
   const ctx = await getCurrentUserInTenant();
@@ -15,7 +15,7 @@ export default async function ConfigReservasPage() {
   const daqui30dias = new Date();
   daqui30dias.setDate(daqui30dias.getDate() + 30);
 
-  const reservas = await listarReservas(
+  const reservas = await listarReservasAdmin(
     undefined,
     hoje.toISOString(),
     daqui30dias.toISOString()

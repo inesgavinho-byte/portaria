@@ -97,7 +97,7 @@ export async function notificarNovaOcorrencia(
       subject: `Nova ocorrência: ${ocorrencia.titulo}`,
       html: molde({
         titulo: "Nova ocorrência",
-        corpo: `<p>Foi registada uma nova ocorrência em <strong>${tenant.nome}</strong>.</p>
+        corpo: `<p>Foi registada uma nova ocorrência em <strong>${escapeHtml(tenant.nome)}</strong>.</p>
           <p style="margin-top:16px"><strong>${escapeHtml(ocorrencia.titulo)}</strong><br>
           <span style="color:#9a9384;font-size:13px">${escapeHtml(ocorrencia.categoria)}</span></p>`,
         acaoTexto: "Ver ocorrência",

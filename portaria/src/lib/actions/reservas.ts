@@ -146,12 +146,46 @@ export async function apagarEspaco(espacoId: string): Promise<void> {
 // RESERVAS
 // ---------------------------------------------------------------------------
 
+/**
+ * S9 — dados de disponibilidade minimizados: só espaço/início/fim/estado,
+ * SEM user_id/motivo/num_pessoas de terceiros. Usado para pintar os slots
+ * ocupados. Obtido via a função disponibilidade_reservas (o RLS já não deixa
+ * um membro ler as reservas dos outros diretamente).
+ */
+export type OcupacaoReserva = Pick<
+  Reserva,
+  "espaco_id" | "data_inicio" | "data_fim" | "estado"
+>;
+
 export async function listarReservas(
   espacoId?: string,
   dataInicio?: string,
   dataFim?: string
-): Promise<Reserva[]> {
+): Promise<OcupacaoReserva[]> {
   const ctx = await getCurrentUserInTenant();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("disponibilidade_reservas", {
+    p_espaco_id: espacoId ?? null,
+    p_from: dataInicio ?? null,
+    p_to: dataFim ?? null,
+  });
+
+  return (data ?? []) as OcupacaoReserva[];
+}
+
+/**
+ * Versão administrativa com os dados completos (quem reservou, motivo, etc.).
+ * Só para admins — a gestão operacional das reservas exige-o. O RLS
+ * "admins manage reservas" garante o acesso; requireAdmin protege a action.
+ */
+export async function listarReservasAdmin(
+  espacoId?: string,
+  dataInicio?: string,
+  dataFim?: string
+): Promise<Reserva[]> {
+  const ctx = await requireAdmin();
   if (!ctx) return [];
 
   const supabase = await createClient();

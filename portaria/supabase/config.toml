@@ -1,0 +1,52 @@
+# Configuração do Supabase local (desenvolvimento + CI).
+#
+# Permite `supabase start` / `supabase db reset` para recriar o schema a partir
+# das migrações em supabase/migrations. NÃO contém segredos nem liga a
+# produção. Ver docs/engineering/ (Tarefa 2.6) para o fluxo.
+#
+# Nota: o schema deste ficheiro pode variar entre versões da Supabase CLI. Se
+# `supabase start` reclamar de um campo, correr `supabase init` para
+# regenerar e reaplicar estes valores.
+
+project_id = "portaria"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[db.pooler]
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["https://127.0.0.1:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[analytics]
+enabled = false

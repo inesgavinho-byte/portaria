@@ -58,6 +58,73 @@ function chunkTexto(
 // ---------------------------------------------------------------------------
 
 /**
+ * Substitui de forma SEGURA os embeddings de uma origem (A2 — reindexação
+ * não destrutiva).
+ *
+ * Computa PRIMEIRO todos os novos vetores; só depois apaga os antigos e
+ * insere os novos, numa janela mínima. Se o serviço de embeddings estiver em
+ * baixo (nenhum vetor gerado), a base anterior é PRESERVADA — nunca se apaga
+ * tudo antes de confirmar que há uma nova geração.
+ *
+ * Casos:
+ *   • fonte vazia (0 itens)        → limpa a origem (nada a indexar) e devolve 0.
+ *   • itens > 0 mas 0 embeddings   → mantém a base anterior e devolve erro.
+ *   • itens > 0 e ≥1 embedding     → substitui.
+ */
+async function reindexarOrigem(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tenantId: string,
+  origem: string,
+  itens: { origem_id: string; conteudo: string; metadata: Record<string, unknown> }[],
+  opts?: { origemId?: string }
+): Promise<{ inseridos: number; error?: string }> {
+  const apagarAntigos = async () => {
+    let del = supabase
+      .from("conhecimento_embeddings")
+      .delete()
+      .eq("tenant_id", tenantId)
+      .eq("origem", origem);
+    if (opts?.origemId) del = del.eq("origem_id", opts.origemId);
+    await del;
+  };
+
+  if (itens.length === 0) {
+    // Fonte legitimamente vazia: limpar o que existisse.
+    await apagarAntigos();
+    return { inseridos: 0 };
+  }
+
+  // 1) Computar todos os embeddings ANTES de tocar na base.
+  const rows: Record<string, unknown>[] = [];
+  for (const it of itens) {
+    const embedding = await gerarEmbedding(it.conteudo);
+    if (!embedding) continue;
+    rows.push({
+      tenant_id: tenantId,
+      origem,
+      origem_id: it.origem_id,
+      conteudo: it.conteudo,
+      embedding: JSON.stringify(embedding),
+      metadata: it.metadata,
+    });
+  }
+
+  // 2) Nenhum vetor gerado (serviço em baixo) → preservar a base anterior.
+  if (rows.length === 0) {
+    return {
+      inseridos: 0,
+      error: "Não foi possível gerar embeddings. A base de conhecimento anterior foi preservada.",
+    };
+  }
+
+  // 3) Só agora substituir (janela mínima: um delete + um insert em lote).
+  await apagarAntigos();
+  const { error } = await supabase.from("conhecimento_embeddings").insert(rows);
+  if (error) return { inseridos: 0, error: "Erro ao gravar embeddings." };
+  return { inseridos: rows.length };
+}
+
+/**
  * Ingerir regulamento do tenant. Extrai texto do tenant_perfil.regulamento_texto.
  */
 export async function ingerirRegulamento(): Promise<{
@@ -80,35 +147,14 @@ export async function ingerirRegulamento(): Promise<{
     return { inseridos: 0, error: "Regulamento não encontrado." };
   }
 
-  // Apagar embeddings antigos do regulamento
-  await supabase
-    .from("conhecimento_embeddings")
-    .delete()
-    .eq("tenant_id", ctx.tenant.id)
-    .eq("origem", "regulamento");
-
-  // Dividir em chunks
   const chunks = chunkTexto(perfil.regulamento_texto);
-  let inseridos = 0;
+  const itens = chunks.map((chunk, i) => ({
+    origem_id: "regulamento",
+    conteudo: chunk,
+    metadata: { chunk_index: i, total_chunks: chunks.length },
+  }));
 
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const embedding = await gerarEmbedding(chunk);
-    if (!embedding) continue;
-
-    const { error } = await supabase.from("conhecimento_embeddings").insert({
-      tenant_id: ctx.tenant.id,
-      origem: "regulamento",
-      origem_id: "regulamento",
-      conteudo: chunk,
-      embedding: JSON.stringify(embedding),
-      metadata: { chunk_index: i, total_chunks: chunks.length },
-    });
-
-    if (!error) inseridos++;
-  }
-
-  return { inseridos };
+  return reindexarOrigem(supabase, ctx.tenant.id, "regulamento", itens);
 }
 
 /**
@@ -133,41 +179,24 @@ export async function ingerirDocumento(documentoId: string): Promise<{
 
   if (!doc) return { inseridos: 0, error: "Documento não encontrado." };
 
-  // Para documentos PDF, precisaríamos de extrair texto — por agora usa título + descrição
+  // NOTA (A1): apenas título + descrição são indexados — o conteúdo integral
+  // do PDF NÃO é extraído. metadata.indexacao='metadados' torna isto explícito
+  // para a UI distinguir "metadados indexados" de "conteúdo indexado".
   const texto = `${doc.titulo}\n\n${doc.descricao ?? ""}`;
   if (!texto.trim()) {
     return { inseridos: 0, error: "Documento sem conteúdo indexável." };
   }
 
-  // Apagar embeddings antigos deste documento
-  await supabase
-    .from("conhecimento_embeddings")
-    .delete()
-    .eq("tenant_id", ctx.tenant.id)
-    .eq("origem", "documento")
-    .eq("origem_id", documentoId);
-
   const chunks = chunkTexto(texto);
-  let inseridos = 0;
+  const itens = chunks.map((chunk, i) => ({
+    origem_id: documentoId,
+    conteudo: chunk,
+    metadata: { titulo: doc.titulo, chunk_index: i, indexacao: "metadados" as const },
+  }));
 
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-    const embedding = await gerarEmbedding(chunk);
-    if (!embedding) continue;
-
-    const { error } = await supabase.from("conhecimento_embeddings").insert({
-      tenant_id: ctx.tenant.id,
-      origem: "documento",
-      origem_id: documentoId,
-      conteudo: chunk,
-      embedding: JSON.stringify(embedding),
-      metadata: { titulo: doc.titulo, chunk_index: i },
-    });
-
-    if (!error) inseridos++;
-  }
-
-  return { inseridos };
+  return reindexarOrigem(supabase, ctx.tenant.id, "documento", itens, {
+    origemId: documentoId,
+  });
 }
 
 /**
@@ -188,37 +217,13 @@ export async function ingerirOcorrenciasResolvidas(): Promise<{
     .eq("tenant_id", ctx.tenant.id)
     .eq("estado", "resolvido");
 
-  if (!ocorrencias || ocorrencias.length === 0) {
-    return { inseridos: 0 };
-  }
+  const itens = (ocorrencias ?? []).map((ocorrencia) => ({
+    origem_id: ocorrencia.id,
+    conteudo: `Ocorrência: ${ocorrencia.titulo}\nCategoria: ${ocorrencia.categoria}\nDescrição: ${ocorrencia.descricao ?? ""}`,
+    metadata: { categoria: ocorrencia.categoria },
+  }));
 
-  // Apagar embeddings antigos
-  await supabase
-    .from("conhecimento_embeddings")
-    .delete()
-    .eq("tenant_id", ctx.tenant.id)
-    .eq("origem", "ocorrencia_resolvida");
-
-  let inseridos = 0;
-
-  for (const ocorrencia of ocorrencias) {
-    const texto = `Ocorrência: ${ocorrencia.titulo}\nCategoria: ${ocorrencia.categoria}\nDescrição: ${ocorrencia.descricao ?? ""}`;
-    const embedding = await gerarEmbedding(texto);
-    if (!embedding) continue;
-
-    const { error } = await supabase.from("conhecimento_embeddings").insert({
-      tenant_id: ctx.tenant.id,
-      origem: "ocorrencia_resolvida",
-      origem_id: ocorrencia.id,
-      conteudo: texto,
-      embedding: JSON.stringify(embedding),
-      metadata: { categoria: ocorrencia.categoria },
-    });
-
-    if (!error) inseridos++;
-  }
-
-  return { inseridos };
+  return reindexarOrigem(supabase, ctx.tenant.id, "ocorrencia_resolvida", itens);
 }
 
 /**
@@ -232,14 +237,10 @@ export async function reindexarTenant(): Promise<{
   const ctx = await requireAdmin();
   if (!ctx) return { regulamento: 0, ocorrencias: 0, error: "Sem permissões." };
 
-  const supabase = await createClient();
-
-  // Apagar tudo
-  await supabase
-    .from("conhecimento_embeddings")
-    .delete()
-    .eq("tenant_id", ctx.tenant.id);
-
+  // A2: NÃO se apaga tudo à cabeça. Cada origem é reindexada de forma segura
+  // (computa-se a nova geração antes de apagar a anterior — ver
+  // reindexarOrigem). Se o serviço de embeddings estiver em baixo, a base
+  // anterior é preservada e o erro é propagado.
   const [regResult, ocorResult] = await Promise.all([
     ingerirRegulamento(),
     ingerirOcorrenciasResolvidas(),
@@ -247,9 +248,16 @@ export async function reindexarTenant(): Promise<{
 
   revalidatePath("/ia/configuracao");
 
+  // "Regulamento não encontrado" não é falha de reindexação (pode não existir).
+  const erroReal =
+    (regResult.error && regResult.error !== "Regulamento não encontrado."
+      ? regResult.error
+      : undefined) ?? ocorResult.error;
+
   return {
     regulamento: regResult.inseridos,
     ocorrencias: ocorResult.inseridos,
+    ...(erroReal ? { error: erroReal } : {}),
   };
 }
 
@@ -366,13 +374,21 @@ ${contexto || "(nenhum documento encontrado)"}`;
     conteudo: c.conteudo.slice(0, 200),
   }));
 
-  await supabase.from("conversas_ia_mensagens").insert({
-    conversa_id: conversaId,
-    tenant_id: ctx.tenant.id,
-    role: "assistant",
-    conteudo: resposta,
-    contexto: fontes as unknown as Record<string, unknown>[],
-  });
+  // S10: mensagens `assistant` só podem ser escritas pelo servidor. O RLS
+  // (migração 0029) restringe os INSERT do cliente a role='user'; a resposta
+  // do assistente é persistida via service role para não poder ser forjada.
+  const adminMsg = createAdminClient();
+  if (adminMsg) {
+    await adminMsg.from("conversas_ia_mensagens").insert({
+      conversa_id: conversaId,
+      tenant_id: ctx.tenant.id,
+      role: "assistant",
+      conteudo: resposta,
+      contexto: fontes as unknown as Record<string, unknown>[],
+    });
+  } else {
+    console.error("[ia-rag] service role indisponível: resposta não persistida.");
+  }
 
   // 9. Se for a primeira mensagem, gerar título
   const { count } = await supabase
@@ -514,8 +530,12 @@ export async function sugerirResolucao(
   ocorrenciasRelacionadas?: { id: string; titulo: string }[];
   error?: string;
 }> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx) return { error: "Não autenticado." };
+  // C2: a sugestão baseia-se em ocorrências resolvidas (descrições de queixas
+  // de terceiros). Só admins podem invocá-la. Ao nível da BD, buscar_chunks já
+  // devolve 0 chunks de ocorrencia_resolvida a não-admins (migração 0028), mas
+  // a action recusa explicitamente para não expor sequer o caminho.
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Apenas administradores podem obter sugestões." };
 
   const supabase = await createClient();
 

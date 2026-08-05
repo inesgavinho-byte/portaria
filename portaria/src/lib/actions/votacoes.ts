@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import type { Votacao, VotacaoOpcao } from "@/types/database";
-import { randomBytes, createHash } from "crypto";
 
 // ---------------------------------------------------------------------------
 // TIPOS
@@ -35,12 +34,6 @@ export type ResultadoVotacao = {
 // ---------------------------------------------------------------------------
 // HELPERS
 // ---------------------------------------------------------------------------
-
-function gerarVotoHash(votacaoId: string, opcaoId: string, salt: string): string {
-  return createHash("sha256")
-    .update(`${votacaoId}:${opcaoId}:${salt}`)
-    .digest("hex");
-}
 
 const QUORUM_LABEL: Record<Votacao["tipo_quorum"], string> = {
   maioria_simples: "Maioria simples (>50%)",
@@ -359,72 +352,32 @@ export async function votar(
 
   const supabase = await createClient();
 
-  // 1. Verificar se a votação está aberta
-  const { data: votacao } = await supabase
-    .from("votacoes")
-    .select("id, estado, tenant_id")
-    .eq("id", votacaoId)
-    .eq("tenant_id", ctx.tenant.id)
-    .single();
-
-  if (!votacao) return { error: "Votação não encontrada." };
-  if (votacao.estado !== "aberta") return { error: "Esta votação não está aberta." };
-
-  // 2. Verificar se é participante e ainda não votou
-  const { data: participante } = await supabase
-    .from("votacao_participantes")
-    .select("id, votou_em")
-    .eq("votacao_id", votacaoId)
-    .eq("user_id", ctx.user.id)
-    .eq("tenant_id", ctx.tenant.id)
-    .single();
-
-  if (!participante) return { error: "Não está autorizado a votar nesta votação." };
-  if (participante.votou_em) return { error: "Já votou nesta votação." };
-
-  // 3. Verificar se a opção pertence à votação
-  const { data: opcao } = await supabase
-    .from("votacao_opcoes")
-    .select("id")
-    .eq("id", opcaoId)
-    .eq("votacao_id", votacaoId)
-    .single();
-
-  if (!opcao) return { error: "Opção inválida." };
-
-  // 4. Gerar hash de verificação
-  const salt = randomBytes(16).toString("hex");
-  const hash = gerarVotoHash(votacaoId, opcaoId, salt);
-
-  // 5. Inserir voto
-  const { error: votoError } = await supabase.from("votos").insert({
-    votacao_id: votacaoId,
-    tenant_id: ctx.tenant.id,
-    opcao_id: opcaoId,
-    voto_hash: hash,
+  // Toda a integridade do voto (votação aberta, participação, opção válida,
+  // unicidade e atualização atómica de votou_em) é garantida pela função
+  // transacional registar_voto no servidor de BD (SECURITY DEFINER, com lock
+  // do participante). O cliente já não insere em `votos` diretamente — o RLS
+  // bloqueia esse caminho (migração 0028, S4). Devolve o hash de comprovativo.
+  const { data: hash, error } = await supabase.rpc("registar_voto", {
+    p_votacao_id: votacaoId,
+    p_opcao_id: opcaoId,
   });
 
-  if (votoError) {
-    console.error("Erro ao registar voto:", votoError);
+  if (error) {
+    // Traduz as exceções da função para mensagens ao utilizador.
+    const msg = error.message ?? "";
+    if (msg.includes("Já votou")) return { error: "Já votou nesta votação." };
+    if (msg.includes("não está aberta")) return { error: "Esta votação não está aberta." };
+    if (msg.includes("autorizado")) return { error: "Não está autorizado a votar nesta votação." };
+    if (msg.includes("Opção inválida")) return { error: "Opção inválida." };
+    console.error("Erro ao registar voto:", error);
     return { error: "Erro ao registar o voto. Tente novamente." };
-  }
-
-  // 6. Marcar participante como votado
-  const { error: partError } = await supabase
-    .from("votacao_participantes")
-    .update({ votou_em: new Date().toISOString() })
-    .eq("id", participante.id);
-
-  if (partError) {
-    console.error("Erro ao marcar participante:", partError);
-    // Não é crítico — o voto já foi registado
   }
 
   revalidatePath("/assembleias");
   revalidatePath(`/assembleias/${votacaoId}`);
   revalidatePath("/votacoes");
 
-  return { success: true, hash };
+  return { success: true, hash: (hash as string | null) ?? undefined };
 }
 
 // ---------------------------------------------------------------------------
