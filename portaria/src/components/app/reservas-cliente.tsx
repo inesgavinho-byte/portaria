@@ -13,12 +13,13 @@ import {
   X,
   AlertCircle,
 } from "lucide-react";
-import { criarReserva, cancelarReserva } from "@/lib/actions/reservas";
+import { criarReserva, cancelarReserva, type OcupacaoReserva } from "@/lib/actions/reservas";
 import type { EspacoComum, Reserva } from "@/types/database";
 
 interface ReservasClienteProps {
+  // S9: a lista geral só traz disponibilidade (sem dados pessoais de terceiros).
   espacos: EspacoComum[];
-  reservas: Reserva[];
+  reservas: OcupacaoReserva[];
   minhasReservas: Reserva[];
   userId: string;
 }
@@ -72,7 +73,7 @@ export function ReservasCliente({
     );
   });
 
-  const minhaReservaNoDia = minhasReservas.find((r) => {
+  const minhasReservasDia = minhasReservas.filter((r) => {
     const d = new Date(r.data_inicio);
     return (
       r.espaco_id === espacoAtivo.id &&
@@ -82,6 +83,8 @@ export function ReservasCliente({
       r.estado !== "cancelada"
     );
   });
+
+  const minhaReservaNoDia = minhasReservasDia[0];
 
   function handleReservar(slotHora: string) {
     setSlotSelecionado({
@@ -237,11 +240,12 @@ export function ReservasCliente({
             return slotTime >= riTime && slotTime < rfTime;
           });
 
-          const minha = reservasDia.some(
+          // S9: "minha" deriva das MINHAS reservas (a lista geral já não traz
+          // user_id de terceiros).
+          const minha = minhasReservasDia.some(
             (r) =>
-              r.user_id === userId &&
               new Date(r.data_inicio).getHours() ===
-                parseInt(slot.hora.split(":")[0])
+              parseInt(slot.hora.split(":")[0])
           );
 
           return (
