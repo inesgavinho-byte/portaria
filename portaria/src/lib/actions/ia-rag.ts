@@ -514,8 +514,12 @@ export async function sugerirResolucao(
   ocorrenciasRelacionadas?: { id: string; titulo: string }[];
   error?: string;
 }> {
-  const ctx = await getCurrentUserInTenant();
-  if (!ctx) return { error: "Não autenticado." };
+  // C2: a sugestão baseia-se em ocorrências resolvidas (descrições de queixas
+  // de terceiros). Só admins podem invocá-la. Ao nível da BD, buscar_chunks já
+  // devolve 0 chunks de ocorrencia_resolvida a não-admins (migração 0028), mas
+  // a action recusa explicitamente para não expor sequer o caminho.
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Apenas administradores podem obter sugestões." };
 
   const supabase = await createClient();
 

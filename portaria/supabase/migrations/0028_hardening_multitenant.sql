@@ -348,11 +348,13 @@ $$;
 -- `votos` e o UPDATE de membro em `votacao_participantes`.
 -- =====================================================================
 
+-- drop-first porque o tipo de retorno mudou (void -> text) e para idempotência
+drop function if exists public.registar_voto(uuid, uuid);
 create or replace function public.registar_voto(
   p_votacao_id uuid,
   p_opcao_id uuid
 )
-returns void
+returns text
 language plpgsql
 security definer
 set search_path = public
@@ -422,6 +424,10 @@ begin
   update public.votacao_participantes
     set votou_em = now()
   where id = v_part_id;
+
+  -- Devolve o hash de comprovativo (a UI mostra-o ao votante). A
+  -- verificabilidade real por hash é decidida na Tarefa 1.4 (D6/C5).
+  return v_hash;
 end;
 $$;
 
