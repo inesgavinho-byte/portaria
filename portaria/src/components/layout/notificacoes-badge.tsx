@@ -3,39 +3,33 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Bell } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { contarNaoLidas } from "@/lib/actions/notificacoes";
 
+/**
+ * Indicador leve de notificações. A atualização periódica evita que uma falha
+ * de Realtime no cliente possa interromper o carregamento da área autenticada.
+ */
 export function NotificacoesBadge() {
   const [count, setCount] = useState(0);
 
-  // Contagem inicial
   useEffect(() => {
-    contarNaoLidas().then(setCount);
-  }, []);
+    let mounted = true;
 
-  // Realtime: escuta inserções na tabela notificacoes
-  useEffect(() => {
-    const supabase = createClient();
+    async function atualizarContagem() {
+      try {
+        const total = await contarNaoLidas();
+        if (mounted) setCount(total);
+      } catch {
+        // O indicador é não crítico: mantém a última contagem disponível.
+      }
+    }
 
-    const channel = supabase
-      .channel("notificacoes-badge")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notificacoes",
-        },
-        () => {
-          // Incrementa contador em vez de fazer fetch
-          setCount((c) => c + 1);
-        }
-      )
-      .subscribe();
+    void atualizarContagem();
+    const interval = window.setInterval(() => void atualizarContagem(), 60_000);
 
     return () => {
-      supabase.removeChannel(channel);
+      mounted = false;
+      window.clearInterval(interval);
     };
   }, []);
 
