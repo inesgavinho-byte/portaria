@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LockKeyhole, Plus, FileText } from "lucide-react";
+import { LockKeyhole, Plus, FileText, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { CATEGORIA_LABEL } from "@/lib/documentos";
@@ -32,10 +32,16 @@ export default async function DocumentosAdministracaoPage() {
             Folhas de reconciliação, comprovativos, transição de pastas e outros documentos de trabalho que não são publicados aos condóminos.
           </p>
         </div>
-        <Link href="/configuracao/documentos-administracao/novo"
-          className="inline-flex shrink-0 items-center gap-2 bg-ink px-6 py-3 font-body text-sm uppercase tracking-widest text-paper transition-colors hover:bg-oliveGray">
-          <Plus className="h-4 w-4" />Carregar
-        </Link>
+        <div className="flex shrink-0 flex-wrap justify-end gap-2">
+          <Link href="/configuracao/documentos-administracao/lote"
+            className="inline-flex items-center gap-2 border border-ink px-5 py-3 font-body text-sm uppercase tracking-widest text-ink transition-colors hover:bg-ink/5">
+            <Upload className="h-4 w-4" />Carregar em lote
+          </Link>
+          <Link href="/configuracao/documentos-administracao/novo"
+            className="inline-flex items-center gap-2 bg-ink px-5 py-3 font-body text-sm uppercase tracking-widest text-paper transition-colors hover:bg-oliveGray">
+            <Plus className="h-4 w-4" />Carregar
+          </Link>
+        </div>
       </div>
 
       <MigrarQuotasHistorico tenantId={ctx.tenant.id} />
