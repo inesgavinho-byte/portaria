@@ -315,3 +315,90 @@ export async function finalizarDocumentosAdministracaoEmLote(input: {
   revalidatePath("/configuracao/documentos-administracao/lote");
   return { carregados: documentos.length, falhas };
 }
+
+
+export type DocumentoAdministracaoLotePreparacaoItem = {
+  ordem: number;
+  nome: string;
+  tamanho: number;
+  tipo: string;
+};
+
+export type DocumentoAdministracaoLoteAssinado = DocumentoAdministracaoLoteItem & {
+  ordem: number;
+  signedUrl: string;
+};
+
+export type DocumentoAdministracaoLotePreparacaoResultado = {
+  error?: string;
+  ficheiros?: DocumentoAdministracaoLoteAssinado[];
+  falhas?: string[];
+};
+
+/**
+ * Gera URLs de carregamento temporárias para que documentos grandes sigam do
+ * navegador diretamente para o bucket privado, sem atravessar a server action.
+ */
+export async function prepararDocumentosAdministracaoEmLote(input: {
+  ficheiros: DocumentoAdministracaoLotePreparacaoItem[];
+}): Promise<DocumentoAdministracaoLotePreparacaoResultado> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões para esta operação." };
+  if (!Array.isArray(input.ficheiros) || input.ficheiros.length === 0 || input.ficheiros.length > 30) {
+    return { error: "O lote tem de conter entre 1 e 30 ficheiros." };
+  }
+
+  const supabase = await createClient();
+  const loteId = crypto.randomUUID();
+  const ordens = new Set<number>();
+  const ficheiros: DocumentoAdministracaoLoteAssinado[] = [];
+  const falhas: string[] = [];
+
+  for (const ficheiro of input.ficheiros) {
+    if (!Number.isInteger(ficheiro.ordem) || ficheiro.ordem < 0 || ficheiro.ordem > 29 || ordens.has(ficheiro.ordem)) {
+      falhas.push(`${ficheiro.nome}: referência de lote inválida.`);
+      continue;
+    }
+    ordens.add(ficheiro.ordem);
+    if (!ficheiro.nome || !Number.isFinite(ficheiro.tamanho) || ficheiro.tamanho <= 0 || ficheiro.tamanho > TAMANHO_MAXIMO_BYTES) {
+      falhas.push(`${ficheiro.nome || "Ficheiro"}: tamanho inválido.`);
+      continue;
+    }
+    const extensao = DOCUMENTO_TIPOS_VALIDOS[ficheiro.tipo];
+    if (!extensao) {
+      falhas.push(`${ficheiro.nome}: tipo de ficheiro não suportado.`);
+      continue;
+    }
+
+    const path = `${ctx.tenant.id}/lotes/${loteId}/${String(ficheiro.ordem + 1).padStart(2, "0")}-${crypto.randomUUID()}.${extensao}`;
+    const { data, error } = await supabase.storage
+      .from("documentos-admin")
+      .createSignedUploadUrl(path);
+    if (error || !data?.signedUrl) {
+      falhas.push(`${ficheiro.nome}: não foi possível preparar o envio seguro.`);
+      continue;
+    }
+    ficheiros.push({
+      ordem: ficheiro.ordem,
+      nome: ficheiro.nome,
+      path,
+      tamanho: ficheiro.tamanho,
+      tipo: ficheiro.tipo,
+      signedUrl: data.signedUrl,
+    });
+  }
+
+  if (ficheiros.length === 0) return { error: "Não existem ficheiros válidos para carregar.", falhas };
+  return { ficheiros, falhas };
+}
+
+/** Remove objetos temporários se a finalização de metadados falhar. */
+export async function removerDocumentosAdministracaoTemporarios(paths: string[]): Promise<void> {
+  const ctx = await requireAdmin();
+  if (!ctx) return;
+  const prefixoPermitido = `${ctx.tenant.id}/lotes/`;
+  const seguros = paths.filter((path) => path.startsWith(prefixoPermitido)).slice(0, 30);
+  if (seguros.length === 0) return;
+  const supabase = await createClient();
+  await supabase.storage.from("documentos-admin").remove(seguros);
+}
