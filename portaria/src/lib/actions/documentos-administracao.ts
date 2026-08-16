@@ -204,7 +204,14 @@ export async function gerarLinkDownloadDocumentoAdministracao(documentoId: strin
 }
 
 
-export type DocumentoAdministracaoLoteState = {
+export type DocumentoAdministracaoLoteItem = {
+  nome: string;
+  path: string;
+  tamanho: number;
+  tipo: string;
+};
+
+export type DocumentoAdministracaoLoteResultado = {
   error?: string;
   carregados?: number;
   falhas?: string[];
@@ -234,108 +241,77 @@ function categoriaPorFicheiro(nome: string, categoriaBase: Documento["categoria"
 }
 
 /**
- * Carrega vários documentos confidenciais de uma só vez. Cada ficheiro recebe
- * um registo e caminho próprios, sempre dentro da pasta do tenant do admin.
+ * Finaliza os registos de um lote já enviado diretamente do navegador para o
+ * bucket privado. Evita enviar ficheiros grandes pelo pedido da server action.
  */
-export async function criarDocumentosAdministracaoEmLote(
-  _prev: DocumentoAdministracaoLoteState,
-  formData: FormData
-): Promise<DocumentoAdministracaoLoteState> {
+export async function finalizarDocumentosAdministracaoEmLote(input: {
+  categoria: Documento["categoria"];
+  descricao?: string;
+  ano?: number | null;
+  ficheiros: DocumentoAdministracaoLoteItem[];
+}): Promise<DocumentoAdministracaoLoteResultado> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões para esta operação." };
 
-  const categoria = String(formData.get("categoria") ?? "outro");
-  const descricaoBase = String(formData.get("descricao") ?? "").trim() || null;
-  const anoStr = String(formData.get("ano") ?? "").trim();
-  const files = formData
-    .getAll("ficheiros")
-    .filter((item): item is File => item instanceof File && item.size > 0);
-
-  if (!CATEGORIAS_VALIDAS.includes(categoria as Documento["categoria"])) {
-    return { error: "Categoria inválida." };
+  if (!CATEGORIAS_VALIDAS.includes(input.categoria)) return { error: "Categoria inválida." };
+  if (!Array.isArray(input.ficheiros) || input.ficheiros.length === 0 || input.ficheiros.length > 30) {
+    return { error: "O lote tem de conter entre 1 e 30 ficheiros." };
   }
-  if (files.length === 0) return { error: "Selecione pelo menos um ficheiro." };
-  if (files.length > 30) return { error: "Carregue no máximo 30 ficheiros por lote." };
+  if (input.descricao && input.descricao.length > 500) return { error: "Nota comum demasiado longa." };
+  if (input.ano !== null && input.ano !== undefined && (input.ano < 1900 || input.ano > 2100)) {
+    return { error: "Ano inválido." };
+  }
 
-  let ano: number | null = null;
-  if (anoStr) {
-    const parsed = Number.parseInt(anoStr, 10);
-    if (Number.isNaN(parsed) || parsed < 1900 || parsed > 2100) {
-      return { error: "Ano inválido." };
+  const prefixoPermitido = `${ctx.tenant.id}/lotes/`;
+  const pathsVistos = new Set<string>();
+  const falhas: string[] = [];
+  const documentos = [] as Array<{
+    tenant_id: string;
+    titulo: string;
+    descricao: string | null;
+    categoria: Documento["categoria"];
+    ano: number | null;
+    ficheiro_path: string;
+    ficheiro_tamanho: number;
+    ficheiro_tipo: string;
+    upload_por: string;
+  }>;
+
+  for (const ficheiro of input.ficheiros) {
+    const titulo = tituloDeFicheiro(ficheiro.nome);
+    if (!titulo || !ficheiro.path.startsWith(prefixoPermitido) || pathsVistos.has(ficheiro.path)) {
+      falhas.push(`${ficheiro.nome}: referência de carregamento inválida.`);
+      continue;
     }
-    ano = parsed;
+    if (!Number.isFinite(ficheiro.tamanho) || ficheiro.tamanho <= 0 || ficheiro.tamanho > TAMANHO_MAXIMO_BYTES) {
+      falhas.push(`${ficheiro.nome}: tamanho inválido.`);
+      continue;
+    }
+    if (!DOCUMENTO_TIPOS_VALIDOS[ficheiro.tipo]) {
+      falhas.push(`${ficheiro.nome}: tipo de ficheiro não suportado.`);
+      continue;
+    }
+    pathsVistos.add(ficheiro.path);
+    documentos.push({
+      tenant_id: ctx.tenant.id,
+      titulo,
+      descricao: input.descricao?.trim() || null,
+      categoria: categoriaPorFicheiro(ficheiro.nome, input.categoria),
+      ano: input.ano ?? null,
+      ficheiro_path: ficheiro.path,
+      ficheiro_tamanho: ficheiro.tamanho,
+      ficheiro_tipo: ficheiro.tipo,
+      upload_por: ctx.user.id,
+    });
   }
+
+  if (documentos.length === 0) return { error: "Não existem ficheiros válidos para finalizar.", falhas };
 
   const supabase = await createClient();
-  const falhas: string[] = [];
-  let carregados = 0;
-
-  for (const file of files) {
-    const titulo = tituloDeFicheiro(file.name);
-    const categoriaFicheiro = categoriaPorFicheiro(file.name, categoria as Documento["categoria"]);
-    if (!titulo) {
-      falhas.push(`${file.name}: não foi possível gerar um título.`);
-      continue;
-    }
-    if (file.size > TAMANHO_MAXIMO_BYTES) {
-      falhas.push(`${file.name}: excede o limite de 25 MB.`);
-      continue;
-    }
-    if (!DOCUMENTO_TIPOS_VALIDOS[file.type]) {
-      falhas.push(`${file.name}: tipo de ficheiro não suportado.`);
-      continue;
-    }
-
-    const { data: documento, error: insertError } = await supabase
-      .from("documentos_administracao")
-      .insert({
-        tenant_id: ctx.tenant.id,
-        titulo,
-        descricao: descricaoBase,
-        categoria: categoriaFicheiro,
-        ano,
-        ficheiro_path: "pending",
-        ficheiro_tamanho: file.size,
-        ficheiro_tipo: file.type,
-        upload_por: ctx.user.id,
-      })
-      .select("id")
-      .single();
-
-    if (insertError || !documento) {
-      falhas.push(`${file.name}: erro ao criar o registo confidencial.`);
-      continue;
-    }
-
-    const extensao = DOCUMENTO_TIPOS_VALIDOS[file.type];
-    const path = `${ctx.tenant.id}/${documento.id}/${Date.now()}.${extensao}`;
-    const { error: uploadError } = await supabase.storage
-      .from("documentos-admin")
-      .upload(path, file, { contentType: file.type, cacheControl: "3600", upsert: false });
-
-    if (uploadError) {
-      await supabase.from("documentos_administracao").delete().eq("id", documento.id);
-      falhas.push(`${file.name}: erro ao carregar o ficheiro.`);
-      continue;
-    }
-
-    const { error: updateError } = await supabase
-      .from("documentos_administracao")
-      .update({ ficheiro_path: path })
-      .eq("id", documento.id)
-      .eq("tenant_id", ctx.tenant.id);
-
-    if (updateError) {
-      await supabase.storage.from("documentos-admin").remove([path]);
-      await supabase.from("documentos_administracao").delete().eq("id", documento.id);
-      falhas.push(`${file.name}: erro ao finalizar o registo.`);
-      continue;
-    }
-
-    carregados += 1;
-  }
+  const { error: insertError } = await supabase.from("documentos_administracao").insert(documentos);
+  if (insertError) return { error: "Os ficheiros foram enviados, mas os registos não puderam ser finalizados.", falhas };
 
   revalidatePath("/configuracao/documentos-administracao");
   revalidatePath("/configuracao/documentos-administracao/lote");
-  return { carregados, falhas };
+  return { carregados: documentos.length, falhas };
 }
