@@ -277,6 +277,22 @@ export type Documento = {
   blueprint_id: string | null;
 };
 
+/** Documento confidencial, visível apenas a administradores do tenant. */
+export type DocumentoAdministracao = {
+  id: string;
+  tenant_id: string;
+  titulo: string;
+  descricao: string | null;
+  categoria: Documento["categoria"];
+  ano: number | null;
+  ficheiro_path: string;
+  ficheiro_tamanho: number | null;
+  ficheiro_tipo: string | null;
+  origem_partilhada_path: string | null;
+  upload_em: string;
+  upload_por: string;
+};
+
 export type Votacao = {
   id: string;
   tenant_id: string;
