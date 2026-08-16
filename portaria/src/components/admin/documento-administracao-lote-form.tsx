@@ -25,7 +25,25 @@ const CATEGORIAS = [
 ];
 
 const TAMANHO_MAXIMO_BYTES = 25 * 1024 * 1024;
+const TIPOS_POR_EXTENSAO: Record<string, string> = {
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
 type FormState = DocumentoAdministracaoLoteResultado & { progresso?: string };
+
+function tipoNormalizado(file: File): string | null {
+  if (DOCUMENTO_TIPOS_VALIDOS[file.type]) return file.type;
+  const extensao = file.name.split(".").pop()?.toLowerCase() ?? "";
+  const tipo = TIPOS_POR_EXTENSAO[extensao];
+  return tipo && DOCUMENTO_TIPOS_VALIDOS[tipo] ? tipo : null;
+}
 
 export function DocumentoAdministracaoLoteForm() {
   const [state, setState] = useState<FormState>({});
@@ -55,13 +73,13 @@ export function DocumentoAdministracaoLoteForm() {
     const falhas: string[] = [];
 
     const candidatos = files
-      .map((file, ordem) => ({ file, ordem }))
-      .filter(({ file }) => {
+      .map((file, ordem) => ({ file, ordem, tipo: tipoNormalizado(file) }))
+      .filter(({ file, tipo }) => {
         if (file.size === 0 || file.size > TAMANHO_MAXIMO_BYTES) {
           falhas.push(`${file.name}: excede o limite de 25 MB ou está vazio.`);
           return false;
         }
-        if (!DOCUMENTO_TIPOS_VALIDOS[file.type]) {
+        if (!tipo) {
           falhas.push(`${file.name}: tipo de ficheiro não suportado.`);
           return false;
         }
@@ -75,11 +93,11 @@ export function DocumentoAdministracaoLoteForm() {
     }
 
     const preparado = await prepararDocumentosAdministracaoEmLote({
-      ficheiros: candidatos.map(({ file, ordem }) => ({
+      ficheiros: candidatos.map(({ file, ordem, tipo }) => ({
         ordem,
         nome: file.name,
         tamanho: file.size,
-        tipo: file.type,
+        tipo: tipo!,
       })),
     });
     falhas.push(...(preparado.falhas ?? []));
@@ -96,7 +114,7 @@ export function DocumentoAdministracaoLoteForm() {
       try {
         const resposta = await fetch(ficheiroAssinado.signedUrl, {
           method: "PUT",
-          headers: { "content-type": file.type, "x-upsert": "false" },
+          headers: { "content-type": ficheiroAssinado.tipo, "x-upsert": "false" },
           body: file,
         });
         if (!resposta.ok) throw new Error("Falha no envio");
