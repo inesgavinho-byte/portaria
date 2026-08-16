@@ -50,3 +50,6 @@ enable_confirmations = false
 
 [analytics]
 enabled = false
+
+[functions.hostinger-inbox-webhook]
+verify_jwt = false
