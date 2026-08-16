@@ -202,3 +202,140 @@ export async function gerarLinkDownloadDocumentoAdministracao(documentoId: strin
   if (error || !data) return { error: "Erro ao gerar link de descarga." };
   return { url: data.signedUrl };
 }
+
+
+export type DocumentoAdministracaoLoteState = {
+  error?: string;
+  carregados?: number;
+  falhas?: string[];
+};
+
+function tituloDeFicheiro(nome: string): string {
+  const semExtensao = nome.replace(/\.[^.]+$/, "");
+  return semExtensao
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 200);
+}
+
+function categoriaPorFicheiro(nome: string, categoriaBase: Documento["categoria"]): Documento["categoria"] {
+  if (categoriaBase !== "outro") return categoriaBase;
+  const normalizado = nome
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  if (normalizado.includes("ata")) return "ata";
+  if (normalizado.includes("regulamento")) return "regulamento";
+  if (normalizado.includes("contrato")) return "contrato";
+  if (normalizado.includes("apolice") || normalizado.includes("seguro")) return "apolice";
+  if (normalizado.includes("conta") || normalizado.includes("balancete") || normalizado.includes("orcamento") || normalizado.includes("quota")) return "conta";
+  return "outro";
+}
+
+/**
+ * Carrega vários documentos confidenciais de uma só vez. Cada ficheiro recebe
+ * um registo e caminho próprios, sempre dentro da pasta do tenant do admin.
+ */
+export async function criarDocumentosAdministracaoEmLote(
+  _prev: DocumentoAdministracaoLoteState,
+  formData: FormData
+): Promise<DocumentoAdministracaoLoteState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões para esta operação." };
+
+  const categoria = String(formData.get("categoria") ?? "outro");
+  const descricaoBase = String(formData.get("descricao") ?? "").trim() || null;
+  const anoStr = String(formData.get("ano") ?? "").trim();
+  const files = formData
+    .getAll("ficheiros")
+    .filter((item): item is File => item instanceof File && item.size > 0);
+
+  if (!CATEGORIAS_VALIDAS.includes(categoria as Documento["categoria"])) {
+    return { error: "Categoria inválida." };
+  }
+  if (files.length === 0) return { error: "Selecione pelo menos um ficheiro." };
+  if (files.length > 30) return { error: "Carregue no máximo 30 ficheiros por lote." };
+
+  let ano: number | null = null;
+  if (anoStr) {
+    const parsed = Number.parseInt(anoStr, 10);
+    if (Number.isNaN(parsed) || parsed < 1900 || parsed > 2100) {
+      return { error: "Ano inválido." };
+    }
+    ano = parsed;
+  }
+
+  const supabase = await createClient();
+  const falhas: string[] = [];
+  let carregados = 0;
+
+  for (const file of files) {
+    const titulo = tituloDeFicheiro(file.name);
+    const categoriaFicheiro = categoriaPorFicheiro(file.name, categoria as Documento["categoria"]);
+    if (!titulo) {
+      falhas.push(`${file.name}: não foi possível gerar um título.`);
+      continue;
+    }
+    if (file.size > TAMANHO_MAXIMO_BYTES) {
+      falhas.push(`${file.name}: excede o limite de 25 MB.`);
+      continue;
+    }
+    if (!DOCUMENTO_TIPOS_VALIDOS[file.type]) {
+      falhas.push(`${file.name}: tipo de ficheiro não suportado.`);
+      continue;
+    }
+
+    const { data: documento, error: insertError } = await supabase
+      .from("documentos_administracao")
+      .insert({
+        tenant_id: ctx.tenant.id,
+        titulo,
+        descricao: descricaoBase,
+        categoria: categoriaFicheiro,
+        ano,
+        ficheiro_path: "pending",
+        ficheiro_tamanho: file.size,
+        ficheiro_tipo: file.type,
+        upload_por: ctx.user.id,
+      })
+      .select("id")
+      .single();
+
+    if (insertError || !documento) {
+      falhas.push(`${file.name}: erro ao criar o registo confidencial.`);
+      continue;
+    }
+
+    const extensao = DOCUMENTO_TIPOS_VALIDOS[file.type];
+    const path = `${ctx.tenant.id}/${documento.id}/${Date.now()}.${extensao}`;
+    const { error: uploadError } = await supabase.storage
+      .from("documentos-admin")
+      .upload(path, file, { contentType: file.type, cacheControl: "3600", upsert: false });
+
+    if (uploadError) {
+      await supabase.from("documentos_administracao").delete().eq("id", documento.id);
+      falhas.push(`${file.name}: erro ao carregar o ficheiro.`);
+      continue;
+    }
+
+    const { error: updateError } = await supabase
+      .from("documentos_administracao")
+      .update({ ficheiro_path: path })
+      .eq("id", documento.id)
+      .eq("tenant_id", ctx.tenant.id);
+
+    if (updateError) {
+      await supabase.storage.from("documentos-admin").remove([path]);
+      await supabase.from("documentos_administracao").delete().eq("id", documento.id);
+      falhas.push(`${file.name}: erro ao finalizar o registo.`);
+      continue;
+    }
+
+    carregados += 1;
+  }
+
+  revalidatePath("/configuracao/documentos-administracao");
+  revalidatePath("/configuracao/documentos-administracao/lote");
+  return { carregados, falhas };
+}
