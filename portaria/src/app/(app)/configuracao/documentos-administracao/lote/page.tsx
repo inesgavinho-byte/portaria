@@ -1,7 +1,11 @@
 import { LockKeyhole } from "lucide-react";
 import { DocumentoAdministracaoLoteForm } from "@/components/admin/documento-administracao-lote-form";
+import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 
-export default function DocumentosAdministracaoLotePage() {
+export default async function DocumentosAdministracaoLotePage() {
+  const ctx = await getCurrentUserInTenant();
+  if (!ctx) return null;
+
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
@@ -15,7 +19,7 @@ export default function DocumentosAdministracaoLotePage() {
         </p>
       </div>
 
-      <DocumentoAdministracaoLoteForm />
+      <DocumentoAdministracaoLoteForm tenantId={ctx.tenant.id} />
     </div>
   );
 }
