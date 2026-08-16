@@ -102,6 +102,76 @@ export async function criarDocumentoAdministracao(
   redirect("/configuracao/documentos-administracao");
 }
 
+/**
+ * Move um ficheiro previamente carregado para a pasta de importação do tenant
+ * para o bucket confidencial e cria o respetivo registo administrativo.
+ */
+export async function migrarFicheiroHistoricoParaAdministracao(input: {
+  ficheiroPath: string;
+  titulo: string;
+  descricao?: string;
+  categoria: Documento["categoria"];
+  ano?: number;
+}): Promise<{ error?: string }> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões para esta operação." };
+
+  const prefixoPermitido = `${ctx.tenant.id}/historico_2026/`;
+  if (!input.ficheiroPath.startsWith(prefixoPermitido)) {
+    return { error: "O ficheiro não pertence à pasta de importação deste condomínio." };
+  }
+  if (!CATEGORIAS_VALIDAS.includes(input.categoria)) {
+    return { error: "Categoria inválida." };
+  }
+
+  const supabase = await createClient();
+  const { data: origem, error: origemError } = await supabase.storage
+    .from("documentos")
+    .list(`${ctx.tenant.id}/historico_2026`, { search: input.ficheiroPath.split("/").pop() });
+  const objeto = origem?.find((item) => `${ctx.tenant.id}/historico_2026/${item.name}` === input.ficheiroPath);
+  if (origemError || !objeto) return { error: "Ficheiro de origem não encontrado." };
+
+  const { data: documento, error: insertError } = await supabase
+    .from("documentos_administracao")
+    .insert({
+      tenant_id: ctx.tenant.id,
+      titulo: input.titulo.trim(),
+      descricao: input.descricao?.trim() || null,
+      categoria: input.categoria,
+      ano: input.ano ?? null,
+      ficheiro_path: "pending",
+      ficheiro_tamanho: Number(objeto.metadata?.size ?? 0) || null,
+      ficheiro_tipo: objeto.metadata?.mimetype ?? null,
+      origem_partilhada_path: input.ficheiroPath,
+      upload_por: ctx.user.id,
+    })
+    .select("id")
+    .single();
+  if (insertError || !documento) return { error: "Erro ao criar o registo confidencial." };
+
+  const extensao = input.ficheiroPath.includes(".")
+    ? input.ficheiroPath.slice(input.ficheiroPath.lastIndexOf(".")).toLowerCase()
+    : "";
+  const destino = `${ctx.tenant.id}/${documento.id}/${Date.now()}${extensao}`;
+  const { error: moveError } = await supabase.storage
+    .from("documentos")
+    .move(input.ficheiroPath, destino, { destinationBucket: "documentos-admin" });
+  if (moveError) {
+    await supabase.from("documentos_administracao").delete().eq("id", documento.id);
+    return { error: "Erro ao mover o ficheiro para o arquivo confidencial." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("documentos_administracao")
+    .update({ ficheiro_path: destino })
+    .eq("id", documento.id)
+    .eq("tenant_id", ctx.tenant.id);
+  if (updateError) return { error: "O ficheiro foi movido, mas o registo não foi finalizado." };
+
+  revalidatePath("/configuracao/documentos-administracao");
+  return {};
+}
+
 export async function gerarLinkDownloadDocumentoAdministracao(documentoId: string): Promise<{
   url?: string;
   error?: string;

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { CATEGORIA_LABEL } from "@/lib/documentos";
 import { DocumentoAdministracaoDownload } from "@/components/admin/documento-administracao-download";
+import { MigrarQuotasHistorico } from "@/components/admin/migrar-quotas-historico";
 import type { DocumentoAdministracao } from "@/types/database";
 
 export default async function DocumentosAdministracaoPage() {
@@ -36,6 +37,8 @@ export default async function DocumentosAdministracaoPage() {
           <Plus className="h-4 w-4" />Carregar
         </Link>
       </div>
+
+      <MigrarQuotasHistorico tenantId={ctx.tenant.id} />
 
       {documentos.length === 0 ? (
         <div className="border border-warmBeige/20 bg-paper p-12 text-center">
