@@ -19,7 +19,7 @@ export default async function DocumentosAdministracaoLotePage() {
         </p>
       </div>
 
-      <DocumentoAdministracaoLoteForm tenantId={ctx.tenant.id} />
+      <DocumentoAdministracaoLoteForm />
     </div>
   );
 }
