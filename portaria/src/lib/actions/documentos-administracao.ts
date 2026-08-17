@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { DOCUMENTO_TIPOS_VALIDOS } from "@/lib/documentos";
+import { DOCUMENTO_TIPOS_VALIDOS, temaPorDocumento } from "@/lib/documentos";
+import * as XLSX from "xlsx";
+import * as mammoth from "mammoth";
+import { sanitizarHtml } from "@/lib/sanitize";
 import type { Documento } from "@/types/database";
 
 const CATEGORIAS_VALIDAS: Documento["categoria"][] = [
@@ -68,6 +71,7 @@ export async function criarDocumentoAdministracao(
       titulo,
       descricao,
       categoria: categoria as Documento["categoria"],
+      tema: temaPorDocumento({ titulo, categoria }),
       ano,
       ficheiro_path: "pending",
       ficheiro_tamanho: file.size,
@@ -138,6 +142,7 @@ export async function migrarFicheiroHistoricoParaAdministracao(input: {
       titulo: input.titulo.trim(),
       descricao: input.descricao?.trim() || null,
       categoria: input.categoria,
+      tema: temaPorDocumento({ titulo: input.titulo, categoria: input.categoria }),
       ano: input.ano ?? null,
       ficheiro_path: "pending",
       ficheiro_tamanho: Number(objeto.metadata?.size ?? 0) || null,
@@ -270,6 +275,7 @@ export async function finalizarDocumentosAdministracaoEmLote(input: {
     titulo: string;
     descricao: string | null;
     categoria: Documento["categoria"];
+    tema: import("@/lib/documentos").TemaDocumento;
     ano: number | null;
     ficheiro_path: string;
     ficheiro_tamanho: number;
@@ -297,6 +303,10 @@ export async function finalizarDocumentosAdministracaoEmLote(input: {
       titulo,
       descricao: input.descricao?.trim() || null,
       categoria: categoriaPorFicheiro(ficheiro.nome, input.categoria),
+      tema: temaPorDocumento({
+        titulo,
+        categoria: categoriaPorFicheiro(ficheiro.nome, input.categoria),
+      }),
       ano: input.ano ?? null,
       ficheiro_path: ficheiro.path,
       ficheiro_tamanho: ficheiro.tamanho,
@@ -401,4 +411,101 @@ export async function removerDocumentosAdministracaoTemporarios(paths: string[])
   if (seguros.length === 0) return;
   const supabase = await createClient();
   await supabase.storage.from("documentos-admin").remove(seguros);
+}
+
+export type DocumentoAdministracaoPreview = {
+  titulo: string;
+  tipo: "embed" | "html" | "tabela" | "indisponivel";
+  mime: string | null;
+  url?: string;
+  html?: string;
+  folhas?: string[];
+  dados?: string[][];
+  mensagem?: string;
+};
+
+/**
+ * Prepara uma visualização temporária, sempre depois de confirmar o papel de
+ * administrador. PDFs e imagens usam URL temporária; DOCX e Excel são
+ * interpretados localmente no servidor e devolvem apenas uma amostra segura.
+ */
+export async function gerarPreviewDocumentoAdministracao(documentoId: string): Promise<{
+  preview?: DocumentoAdministracaoPreview;
+  error?: string;
+}> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões para esta operação." };
+  const supabase = await createClient();
+  const { data: documento } = await supabase.from("documentos_administracao")
+    .select("titulo, ficheiro_path, ficheiro_tipo")
+    .eq("id", documentoId).eq("tenant_id", ctx.tenant.id).maybeSingle();
+  if (!documento || documento.ficheiro_path === "pending") {
+    return { error: "Documento confidencial não encontrado." };
+  }
+
+  const mime = documento.ficheiro_tipo ?? null;
+  if (mime === "application/pdf" || mime?.startsWith("image/")) {
+    const { data, error } = await supabase.storage.from("documentos-admin")
+      .createSignedUrl(documento.ficheiro_path, 60);
+    if (error || !data?.signedUrl) return { error: "Não foi possível preparar a visualização." };
+    return { preview: { titulo: documento.titulo, tipo: "embed", mime, url: data.signedUrl } };
+  }
+
+  if (
+    mime === "application/vnd.ms-excel" ||
+    mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+  ) {
+    const { data, error } = await supabase.storage.from("documentos-admin").download(documento.ficheiro_path);
+    if (error || !data) return { error: "Não foi possível ler a folha de cálculo." };
+    try {
+      const workbook = XLSX.read(Buffer.from(await data.arrayBuffer()), { type: "buffer", cellDates: true });
+      const primeiraFolha = workbook.SheetNames[0];
+      const folha = primeiraFolha ? workbook.Sheets[primeiraFolha] : undefined;
+      const linhas = folha
+        ? XLSX.utils.sheet_to_json<unknown[]>(folha, { header: 1, blankrows: false, defval: "" })
+          .slice(0, 50)
+          .map((linha) => linha.slice(0, 20).map((celula) => String(celula ?? "")))
+        : [];
+      return {
+        preview: {
+          titulo: documento.titulo,
+          tipo: "tabela",
+          mime,
+          folhas: workbook.SheetNames.slice(0, 20),
+          dados: linhas,
+          mensagem: "Pré-visualização das primeiras 50 linhas da primeira folha.",
+        },
+      };
+    } catch {
+      return { error: "A folha de cálculo não pôde ser interpretada para pré-visualização." };
+    }
+  }
+
+  if (mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    const { data, error } = await supabase.storage.from("documentos-admin").download(documento.ficheiro_path);
+    if (error || !data) return { error: "Não foi possível ler o documento Word." };
+    try {
+      const result = await mammoth.convertToHtml({ buffer: Buffer.from(await data.arrayBuffer()) });
+      return {
+        preview: {
+          titulo: documento.titulo,
+          tipo: "html",
+          mime,
+          html: sanitizarHtml(result.value),
+          mensagem: "Pré-visualização convertida do documento Word.",
+        },
+      };
+    } catch {
+      return { error: "O documento Word não pôde ser convertido para visualização." };
+    }
+  }
+
+  return {
+    preview: {
+      titulo: documento.titulo,
+      tipo: "indisponivel",
+      mime,
+      mensagem: "Este formato não permite ainda uma pré-visualização segura dentro da plataforma. A descarga continua disponível para administradores.",
+    },
+  };
 }

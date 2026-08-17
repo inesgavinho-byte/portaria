@@ -284,6 +284,8 @@ export type DocumentoAdministracao = {
   titulo: string;
   descricao: string | null;
   categoria: Documento["categoria"];
+  tema: "governacao_regulamento" | "financeiro_fiscal" | "contratos_fornecedores" | "manutencao_obras" | "tecnico_plantas" | "seguros_riscos" | "recursos_humanos" | "transicao_correspondencia" | "geral";
+  palavras_chave: string[];
   ano: number | null;
   ficheiro_path: string;
   ficheiro_tamanho: number | null;
@@ -684,4 +686,56 @@ export type VwInadimplencia = {
   divida_total: number;
   meses_pendentes: number;
   ultimo_vencimento: string | null;
+};
+
+export type IAConfiguracaoDocumental = {
+  tenant_id: string;
+  instrucoes: string;
+  guardrails: string;
+  exige_revisao_humana: boolean;
+  modelo: string;
+  atualizado_em: string;
+  atualizado_por: string | null;
+};
+
+export type IADocumentalFonte = {
+  id: string;
+  tenant_id: string;
+  titulo: string;
+  referencia: string | null;
+  url: string | null;
+  conteudo_resumo: string | null;
+  jurisdicao: string;
+  ativa: boolean;
+  criado_em: string;
+  atualizado_em: string;
+  criado_por: string | null;
+};
+
+export type IADocumentalSessao = {
+  id: string;
+  tenant_id: string;
+  blueprint_id: string | null;
+  titulo: string;
+  estado: "recolha" | "rascunho" | "em_revisao" | "aprovado" | "arquivado";
+  dados_recolhidos: Record<string, string>;
+  rascunho_html: string | null;
+  avisos: string[];
+  fontes_utilizadas: IADocumentalFonte[];
+  criado_por: string;
+  aprovado_por: string | null;
+  aprovado_em: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type IADocumentalMensagem = {
+  id: string;
+  tenant_id: string;
+  sessao_id: string;
+  papel: "administrador" | "assistente" | "sistema";
+  conteudo: string;
+  citacoes: Array<{ titulo: string; referencia?: string | null; url?: string | null }>;
+  criado_em: string;
+  criado_por: string | null;
 };
