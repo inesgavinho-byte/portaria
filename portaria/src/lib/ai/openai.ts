@@ -46,7 +46,8 @@ export async function gerarEmbedding(texto: string): Promise<number[] | null> {
 /** Chat completion simples de texto. Devolve null em falha. */
 export async function chatTexto(
   system: string,
-  user: string
+  user: string,
+  modelo = CHAT_MODELO
 ): Promise<string | null> {
   const key = process.env.OPENAI_API_KEY;
   if (!key) return null;
@@ -58,7 +59,7 @@ export async function chatTexto(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: CHAT_MODELO,
+        model: modelo,
         temperature: 0.2,
         messages: [
           { role: "system", content: system },

@@ -44,6 +44,11 @@ export default async function IAConfigPage({
         </div>
       )}
 
+      <Link href="/ia/configuracao/documentos" className="mb-6 flex items-start gap-3 border border-warmBeige/25 bg-softCream/25 p-5 transition-colors hover:bg-softCream/50">
+        <BookOpen className="mt-0.5 h-5 w-5 text-warmBeige" />
+        <span><strong className="font-title text-lg text-ink">Assistente documental</strong><span className="mt-1 block font-body text-sm text-oliveGray">Configurar instruções, guardrails, fontes legais e revisão humana para gerar documentos com IA.</span></span>
+      </Link>
+
       {/* Estado */}
       <div className="bg-paper border border-warmBeige/20 p-6 mb-8">
         <h2 className="font-title text-h3 text-ink mb-4">Base de conhecimento</h2>

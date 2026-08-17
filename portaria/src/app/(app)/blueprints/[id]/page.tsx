@@ -72,6 +72,10 @@ export default async function BlueprintPage({
           <h1 className="font-title text-h1 text-ink">{bp.nome}</h1>
         </div>
         <div className="flex flex-col items-end gap-3 shrink-0">
+          <Link href={`/blueprints/${bp.id}/assistente`}
+            className="inline-flex items-center gap-2 bg-ink px-5 py-2 font-body text-xs tracking-widest uppercase text-paper hover:bg-oliveGray transition-colors">
+            <span aria-hidden="true">✦</span> Elaborar com IA
+          </Link>
           <Link href={`/blueprints/${bp.id}/editar`}
             className="inline-flex items-center gap-2 px-5 py-2 border border-warmBeige/40 font-body text-xs tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors">
             <Pencil className="w-3.5 h-3.5" /> Editar template
