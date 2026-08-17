@@ -18,6 +18,8 @@ import {
   TrendingUp,
   TrendingDown,
   AlertTriangle,
+  Landmark,
+  Repeat2,
   Plus,
   Download,
 } from "lucide-react";
@@ -26,8 +28,11 @@ import {
   Pagamento,
   Recibo,
   ConfiguracaoFinanceira,
+  Despesa,
+  ObrigacaoRecorrente,
 } from "@/types/database";
-import { DashboardFinanceiro, gerarQuotasMensais, emitirRecibo, anularRecibo } from "@/lib/actions/financeiro";
+import { DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo } from "@/lib/actions/financeiro";
+import { DespesasObrigacoesPainel } from "@/components/admin/despesas-obrigacoes-painel";
 
 function centsToEuro(cents: number) {
   return (cents / 100).toLocaleString("pt-PT", {
@@ -67,6 +72,8 @@ const TABS = [
   { key: "quotas", label: "Quotas", icon: Receipt },
   { key: "pagamentos", label: "Pagamentos", icon: CreditCard },
   { key: "recibos", label: "Recibos", icon: FileText },
+  { key: "despesas", label: "Despesas", icon: Landmark },
+  { key: "obrigacoes", label: "Obrigações", icon: Repeat2 },
   { key: "configuracao", label: "Configuração", icon: Settings },
 ];
 
@@ -83,6 +90,12 @@ export function FinanceiroTabs({
   pagamentos,
   recibos,
   configuracao,
+  despesas,
+  obrigacoes,
+  resumoDespesas,
+  fornecedores,
+  contratos,
+  documentosAdministracao,
 }: {
   tab: string;
   ano: number;
@@ -92,6 +105,12 @@ export function FinanceiroTabs({
   pagamentos: Pagamento[];
   recibos: Recibo[];
   configuracao: ConfiguracaoFinanceira | null;
+  despesas: Despesa[];
+  obrigacoes: ObrigacaoRecorrente[];
+  resumoDespesas: DespesaResumo;
+  fornecedores: OpcaoFinanceira[];
+  contratos: OpcaoFinanceira[];
+  documentosAdministracao: OpcaoFinanceira[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -135,6 +154,16 @@ export function FinanceiroTabs({
       {tab === "quotas" && <TabQuotas quotas={quotas} ano={ano} mes={mes} />}
       {tab === "pagamentos" && <TabPagamentos pagamentos={pagamentos} />}
       {tab === "recibos" && <TabRecibos recibos={recibos} />}
+      {(tab === "despesas" || tab === "obrigacoes") && (
+        <DespesasObrigacoesPainel
+          despesas={despesas}
+          obrigacoes={obrigacoes}
+          resumo={resumoDespesas}
+          fornecedores={fornecedores}
+          contratos={contratos}
+          documentos={documentosAdministracao}
+        />
+      )}
       {tab === "configuracao" && <TabConfiguracao configuracao={configuracao} />}
     </div>
   );

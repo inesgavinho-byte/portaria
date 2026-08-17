@@ -8,6 +8,10 @@ import type {
   QuotaMensal,
   Pagamento,
   Recibo,
+  Despesa,
+  ObrigacaoRecorrente,
+  EstadoDespesa,
+  CategoriaDespesa,
   VwQuotasResumoMes,
   VwInadimplencia,
 } from "@/types/database";
@@ -21,6 +25,15 @@ export type FinanceiroFormState = {
   success?: boolean;
   id?: string;
 };
+
+export type DespesaResumo = {
+  totalPendente: number;
+  totalPago: number;
+  totalReconciliar: number;
+  totalVencido: number;
+};
+
+export type OpcaoFinanceira = { id: string; nome: string };
 
 export type DashboardFinanceiro = {
   resumoMes: VwQuotasResumoMes | null;
@@ -536,4 +549,334 @@ export async function resumoFinanceiroCondomino(): Promise<{
   ]);
 
   return { quotas, pagamentos, recibos, divida, configuracao };
+}
+
+
+// ============================================================================
+// DESPESAS E OBRIGAÇÕES — ADMIN
+// ============================================================================
+
+const CATEGORIAS_DESPESA: CategoriaDespesa[] = [
+  "seguranca_social", "salario", "elevadores", "seguro", "manutencao",
+  "obras", "servicos", "impostos", "outro",
+];
+
+const ESTADOS_DESPESA: EstadoDespesa[] = [
+  "rascunho", "pendente", "pago", "vencido", "cancelado", "a_reconciliar",
+];
+
+function valorParaCents(valor: FormDataEntryValue | null) {
+  const normalizado = String(valor ?? "").trim().replace(".", "").replace(",", ".");
+  return Math.round(Number(normalizado) * 100);
+}
+
+function textoOpcional(valor: FormDataEntryValue | null) {
+  const resultado = String(valor ?? "").trim();
+  return resultado || null;
+}
+
+async function validarRelacaoDoTenant(
+  tabela: "fornecedores" | "contratos" | "obrigacoes_recorrentes",
+  id: string | null,
+  tenantId: string
+) {
+  if (!id) return true;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from(tabela)
+    .select("id")
+    .eq("id", id)
+    .eq("tenant_id", tenantId)
+    .maybeSingle();
+  return Boolean(data);
+}
+
+export async function listarDespesas(): Promise<Despesa[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("despesas")
+    .select("*, fornecedores(nome), contratos(titulo), obrigacoes_recorrentes(titulo)")
+    .eq("tenant_id", ctx.tenant.id)
+    .order("data_vencimento", { ascending: true, nullsFirst: false })
+    .order("criado_em", { ascending: false });
+
+  return (data ?? []) as unknown as Despesa[];
+}
+
+export async function listarObrigacoes(): Promise<ObrigacaoRecorrente[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("obrigacoes_recorrentes")
+    .select("*, fornecedores(nome), contratos(titulo)")
+    .eq("tenant_id", ctx.tenant.id)
+    .order("proximo_vencimento", { ascending: true, nullsFirst: false })
+    .order("titulo");
+
+  return (data ?? []) as unknown as ObrigacaoRecorrente[];
+}
+
+export async function listarFornecedoresFinanceiro(): Promise<OpcaoFinanceira[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("fornecedores")
+    .select("id, nome")
+    .eq("tenant_id", ctx.tenant.id)
+    .eq("ativo", true)
+    .order("nome");
+
+  return (data ?? []) as OpcaoFinanceira[];
+}
+
+export async function listarContratosFinanceiro(): Promise<OpcaoFinanceira[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("contratos")
+    .select("id, titulo")
+    .eq("tenant_id", ctx.tenant.id)
+    .order("titulo");
+
+  return (data ?? []).map((contrato) => ({ id: contrato.id, nome: contrato.titulo }));
+}
+
+export async function listarDocumentosAdministracaoFinanceiro(): Promise<OpcaoFinanceira[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("documentos_administracao")
+    .select("id, titulo")
+    .eq("tenant_id", ctx.tenant.id)
+    .order("upload_em", { ascending: false })
+    .limit(100);
+
+  return (data ?? []).map((documento) => ({ id: documento.id, nome: documento.titulo }));
+}
+
+export async function obterResumoDespesas(): Promise<DespesaResumo> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { totalPendente: 0, totalPago: 0, totalReconciliar: 0, totalVencido: 0 };
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("despesas")
+    .select("valor_cents, estado")
+    .eq("tenant_id", ctx.tenant.id);
+
+  return (data ?? []).reduce<DespesaResumo>((resumo, despesa) => {
+    if (despesa.estado === "pago") resumo.totalPago += despesa.valor_cents;
+    if (despesa.estado === "pendente") resumo.totalPendente += despesa.valor_cents;
+    if (despesa.estado === "a_reconciliar") resumo.totalReconciliar += despesa.valor_cents;
+    if (despesa.estado === "vencido") resumo.totalVencido += despesa.valor_cents;
+    return resumo;
+  }, { totalPendente: 0, totalPago: 0, totalReconciliar: 0, totalVencido: 0 });
+}
+
+export async function criarDespesa(formData: FormData): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const fornecedorId = textoOpcional(formData.get("fornecedor_id"));
+  const contratoId = textoOpcional(formData.get("contrato_id"));
+  const obrigacaoId = textoOpcional(formData.get("obrigacao_id"));
+  const descricao = String(formData.get("descricao") ?? "").trim();
+  const categoria = String(formData.get("categoria") ?? "outro") as CategoriaDespesa;
+  const estado = String(formData.get("estado") ?? "a_reconciliar") as EstadoDespesa;
+  const valorCents = valorParaCents(formData.get("valor"));
+  const dataPagamento = textoOpcional(formData.get("data_pagamento"));
+  const documentoAdministracaoId = textoOpcional(formData.get("documento_administracao_id"));
+  const papelDocumento = String(formData.get("papel_documento") ?? "outro") as "fatura" | "comprovativo" | "nota_credito" | "correspondencia" | "outro";
+
+  if (!descricao) return { error: "Descrição é obrigatória." };
+  if (!CATEGORIAS_DESPESA.includes(categoria)) return { error: "Categoria inválida." };
+  if (!ESTADOS_DESPESA.includes(estado)) return { error: "Estado inválido." };
+  if (!Number.isFinite(valorCents) || valorCents <= 0) return { error: "Valor deve ser superior a zero." };
+  if (estado === "pago" && !dataPagamento) return { error: "Indique a data de pagamento." };
+
+  const relacoesValidas = await Promise.all([
+    validarRelacaoDoTenant("fornecedores", fornecedorId, ctx.tenant.id),
+    validarRelacaoDoTenant("contratos", contratoId, ctx.tenant.id),
+    validarRelacaoDoTenant("obrigacoes_recorrentes", obrigacaoId, ctx.tenant.id),
+  ]);
+  if (relacoesValidas.some((valida) => !valida)) return { error: "Uma relação selecionada não pertence a este condomínio." };
+  if (!["fatura", "comprovativo", "nota_credito", "correspondencia", "outro"].includes(papelDocumento)) return { error: "Tipo de documento inválido." };
+
+  const supabase = await createClient();
+  if (documentoAdministracaoId) {
+    const { data: documento } = await supabase
+      .from("documentos_administracao")
+      .select("id")
+      .eq("id", documentoAdministracaoId)
+      .eq("tenant_id", ctx.tenant.id)
+      .maybeSingle();
+    if (!documento) return { error: "Documento confidencial não encontrado neste condomínio." };
+  }
+
+  const { data, error } = await supabase
+    .from("despesas")
+    .insert({
+      tenant_id: ctx.tenant.id,
+      fornecedor_id: fornecedorId,
+      contrato_id: contratoId,
+      obrigacao_id: obrigacaoId,
+      descricao,
+      categoria,
+      numero_documento: textoOpcional(formData.get("numero_documento")),
+      referencia: textoOpcional(formData.get("referencia")),
+      data_documento: textoOpcional(formData.get("data_documento")),
+      data_vencimento: textoOpcional(formData.get("data_vencimento")),
+      valor_cents: valorCents,
+      estado,
+      data_pagamento: dataPagamento,
+      metodo_pagamento: textoOpcional(formData.get("metodo_pagamento")),
+      referencia_pagamento: textoOpcional(formData.get("referencia_pagamento")),
+      notas: textoOpcional(formData.get("notas")),
+      criado_por: ctx.user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) return { error: error?.message ?? "Não foi possível criar a despesa." };
+
+  if (documentoAdministracaoId) {
+    const { error: documentoError } = await supabase
+      .from("despesas_documentos")
+      .insert({
+        tenant_id: ctx.tenant.id,
+        despesa_id: data.id,
+        documento_administracao_id: documentoAdministracaoId,
+        papel: papelDocumento,
+        criado_por: ctx.user.id,
+      });
+    if (documentoError) return { error: `Despesa criada, mas o documento não foi associado: ${documentoError.message}`, id: data.id };
+  }
+
+  revalidatePath("/configuracao/financeiro");
+  return { success: true, id: data.id };
+}
+
+export async function atualizarEstadoDespesa(
+  despesaId: string,
+  estado: EstadoDespesa,
+  dataPagamento?: string
+): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+  if (!ESTADOS_DESPESA.includes(estado)) return { error: "Estado inválido." };
+  if (estado === "pago" && !dataPagamento) return { error: "Indique a data de pagamento." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("despesas")
+    .update({
+      estado,
+      data_pagamento: estado === "pago" ? dataPagamento : null,
+    })
+    .eq("id", despesaId)
+    .eq("tenant_id", ctx.tenant.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function criarObrigacao(formData: FormData): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const titulo = String(formData.get("titulo") ?? "").trim();
+  const fornecedorId = textoOpcional(formData.get("fornecedor_id"));
+  const contratoId = textoOpcional(formData.get("contrato_id"));
+  const categoria = String(formData.get("categoria") ?? "outro") as CategoriaDespesa;
+  const periodicidade = String(formData.get("periodicidade") ?? "mensal");
+  const valorEstimadoCents = formData.get("valor_estimado") ? valorParaCents(formData.get("valor_estimado")) : null;
+
+  if (!titulo) return { error: "Título é obrigatório." };
+  if (!CATEGORIAS_DESPESA.includes(categoria)) return { error: "Categoria inválida." };
+  if (!["mensal", "trimestral", "semestral", "anual", "pontual"].includes(periodicidade)) return { error: "Periodicidade inválida." };
+  if (valorEstimadoCents !== null && (!Number.isFinite(valorEstimadoCents) || valorEstimadoCents <= 0)) return { error: "Valor estimado inválido." };
+
+  const relacoesValidas = await Promise.all([
+    validarRelacaoDoTenant("fornecedores", fornecedorId, ctx.tenant.id),
+    validarRelacaoDoTenant("contratos", contratoId, ctx.tenant.id),
+  ]);
+  if (relacoesValidas.some((valida) => !valida)) return { error: "Uma relação selecionada não pertence a este condomínio." };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("obrigacoes_recorrentes")
+    .insert({
+      tenant_id: ctx.tenant.id,
+      fornecedor_id: fornecedorId,
+      contrato_id: contratoId,
+      titulo,
+      categoria,
+      periodicidade,
+      valor_estimado_cents: valorEstimadoCents,
+      proximo_vencimento: textoOpcional(formData.get("proximo_vencimento")),
+      estado: "ativa",
+      notas: textoOpcional(formData.get("notas")),
+      criado_por: ctx.user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) return { error: error?.message ?? "Não foi possível criar a obrigação." };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true, id: data.id };
+}
+
+export async function atualizarEstadoObrigacao(
+  obrigacaoId: string,
+  estado: "ativa" | "suspensa" | "terminada"
+): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("obrigacoes_recorrentes")
+    .update({ estado })
+    .eq("id", obrigacaoId)
+    .eq("tenant_id", ctx.tenant.id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function associarDocumentoDespesa(
+  despesaId: string,
+  documentoAdministracaoId: string,
+  papel: "fatura" | "comprovativo" | "nota_credito" | "correspondencia" | "outro" = "outro"
+): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("despesas_documentos")
+    .upsert({
+      tenant_id: ctx.tenant.id,
+      despesa_id: despesaId,
+      documento_administracao_id: documentoAdministracaoId,
+      papel,
+      criado_por: ctx.user.id,
+    }, { onConflict: "despesa_id,documento_administracao_id" });
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
 }

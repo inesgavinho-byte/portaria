@@ -496,6 +496,75 @@ export type Recibo = {
   motivo_anulacao: string | null;
 };
 
+export type CategoriaDespesa =
+  | "seguranca_social"
+  | "salario"
+  | "elevadores"
+  | "seguro"
+  | "manutencao"
+  | "obras"
+  | "servicos"
+  | "impostos"
+  | "outro";
+
+export type EstadoDespesa =
+  | "rascunho"
+  | "pendente"
+  | "pago"
+  | "vencido"
+  | "cancelado"
+  | "a_reconciliar";
+
+export type ObrigacaoRecorrente = {
+  id: string;
+  tenant_id: string;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
+  titulo: string;
+  categoria: CategoriaDespesa;
+  periodicidade: "mensal" | "trimestral" | "semestral" | "anual" | "pontual";
+  valor_estimado_cents: number | null;
+  proximo_vencimento: string | null;
+  estado: "ativa" | "suspensa" | "terminada";
+  notas: string | null;
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type Despesa = {
+  id: string;
+  tenant_id: string;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
+  obrigacao_id: string | null;
+  descricao: string;
+  categoria: CategoriaDespesa;
+  numero_documento: string | null;
+  referencia: string | null;
+  data_documento: string | null;
+  data_vencimento: string | null;
+  valor_cents: number;
+  estado: EstadoDespesa;
+  data_pagamento: string | null;
+  metodo_pagamento: "transferencia" | "debito_direto" | "mbway" | "dinheiro" | "outro" | null;
+  referencia_pagamento: string | null;
+  notas: string | null;
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type DespesaDocumento = {
+  id: string;
+  tenant_id: string;
+  despesa_id: string;
+  documento_administracao_id: string;
+  papel: "fatura" | "comprovativo" | "nota_credito" | "correspondencia" | "outro";
+  criado_por: string | null;
+  criado_em: string;
+};
+
 export type VwQuotasResumoMes = {
   tenant_id: string;
   ano: number;
