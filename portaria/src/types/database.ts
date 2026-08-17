@@ -295,6 +295,85 @@ export type DocumentoAdministracao = {
   upload_por: string;
 };
 
+export type ComunicacaoTipo =
+  | "circular"
+  | "convocatoria"
+  | "ata"
+  | "quotas"
+  | "obras_manutencao"
+  | "cobranca"
+  | "entrega_documental"
+  | "aviso"
+  | "geral"
+  | "outro";
+
+export type ComunicacaoEstado =
+  | "rascunho"
+  | "preparada"
+  | "em_envio"
+  | "concluida"
+  | "arquivada"
+  | "cancelada";
+
+export type ComunicacaoCanal =
+  | "email"
+  | "correio_simples"
+  | "correio_registado"
+  | "entrega_em_mao"
+  | "portal"
+  | "outro";
+
+export type ComunicacaoDestinatarioEstado =
+  | "pendente"
+  | "enviado"
+  | "entregue"
+  | "devolvido"
+  | "sem_contacto"
+  | "dispensado";
+
+export type Comunicacao = {
+  id: string;
+  tenant_id: string;
+  tipo: ComunicacaoTipo;
+  assunto: string;
+  descricao: string | null;
+  estado: ComunicacaoEstado;
+  data_comunicacao: string;
+  data_limite: string | null;
+  criado_por: string;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type ComunicacaoDestinatario = {
+  id: string;
+  tenant_id: string;
+  comunicacao_id: string;
+  fracao_id: string;
+  papel_destinatario: "proprietario" | "inquilino" | "ambos" | "representante" | "outro";
+  destinatario_nome: string | null;
+  destinatario_email: string | null;
+  destinatario_telefone: string | null;
+  canal: ComunicacaoCanal;
+  estado: ComunicacaoDestinatarioEstado;
+  enviado_em: string | null;
+  entregue_em: string | null;
+  referencia_envio: string | null;
+  observacoes: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type ComunicacaoDocumento = {
+  id: string;
+  tenant_id: string;
+  comunicacao_id: string;
+  documento_id: string | null;
+  documento_administracao_id: string | null;
+  nota: string | null;
+  criado_em: string;
+};
+
 export type Votacao = {
   id: string;
   tenant_id: string;
