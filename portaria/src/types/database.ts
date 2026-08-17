@@ -577,6 +577,50 @@ export type Recibo = {
   motivo_anulacao: string | null;
 };
 
+export type ContribuicaoExtraordinaria = {
+  id: string;
+  tenant_id: string;
+  titulo: string;
+  descricao: string | null;
+  referencia: string | null;
+  estado: "rascunho" | "ativa" | "encerrada" | "arquivada" | "cancelada";
+  total_cents: number;
+  documento_administracao_id: string | null;
+  criado_por: string;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type ContribuicaoPrestacao = {
+  id: string;
+  tenant_id: string;
+  contribuicao_id: string;
+  ordem: number;
+  designacao: string;
+  vencimento: string;
+  valor_cents: number;
+  estado: "prevista" | "liquidada" | "parcial" | "anulada";
+  liquidado_em: string | null;
+  fonte: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type ContribuicaoPrestacaoFracao = {
+  id: string;
+  tenant_id: string;
+  prestacao_id: string;
+  fracao_id: string;
+  valor_cents: number;
+  liquidado_cents: number;
+  estado: "pendente" | "liquidada" | "parcial" | "dispensada" | "anulada";
+  liquidado_em: string | null;
+  referencia: string | null;
+  observacoes: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type CategoriaDespesa =
   | "seguranca_social"
   | "salario"

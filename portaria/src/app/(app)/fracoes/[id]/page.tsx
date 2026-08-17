@@ -1,14 +1,17 @@
 import Link from "next/link";
-import { ChevronLeft, FileText, ReceiptText, CircleAlert, Mail, WalletCards, UserRound } from "lucide-react";
+import { ChevronLeft, FileText, ReceiptText, CircleAlert, Mail, WalletCards, UserRound, Landmark } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import type { Comunicacao, ComunicacaoDestinatario, Fracao, Ocorrencia, Pagamento, QuotaMensal, Recibo } from "@/types/database";
+import type { Comunicacao, ComunicacaoDestinatario, ContribuicaoExtraordinaria, ContribuicaoPrestacao, ContribuicaoPrestacaoFracao, Fracao, Ocorrencia, Pagamento, QuotaMensal, Recibo } from "@/types/database";
 
 type EntregaHistorico = ComunicacaoDestinatario & { comunicacao: Comunicacao | null };
+type PosicaoExtraordinariaHistorico = ContribuicaoPrestacaoFracao & {
+  prestacao: (ContribuicaoPrestacao & { contribuicao: ContribuicaoExtraordinaria | null }) | null;
+};
 type Evento = {
   data: string;
-  tipo: "comunicacao" | "quota" | "pagamento" | "recibo" | "ocorrencia";
+  tipo: "comunicacao" | "quota" | "pagamento" | "recibo" | "ocorrencia" | "contribuicao";
   titulo: string;
   detalhe: string;
   href: string;
@@ -29,7 +32,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
   if (!ctx) redirect("/avisos");
 
   const supabase = await createClient();
-  const [{ data: fracao }, { data: entregas }, { data: quotas }, { data: pagamentos }, { data: recibos }, { data: ocorrencias }] = await Promise.all([
+  const [{ data: fracao }, { data: entregas }, { data: quotas }, { data: pagamentos }, { data: recibos }, { data: ocorrencias }, { data: contribuicoes }] = await Promise.all([
     supabase.from("fracoes").select("*").eq("id", id).eq("tenant_id", ctx.tenant.id).maybeSingle(),
     supabase.from("comunicacao_destinatarios").select("*, comunicacao:comunicacoes(*)")
       .eq("fracao_id", id).eq("tenant_id", ctx.tenant.id).order("criado_em", { ascending: false }),
@@ -41,6 +44,8 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       .order("emitido_em", { ascending: false }),
     supabase.from("ocorrencias").select("*").eq("fracao_id", id).eq("tenant_id", ctx.tenant.id)
       .order("atualizado_em", { ascending: false }),
+    supabase.from("contribuicao_prestacao_fracoes").select("*, prestacao:contribuicao_prestacoes(*, contribuicao:contribuicoes_extraordinarias(*))")
+      .eq("fracao_id", id).eq("tenant_id", ctx.tenant.id).order("criado_em", { ascending: false }),
   ]);
   if (!fracao) notFound();
 
@@ -50,6 +55,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
   const listaPagamentos = (pagamentos ?? []) as Pagamento[];
   const listaRecibos = (recibos ?? []) as Recibo[];
   const listaOcorrencias = (ocorrencias ?? []) as Ocorrencia[];
+  const listaContribuicoes = (contribuicoes ?? []) as PosicaoExtraordinariaHistorico[];
   const pendentes = listaQuotas.filter((quota) => quota.estado === "pendente" || quota.estado === "parcial");
   const totalPendente = pendentes.reduce((soma, quota) => soma + quota.valor_cents, 0);
 
@@ -82,6 +88,17 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       detalhe: `${EURO.format(recibo.valor_cents / 100)} · ${recibo.estado}`,
       href: "/configuracao/financeiro?tab=recibos",
     })),
+    ...listaContribuicoes.flatMap((posicao) => {
+      const prestacao = posicao.prestacao;
+      const contribuicao = prestacao?.contribuicao;
+      return prestacao && contribuicao ? [{
+        data: posicao.liquidado_em ?? prestacao.liquidado_em ?? prestacao.vencimento,
+        tipo: "contribuicao" as const,
+        titulo: `${contribuicao.titulo} — ${prestacao.designacao}`,
+        detalhe: `${EURO.format(posicao.valor_cents / 100)} · ${posicao.estado}`,
+        href: `/contribuicoes-extraordinarias/${contribuicao.id}`,
+      }] : [];
+    }),
     ...listaOcorrencias.map((ocorrencia) => ({
       data: ocorrencia.atualizado_em,
       tipo: "ocorrencia" as const,
@@ -97,6 +114,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
     pagamento: WalletCards,
     recibo: ReceiptText,
     ocorrencia: CircleAlert,
+    contribuicao: Landmark,
   };
 
   return (
@@ -131,7 +149,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       </div>
 
       <section className="bg-paper border border-warmBeige/20">
-        <div className="p-5 md:p-6 border-b border-warmBeige/15"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-warmBeige" /><h2 className="font-title text-xl text-ink">Histórico completo</h2></div><p className="font-body text-sm text-oliveGray mt-2">Comunicações formais, movimentos financeiros e ocorrências relacionados com esta fração.</p></div>
+        <div className="p-5 md:p-6 border-b border-warmBeige/15"><div className="flex items-center gap-2"><FileText className="w-4 h-4 text-warmBeige" /><h2 className="font-title text-xl text-ink">Histórico completo</h2></div><p className="font-body text-sm text-oliveGray mt-2">Comunicações formais, quotas, contribuições extraordinárias, movimentos financeiros e ocorrências relacionados com esta fração.</p></div>
         {eventos.length === 0 ? (
           <div className="p-10 text-center"><p className="font-body text-sm text-oliveGray">Ainda não há eventos associados a esta fração.</p></div>
         ) : (

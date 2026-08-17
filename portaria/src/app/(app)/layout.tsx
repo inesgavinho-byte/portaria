@@ -19,6 +19,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
       { href: "/blueprints", label: "Modelos" },
       { href: "/configuracao/reservas", label: "Reservas" },
       { href: "/configuracao/financeiro", label: "Financeiro" },
+      { href: "/contribuicoes-extraordinarias", label: "Contribuições extraordinárias" },
       { href: "/configuracao/manutencao", label: "Manutenção preventiva" },
     ],
   },
