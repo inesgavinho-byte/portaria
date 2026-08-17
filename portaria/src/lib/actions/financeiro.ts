@@ -14,6 +14,8 @@ import type {
   CategoriaDespesa,
   VwQuotasResumoMes,
   VwInadimplencia,
+  AlertaOperacional,
+  EventoCalendarioAdministrativo,
 } from "@/types/database";
 
 // ============================================================================
@@ -34,6 +36,11 @@ export type DespesaResumo = {
 };
 
 export type OpcaoFinanceira = { id: string; nome: string };
+
+export type CalendarioAdministrativo = {
+  eventos: EventoCalendarioAdministrativo[];
+  alertasAbertos: AlertaOperacional[];
+};
 
 export type DashboardFinanceiro = {
   resumoMes: VwQuotasResumoMes | null;
@@ -562,7 +569,7 @@ const CATEGORIAS_DESPESA: CategoriaDespesa[] = [
 ];
 
 const ESTADOS_DESPESA: EstadoDespesa[] = [
-  "rascunho", "pendente", "pago", "vencido", "cancelado", "a_reconciliar",
+  "rascunho", "pendente", "em_aprovacao", "aprovada", "pago", "vencido", "cancelado", "rejeitada", "a_reconciliar",
 ];
 
 function valorParaCents(valor: FormDataEntryValue | null) {
@@ -702,8 +709,9 @@ export async function criarDespesa(formData: FormData): Promise<FinanceiroFormSt
   if (!descricao) return { error: "Descrição é obrigatória." };
   if (!CATEGORIAS_DESPESA.includes(categoria)) return { error: "Categoria inválida." };
   if (!ESTADOS_DESPESA.includes(estado)) return { error: "Estado inválido." };
+  if (!["rascunho", "pendente", "a_reconciliar"].includes(estado)) return { error: "Uma nova despesa só pode começar em rascunho, pendente ou a reconciliar." };
   if (!Number.isFinite(valorCents) || valorCents <= 0) return { error: "Valor deve ser superior a zero." };
-  if (estado === "pago" && !dataPagamento) return { error: "Indique a data de pagamento." };
+  if (dataPagamento) return { error: "O pagamento só pode ser registado depois da aprovação e de um comprovativo associado." };
 
   const relacoesValidas = await Promise.all([
     validarRelacaoDoTenant("fornecedores", fornecedorId, ctx.tenant.id),
@@ -769,24 +777,131 @@ export async function criarDespesa(formData: FormData): Promise<FinanceiroFormSt
 
 export async function atualizarEstadoDespesa(
   despesaId: string,
-  estado: EstadoDespesa,
-  dataPagamento?: string
+  estado: EstadoDespesa
 ): Promise<FinanceiroFormState> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões." };
-  if (!ESTADOS_DESPESA.includes(estado)) return { error: "Estado inválido." };
-  if (estado === "pago" && !dataPagamento) return { error: "Indique a data de pagamento." };
+  if (!["pendente", "a_reconciliar", "cancelado"].includes(estado)) {
+    return { error: "Use o fluxo de aprovação para submeter, aprovar, rejeitar ou confirmar pagamentos." };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("despesas")
-    .update({
-      estado,
-      data_pagamento: estado === "pago" ? dataPagamento : null,
-    })
+    .update({ estado })
     .eq("id", despesaId)
     .eq("tenant_id", ctx.tenant.id);
 
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function submeterDespesaParaAprovacao(despesaId: string): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("despesas")
+    .update({ estado: "em_aprovacao" })
+    .eq("id", despesaId)
+    .eq("tenant_id", ctx.tenant.id)
+    .in("estado", ["rascunho", "pendente", "a_reconciliar", "vencido"]);
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function decidirAprovacaoDespesa(
+  despesaId: string,
+  decisao: "aprovada" | "rejeitada",
+  motivo?: string
+): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+  if (!motivo?.trim()) return { error: "Indique um motivo para a decisão." };
+
+  const supabase = await createClient();
+  const payload = decisao === "aprovada"
+    ? { estado: "aprovada", aprovado_em: new Date().toISOString(), aprovado_por: ctx.user.id, motivo_aprovacao: motivo.trim(), rejeitado_em: null, rejeitado_por: null, motivo_rejeicao: null }
+    : { estado: "rejeitada", rejeitado_em: new Date().toISOString(), rejeitado_por: ctx.user.id, motivo_rejeicao: motivo.trim() };
+
+  const { error } = await supabase
+    .from("despesas")
+    .update(payload)
+    .eq("id", despesaId)
+    .eq("tenant_id", ctx.tenant.id)
+    .eq("estado", "em_aprovacao");
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function confirmarPagamentoDespesa(
+  despesaId: string,
+  dataPagamento: string,
+  referenciaPagamento: string
+): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+  if (!dataPagamento) return { error: "Indique a data de pagamento." };
+  if (!referenciaPagamento.trim()) return { error: "Indique a referência de pagamento." };
+
+  const supabase = await createClient();
+  const { data: comprovativos } = await supabase
+    .from("despesas_documentos")
+    .select("id")
+    .eq("tenant_id", ctx.tenant.id)
+    .eq("despesa_id", despesaId)
+    .eq("papel", "comprovativo")
+    .limit(1);
+
+  if (!comprovativos?.length) return { error: "Associe primeiro um comprovativo no Arquivo confidencial." };
+
+  const { error } = await supabase
+    .from("despesas")
+    .update({ estado: "pago", data_pagamento: dataPagamento, referencia_pagamento: referenciaPagamento.trim() })
+    .eq("id", despesaId)
+    .eq("tenant_id", ctx.tenant.id)
+    .eq("estado", "aprovada");
+
+  if (error) return { error: error.message };
+  revalidatePath("/configuracao/financeiro");
+  return { success: true };
+}
+
+export async function listarCalendarioAdministrativo(): Promise<CalendarioAdministrativo> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { eventos: [], alertasAbertos: [] };
+
+  const supabase = await createClient();
+  const [despesas, obrigacoes, alertas] = await Promise.all([
+    supabase.from("despesas").select("id, descricao, data_vencimento, estado, notas").eq("tenant_id", ctx.tenant.id).not("data_vencimento", "is", null).order("data_vencimento", { ascending: true }).limit(100),
+    supabase.from("obrigacoes_recorrentes").select("id, titulo, proximo_vencimento, estado, notas").eq("tenant_id", ctx.tenant.id).eq("estado", "ativa").not("proximo_vencimento", "is", null).order("proximo_vencimento", { ascending: true }).limit(100),
+    supabase.from("alertas_operacionais").select("*").eq("tenant_id", ctx.tenant.id).is("reconhecido_em", null).order("data_referencia", { ascending: true, nullsFirst: false }).limit(100),
+  ]);
+
+  const eventos: EventoCalendarioAdministrativo[] = [
+    ...(despesas.data ?? []).map((item) => ({ id: `despesa-${item.id}`, tipo: "despesa" as const, titulo: item.descricao, data: item.data_vencimento!, estado: item.estado, severidade: item.data_vencimento! < new Date().toISOString().slice(0, 10) ? "alta" as const : "normal" as const, entidade_id: item.id, descricao: item.notas })),
+    ...(obrigacoes.data ?? []).map((item) => ({ id: `obrigacao-${item.id}`, tipo: "obrigacao" as const, titulo: item.titulo, data: item.proximo_vencimento!, estado: item.estado, severidade: item.proximo_vencimento! < new Date().toISOString().slice(0, 10) ? "alta" as const : "normal" as const, entidade_id: item.id, descricao: item.notas })),
+  ].sort((a, b) => a.data.localeCompare(b.data));
+
+  return { eventos, alertasAbertos: (alertas.data ?? []) as AlertaOperacional[] };
+}
+
+export async function reconhecerAlertaOperacional(alertaId: string): Promise<FinanceiroFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("alertas_operacionais")
+    .update({ reconhecido_em: new Date().toISOString(), reconhecido_por: ctx.user.id })
+    .eq("id", alertaId)
+    .eq("tenant_id", ctx.tenant.id)
+    .is("reconhecido_em", null);
   if (error) return { error: error.message };
   revalidatePath("/configuracao/financeiro");
   return { success: true };
