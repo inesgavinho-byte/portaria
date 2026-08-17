@@ -1,6 +1,18 @@
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { redirect } from "next/navigation";
-import { dashboardFinanceiro, listarQuotas, listarPagamentos, listarRecibos, obterConfiguracaoFinanceira } from "@/lib/actions/financeiro";
+import {
+  dashboardFinanceiro,
+  listarQuotas,
+  listarPagamentos,
+  listarRecibos,
+  obterConfiguracaoFinanceira,
+  listarDespesas,
+  listarObrigacoes,
+  listarFornecedoresFinanceiro,
+  listarContratosFinanceiro,
+  listarDocumentosAdministracaoFinanceiro,
+  obterResumoDespesas,
+} from "@/lib/actions/financeiro";
 import { FinanceiroTabs } from "@/components/admin/financeiro-tabs";
 
 export const metadata = { title: "Financeiro — Portaria" };
@@ -18,12 +30,30 @@ export default async function FinanceiroPage({
   const ano = params.ano ? parseInt(params.ano) : new Date().getFullYear();
   const mes = params.mes ? parseInt(params.mes) : new Date().getMonth() + 1;
 
-  const [dashboard, quotas, pagamentos, recibos, configuracao] = await Promise.all([
+  const [
+    dashboard,
+    quotas,
+    pagamentos,
+    recibos,
+    configuracao,
+    despesas,
+    obrigacoes,
+    resumoDespesas,
+    fornecedores,
+    contratos,
+    documentosAdministracao,
+  ] = await Promise.all([
     dashboardFinanceiro(ano, mes),
     listarQuotas(ano, mes),
     listarPagamentos(),
     listarRecibos(),
     obterConfiguracaoFinanceira(),
+    listarDespesas(),
+    listarObrigacoes(),
+    obterResumoDespesas(),
+    listarFornecedoresFinanceiro(),
+    listarContratosFinanceiro(),
+    listarDocumentosAdministracaoFinanceiro(),
   ]);
 
   return (
@@ -42,6 +72,12 @@ export default async function FinanceiroPage({
         pagamentos={pagamentos}
         recibos={recibos}
         configuracao={configuracao}
+        despesas={despesas}
+        obrigacoes={obrigacoes}
+        resumoDespesas={resumoDespesas}
+        fornecedores={fornecedores}
+        contratos={contratos}
+        documentosAdministracao={documentosAdministracao}
       />
     </div>
   );
