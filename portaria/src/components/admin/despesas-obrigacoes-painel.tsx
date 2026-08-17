@@ -8,6 +8,9 @@ import {
   FileWarning,
   Plus,
   Repeat2,
+  Send,
+  ThumbsDown,
+  ThumbsUp,
   WalletCards,
 } from "lucide-react";
 import type { Despesa, ObrigacaoRecorrente, EstadoDespesa } from "@/types/database";
@@ -15,8 +18,11 @@ import type { DespesaResumo, OpcaoFinanceira } from "@/lib/actions/financeiro";
 import {
   atualizarEstadoDespesa,
   atualizarEstadoObrigacao,
+  confirmarPagamentoDespesa,
   criarDespesa,
   criarObrigacao,
+  decidirAprovacaoDespesa,
+  submeterDespesaParaAprovacao,
 } from "@/lib/actions/financeiro";
 
 const CATEGORIAS = [
@@ -35,9 +41,12 @@ const ESTADOS: Array<[EstadoDespesa, string]> = [
   ["a_reconciliar", "A reconciliar"],
   ["rascunho", "Rascunho"],
   ["pendente", "Pendente"],
+  ["em_aprovacao", "Em aprovação"],
+  ["aprovada", "Aprovada"],
   ["pago", "Pago"],
   ["vencido", "Vencido"],
   ["cancelado", "Cancelado"],
+  ["rejeitada", "Rejeitada"],
 ];
 
 type DespesaComRelacoes = Despesa & {
@@ -64,6 +73,9 @@ function estadoBadge(estado: string) {
     a_reconciliar: "bg-violet-100 text-violet-800",
     rascunho: "bg-gray-100 text-gray-700",
     pendente: "bg-amber-100 text-amber-800",
+    em_aprovacao: "bg-sky-100 text-sky-800",
+    aprovada: "bg-blue-100 text-blue-800",
+    rejeitada: "bg-rose-100 text-rose-800",
     pago: "bg-emerald-100 text-emerald-800",
     vencido: "bg-red-100 text-red-800",
     cancelado: "bg-slate-100 text-slate-600",
@@ -75,6 +87,9 @@ function estadoBadge(estado: string) {
     a_reconciliar: "A reconciliar",
     rascunho: "Rascunho",
     pendente: "Pendente",
+    em_aprovacao: "Em aprovação",
+    aprovada: "Aprovada",
+    rejeitada: "Rejeitada",
     pago: "Pago",
     vencido: "Vencido",
     cancelado: "Cancelado",
@@ -145,12 +160,30 @@ export function DespesasObrigacoesPainel({
     });
   }
 
-  function marcarComoPago(id: string) {
+  function submeterParaAprovacao(id: string) {
+    startTransition(async () => {
+      const resultado = await submeterDespesaParaAprovacao(id);
+      setMensagem(resultado.error ?? "Despesa submetida para aprovação.");
+    });
+  }
+
+  function decidir(id: string, decisao: "aprovada" | "rejeitada") {
+    const motivo = window.prompt(decisao === "aprovada" ? "Fundamento da aprovação:" : "Motivo da rejeição:");
+    if (!motivo) return;
+    startTransition(async () => {
+      const resultado = await decidirAprovacaoDespesa(id, decisao, motivo);
+      setMensagem(resultado.error ?? (decisao === "aprovada" ? "Despesa aprovada." : "Despesa rejeitada."));
+    });
+  }
+
+  function confirmarPagamento(id: string) {
     const data = window.prompt("Data de pagamento (AAAA-MM-DD):", new Date().toISOString().slice(0, 10));
     if (!data) return;
+    const referencia = window.prompt("Referência de pagamento:");
+    if (!referencia) return;
     startTransition(async () => {
-      const resultado = await atualizarEstadoDespesa(id, "pago", data);
-      setMensagem(resultado.error ?? "Despesa marcada como paga.");
+      const resultado = await confirmarPagamentoDespesa(id, data, referencia);
+      setMensagem(resultado.error ?? "Pagamento confirmado com comprovativo associado.");
     });
   }
 
@@ -224,7 +257,7 @@ export function DespesasObrigacoesPainel({
       )}
 
       {vista === "despesas" ? (
-        <TabelaDespesas despesas={despesas as DespesaComRelacoes[]} pending={pending} onPagar={marcarComoPago} onEstado={(id, estado) => startTransition(async () => setMensagem((await atualizarEstadoDespesa(id, estado)).error ?? "Estado atualizado."))} />
+        <TabelaDespesas despesas={despesas as DespesaComRelacoes[]} pending={pending} onSubmeter={submeterParaAprovacao} onDecidir={decidir} onConfirmarPagamento={confirmarPagamento} onEstado={(id, estado) => startTransition(async () => setMensagem((await atualizarEstadoDespesa(id, estado)).error ?? "Estado atualizado."))} />
       ) : (
         <TabelaObrigacoes obrigacoes={obrigacoes as ObrigacaoComRelacoes[]} pending={pending} onEstado={(id, estado) => startTransition(async () => setMensagem((await atualizarEstadoObrigacao(id, estado)).error ?? "Estado atualizado."))} />
       )}
@@ -240,9 +273,9 @@ function Campo({ label, children }: { label: string; children: React.ReactNode }
   return <label className="block font-body text-xs tracking-widest text-oliveGray uppercase"><span className="mb-2 block">{label}</span>{children}</label>;
 }
 
-function TabelaDespesas({ despesas, pending, onPagar, onEstado }: { despesas: DespesaComRelacoes[]; pending: boolean; onPagar: (id: string) => void; onEstado: (id: string, estado: EstadoDespesa) => void }) {
+function TabelaDespesas({ despesas, pending, onSubmeter, onDecidir, onConfirmarPagamento, onEstado }: { despesas: DespesaComRelacoes[]; pending: boolean; onSubmeter: (id: string) => void; onDecidir: (id: string, decisao: "aprovada" | "rejeitada") => void; onConfirmarPagamento: (id: string) => void; onEstado: (id: string, estado: EstadoDespesa) => void }) {
   if (despesas.length === 0) return <Vazio icon={<WalletCards className="h-8 w-8" />} texto="Ainda não existem despesas registadas." />;
-  return <div className="overflow-x-auto border border-warmBeige/30"><table className="w-full text-sm"><thead className="bg-warmBeige/10"><tr><Th>Descrição</Th><Th>Fornecedor</Th><Th>Documento</Th><Th>Vencimento</Th><Th>Valor</Th><Th>Estado</Th><Th>Ações</Th></tr></thead><tbody>{despesas.map((despesa) => <tr key={despesa.id} className="border-t border-warmBeige/20"><Td><p className="font-medium text-ink">{despesa.descricao}</p><p className="text-xs text-oliveGray">{categoriaLabel(despesa.categoria)}</p></Td><Td>{despesa.fornecedores?.nome ?? "—"}</Td><Td>{despesa.numero_documento ?? despesa.referencia ?? "—"}</Td><Td>{despesa.data_vencimento ?? "—"}</Td><Td className="font-medium text-ink">{euros(despesa.valor_cents)}</Td><Td>{estadoBadge(despesa.estado)}</Td><Td><div className="flex flex-wrap gap-2">{despesa.estado !== "pago" && <button disabled={pending} onClick={() => onPagar(despesa.id)} className="text-xs text-emerald-700 hover:underline">Marcar pago</button>}{despesa.estado !== "a_reconciliar" && despesa.estado !== "pago" && <button disabled={pending} onClick={() => onEstado(despesa.id, "a_reconciliar")} className="text-xs text-violet-700 hover:underline">Reconciliar</button>}</div></Td></tr>)}</tbody></table></div>;
+  return <div className="overflow-x-auto border border-warmBeige/30"><table className="w-full text-sm"><thead className="bg-warmBeige/10"><tr><Th>Descrição</Th><Th>Fornecedor</Th><Th>Documento</Th><Th>Vencimento</Th><Th>Valor</Th><Th>Estado</Th><Th>Ações</Th></tr></thead><tbody>{despesas.map((despesa) => <tr key={despesa.id} className="border-t border-warmBeige/20"><Td><p className="font-medium text-ink">{despesa.descricao}</p><p className="text-xs text-oliveGray">{categoriaLabel(despesa.categoria)}</p></Td><Td>{despesa.fornecedores?.nome ?? "—"}</Td><Td>{despesa.numero_documento ?? despesa.referencia ?? "—"}</Td><Td>{despesa.data_vencimento ?? "—"}</Td><Td className="font-medium text-ink">{euros(despesa.valor_cents)}</Td><Td>{estadoBadge(despesa.estado)}</Td><Td><div className="flex flex-wrap gap-2">{["rascunho", "pendente", "a_reconciliar", "vencido"].includes(despesa.estado) && <button disabled={pending} onClick={() => onSubmeter(despesa.id)} className="inline-flex items-center gap-1 text-xs text-sky-700 hover:underline"><Send className="h-3 w-3" />Submeter</button>}{despesa.estado === "em_aprovacao" && <><button disabled={pending} onClick={() => onDecidir(despesa.id, "aprovada")} className="inline-flex items-center gap-1 text-xs text-blue-700 hover:underline"><ThumbsUp className="h-3 w-3" />Aprovar</button><button disabled={pending} onClick={() => onDecidir(despesa.id, "rejeitada")} className="inline-flex items-center gap-1 text-xs text-rose-700 hover:underline"><ThumbsDown className="h-3 w-3" />Rejeitar</button></>}{despesa.estado === "aprovada" && <button disabled={pending} onClick={() => onConfirmarPagamento(despesa.id)} className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:underline"><CheckCircle2 className="h-3 w-3" />Confirmar pagamento</button>}{!["pago", "cancelado", "rejeitada", "a_reconciliar"].includes(despesa.estado) && <button disabled={pending} onClick={() => onEstado(despesa.id, "a_reconciliar")} className="text-xs text-violet-700 hover:underline">Reconciliar</button>}</div></Td></tr>)}</tbody></table></div>;
 }
 
 function TabelaObrigacoes({ obrigacoes, pending, onEstado }: { obrigacoes: ObrigacaoComRelacoes[]; pending: boolean; onEstado: (id: string, estado: "ativa" | "suspensa" | "terminada") => void }) {

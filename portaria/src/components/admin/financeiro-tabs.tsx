@@ -31,8 +31,9 @@ import {
   Despesa,
   ObrigacaoRecorrente,
 } from "@/types/database";
-import { DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo } from "@/lib/actions/financeiro";
+import { CalendarioAdministrativo as CalendarioAdministrativoDados, DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo } from "@/lib/actions/financeiro";
 import { DespesasObrigacoesPainel } from "@/components/admin/despesas-obrigacoes-painel";
+import { CalendarioAdministrativo } from "@/components/admin/calendario-administrativo";
 
 function centsToEuro(cents: number) {
   return (cents / 100).toLocaleString("pt-PT", {
@@ -74,6 +75,7 @@ const TABS = [
   { key: "recibos", label: "Recibos", icon: FileText },
   { key: "despesas", label: "Despesas", icon: Landmark },
   { key: "obrigacoes", label: "Obrigações", icon: Repeat2 },
+  { key: "calendario", label: "Calendário", icon: Clock },
   { key: "configuracao", label: "Configuração", icon: Settings },
 ];
 
@@ -96,6 +98,7 @@ export function FinanceiroTabs({
   fornecedores,
   contratos,
   documentosAdministracao,
+  calendario,
 }: {
   tab: string;
   ano: number;
@@ -111,6 +114,7 @@ export function FinanceiroTabs({
   fornecedores: OpcaoFinanceira[];
   contratos: OpcaoFinanceira[];
   documentosAdministracao: OpcaoFinanceira[];
+  calendario: CalendarioAdministrativoDados;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -154,6 +158,9 @@ export function FinanceiroTabs({
       {tab === "quotas" && <TabQuotas quotas={quotas} ano={ano} mes={mes} />}
       {tab === "pagamentos" && <TabPagamentos pagamentos={pagamentos} />}
       {tab === "recibos" && <TabRecibos recibos={recibos} />}
+      {tab === "calendario" && (
+        <CalendarioAdministrativo eventos={calendario.eventos} alertas={calendario.alertasAbertos} />
+      )}
       {(tab === "despesas" || tab === "obrigacoes") && (
         <DespesasObrigacoesPainel
           despesas={despesas}

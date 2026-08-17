@@ -12,6 +12,7 @@ import {
   listarContratosFinanceiro,
   listarDocumentosAdministracaoFinanceiro,
   obterResumoDespesas,
+  listarCalendarioAdministrativo,
 } from "@/lib/actions/financeiro";
 import { FinanceiroTabs } from "@/components/admin/financeiro-tabs";
 
@@ -42,6 +43,7 @@ export default async function FinanceiroPage({
     fornecedores,
     contratos,
     documentosAdministracao,
+    calendario,
   ] = await Promise.all([
     dashboardFinanceiro(ano, mes),
     listarQuotas(ano, mes),
@@ -54,6 +56,7 @@ export default async function FinanceiroPage({
     listarFornecedoresFinanceiro(),
     listarContratosFinanceiro(),
     listarDocumentosAdministracaoFinanceiro(),
+    listarCalendarioAdministrativo(),
   ]);
 
   return (
@@ -78,6 +81,7 @@ export default async function FinanceiroPage({
         fornecedores={fornecedores}
         contratos={contratos}
         documentosAdministracao={documentosAdministracao}
+        calendario={calendario}
       />
     </div>
   );

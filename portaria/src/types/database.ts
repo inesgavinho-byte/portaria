@@ -510,9 +510,12 @@ export type CategoriaDespesa =
 export type EstadoDespesa =
   | "rascunho"
   | "pendente"
+  | "em_aprovacao"
+  | "aprovada"
   | "pago"
   | "vencido"
   | "cancelado"
+  | "rejeitada"
   | "a_reconciliar";
 
 export type ObrigacaoRecorrente = {
@@ -546,11 +549,107 @@ export type Despesa = {
   data_vencimento: string | null;
   valor_cents: number;
   estado: EstadoDespesa;
+  aprovado_em: string | null;
+  aprovado_por: string | null;
+  motivo_aprovacao: string | null;
+  rejeitado_em: string | null;
+  rejeitado_por: string | null;
+  motivo_rejeicao: string | null;
   data_pagamento: string | null;
   metodo_pagamento: "transferencia" | "debito_direto" | "mbway" | "dinheiro" | "outro" | null;
   referencia_pagamento: string | null;
   notas: string | null;
   criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type DespesaHistoricoEstado = {
+  id: string;
+  tenant_id: string;
+  despesa_id: string;
+  estado_anterior: EstadoDespesa | null;
+  estado_novo: EstadoDespesa;
+  motivo: string | null;
+  executado_por: string | null;
+  executado_em: string;
+};
+
+export type AlertaOperacional = {
+  id: string;
+  tenant_id: string;
+  tipo: "vencimento_despesa" | "vencimento_obrigacao" | "despesa_vencida" | "manutencao_proxima" | "sistema";
+  titulo: string;
+  descricao: string | null;
+  entidade_tipo: "despesa" | "obrigacao" | "manutencao" | "sistema";
+  entidade_id: string | null;
+  data_referencia: string | null;
+  severidade: "baixa" | "normal" | "alta" | "critica";
+  chave_idempotencia: string;
+  reconhecido_em: string | null;
+  reconhecido_por: string | null;
+  criado_em: string;
+};
+
+export type EventoCalendarioAdministrativo = {
+  id: string;
+  tipo: "despesa" | "obrigacao" | "alerta";
+  titulo: string;
+  data: string;
+  estado: string;
+  severidade: "baixa" | "normal" | "alta" | "critica";
+  entidade_id: string | null;
+  descricao: string | null;
+};
+
+export type CategoriaAtivoManutencao = "elevadores" | "cobertura" | "fachada" | "bombas" | "extintores" | "portas" | "eletricidade" | "agua" | "outro";
+
+export type AtivoManutencao = {
+  id: string;
+  tenant_id: string;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
+  nome: string;
+  categoria: CategoriaAtivoManutencao;
+  localizacao: string | null;
+  codigo_interno: string | null;
+  estado: "ativo" | "inativo" | "substituido";
+  notas: string | null;
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type PlanoManutencao = {
+  id: string;
+  tenant_id: string;
+  ativo_id: string;
+  fornecedor_id: string | null;
+  contrato_id: string | null;
+  titulo: string;
+  periodicidade: "mensal" | "trimestral" | "semestral" | "anual" | "pontual";
+  ultima_execucao: string | null;
+  proxima_execucao: string;
+  antecedencia_alerta_dias: number;
+  instrucoes: string | null;
+  estado: "ativo" | "suspenso" | "terminado";
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type TarefaManutencao = {
+  id: string;
+  tenant_id: string;
+  plano_id: string;
+  ativo_id: string;
+  fornecedor_id: string | null;
+  titulo: string;
+  data_planeada: string;
+  data_conclusao: string | null;
+  estado: "planeada" | "agendada" | "em_curso" | "concluida" | "cancelada";
+  observacoes: string | null;
+  concluida_por: string | null;
   criado_em: string;
   atualizado_em: string;
 };
