@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LockKeyhole, Plus, Upload } from "lucide-react";
+import { CloudDownload, LockKeyhole, Plus, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { MigrarQuotasHistorico } from "@/components/admin/migrar-quotas-historico";
@@ -32,6 +32,9 @@ export default async function DocumentosAdministracaoPage() {
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2 lg:justify-end">
+          <Link href="/configuracao/documentos-administracao/importar-drive" className="inline-flex items-center gap-2 border border-ink px-5 py-3 font-body text-sm uppercase tracking-widest text-ink transition-colors hover:bg-ink/5">
+            <CloudDownload className="h-4 w-4" />Importar do Drive
+          </Link>
           <Link href="/configuracao/documentos-administracao/lote" className="inline-flex items-center gap-2 border border-ink px-5 py-3 font-body text-sm uppercase tracking-widest text-ink transition-colors hover:bg-ink/5">
             <Upload className="h-4 w-4" />Carregar em lote
           </Link>
