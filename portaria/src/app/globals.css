@@ -1,47 +1,46 @@
-/* ======================================================================
- * Fontes — Google Fonts via @import
- * O @import TEM de vir antes de qualquer outra regra (incluindo @tailwind),
- * caso contrário os browsers ignoram-no e as fontes não carregam.
- * Em produção, considerar self-hosting para performance.
- * ====================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Quattrocento+Sans:wght@400;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --font-title: 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'Quattrocento Sans', system-ui, sans-serif;
+    --font-title: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Segoe UI", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", sans-serif;
 
-    /* Variáveis de tema do tenant — preenchidas dinamicamente.
-     * Defaults são paleta GAVINHO. */
-    --color-primary: #ADAA96;
-    --color-secondary: #F2F0E7;
-    --color-accent: #8B8670;
+    --color-primary: #0B4A35;
+    --color-secondary: #F3F7F5;
+    --color-accent: #187653;
   }
 
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background: #edf3f0;
   }
 
   body {
-    @apply bg-paper text-ink font-body;
+    @apply text-ink font-body;
+    background:
+      radial-gradient(circle at 18% 0%, rgba(11, 74, 53, 0.12), transparent 34rem),
+      radial-gradient(circle at 92% 16%, rgba(24, 118, 83, 0.08), transparent 30rem),
+      linear-gradient(180deg, #f7faf8 0%, #edf3f0 100%);
+    min-height: 100vh;
     font-feature-settings: 'kern', 'liga', 'calt';
   }
 
   h1, h2, h3, h4 {
-    @apply font-title;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    @apply font-title text-ink;
+    font-weight: 600;
+    letter-spacing: -0.035em;
   }
 
-  /* Hierarquia tipográfica */
   h1 { @apply text-h1 md:text-display; }
   h2 { @apply text-h2 md:text-h1; }
   h3 { @apply text-h3 md:text-h2; }
+
+  ::selection {
+    background: rgba(11, 74, 53, 0.18);
+  }
 }
 
 @layer components {
@@ -53,118 +52,76 @@
     @apply max-w-6xl mx-auto px-6;
   }
 
-  /* ------------------------------------------------------------------
-   * Tabelas (editor de avisos e vista do condómino — ambos usam .prose)
-   * ------------------------------------------------------------------ */
+  .glass-surface {
+    @apply border border-white/70 bg-white/65 backdrop-blur-glass shadow-glass;
+  }
+
+  .glass-surface-strong {
+    @apply border border-white/80 bg-white/80 backdrop-blur-glass shadow-float;
+  }
+
+  .portaria-panel {
+    @apply rounded-3xl border border-white/75 bg-white/72 backdrop-blur-glass shadow-glass;
+  }
+
+  .portaria-button-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-britishGreen px-4 py-2.5 font-body text-sm font-medium text-white transition-all hover:bg-britishGreenDeep hover:shadow-float active:scale-[0.99];
+  }
+
+  .portaria-button-secondary {
+    @apply inline-flex items-center justify-center rounded-xl border border-britishGreen/15 bg-white/65 px-4 py-2.5 font-body text-sm font-medium text-britishGreen backdrop-blur-md transition-all hover:bg-white hover:border-britishGreen/25;
+  }
+
   .prose table {
     @apply w-full border-collapse my-4 text-sm;
   }
   .prose th,
   .prose td {
-    @apply border border-warmBeige/40 px-3 py-2 text-left align-top;
+    @apply border border-britishGreen/10 px-3 py-2 text-left align-top;
   }
   .prose th {
-    @apply bg-softCream/60 font-body font-bold;
+    @apply bg-britishGreenSoft/70 font-body font-semibold;
   }
-  /* Ajuda de edição no ProseMirror (Tiptap) */
   .ProseMirror table {
     table-layout: fixed;
   }
   .ProseMirror .selectedCell {
-    @apply bg-warmBeige/15;
+    @apply bg-britishGreen/10;
   }
 
-  /* ------------------------------------------------------------------
-   * Landing — superfícies glass sobre fundo escuro
-   * ------------------------------------------------------------------ */
   .glass-card {
-    @apply bg-white/[0.04] border border-white/10 backdrop-blur-md;
+    @apply bg-white/[0.07] border border-white/10 backdrop-blur-md;
   }
 }
 
-/* ======================================================================
- * Landing — animações discretas
- * ====================================================================== */
-
-/* Revelação ao entrar no viewport (ativada por IntersectionObserver) */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1),
-    transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.6, 0.2, 1), transform 0.9s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
+.reveal.is-visible { opacity: 1; transform: none; }
 
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Entrada do hero no carregamento */
 @keyframes hero-enter {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
 }
+.hero-enter { animation: hero-enter 1.1s cubic-bezier(0.2, 0.6, 0.2, 1) both; }
 
-.hero-enter {
-  animation: hero-enter 1.1s cubic-bezier(0.2, 0.6, 0.2, 1) both;
-}
-
-/* Luz ambiente do hero — deriva muito lenta */
 @keyframes glow-drift {
-  0%,
-  100% {
-    transform: translate3d(-2%, -1%, 0) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate3d(2%, 2%, 0) scale(1.06);
-    opacity: 0.9;
-  }
+  0%, 100% { transform: translate3d(-2%, -1%, 0) scale(1); opacity: 0.6; }
+  50% { transform: translate3d(2%, 2%, 0) scale(1.06); opacity: 0.9; }
 }
+.glow-drift { animation: glow-drift 16s ease-in-out infinite; }
 
-.glow-drift {
-  animation: glow-drift 16s ease-in-out infinite;
-}
-
-/* Indicação de scroll — linha vertical que respira */
 @keyframes scroll-hint {
-  0% {
-    transform: scaleY(0);
-    transform-origin: top;
-  }
-  45% {
-    transform: scaleY(1);
-    transform-origin: top;
-  }
-  55% {
-    transform: scaleY(1);
-    transform-origin: bottom;
-  }
-  100% {
-    transform: scaleY(0);
-    transform-origin: bottom;
-  }
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
 }
-
-.scroll-hint {
-  animation: scroll-hint 2.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
-}
+.scroll-hint { animation: scroll-hint 2.6s cubic-bezier(0.6, 0, 0.4, 1) infinite; }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .hero-enter,
-  .glow-drift,
-  .scroll-hint {
-    animation: none;
-  }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .hero-enter, .glow-drift, .scroll-hint { animation: none; }
 }

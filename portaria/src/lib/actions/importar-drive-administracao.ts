@@ -20,10 +20,7 @@ export type DriveImportItem = {
   descricao?: string;
 };
 
-export type DriveImportResultado = {
-  importados: number;
-  falhas: string[];
-};
+export type DriveImportResultado = { importados: number; falhas: string[] };
 
 function extrairGoogleDriveId(url: string): string | null {
   try {
@@ -36,26 +33,36 @@ function extrairGoogleDriveId(url: string): string | null {
   } catch { return null; }
 }
 
+function corrigirMojibake(valor: string): string {
+  if (!/[ÃÂâ]/.test(valor)) return valor;
+  try {
+    const bytes = Uint8Array.from(Array.from(valor), (char) => char.charCodeAt(0) & 0xff);
+    const corrigido = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return corrigido.includes("�") ? valor : corrigido;
+  } catch {
+    return valor;
+  }
+}
+
 function nomeDoContentDisposition(value: string | null): string | null {
   if (!value) return null;
   const utf8 = value.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
-  if (utf8) { try { return decodeURIComponent(utf8); } catch { return utf8; } }
-  return value.match(/filename="?([^";]+)"?/i)?.[1] ?? null;
+  if (utf8) {
+    try { return corrigirMojibake(decodeURIComponent(utf8)); } catch { return corrigirMojibake(utf8); }
+  }
+  const simples = value.match(/filename="?([^";]+)"?/i)?.[1] ?? null;
+  return simples ? corrigirMojibake(simples) : null;
 }
 
 function extensaoPorMime(mime: string): string | null { return DOCUMENTO_TIPOS_VALIDOS[mime] ?? null; }
 
 function tipoPorAssinatura(bytes: Uint8Array): { mime: string; extensao: string } | null {
-  // PDF: %PDF-
   if (bytes.length >= 5 && bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46 && bytes[4] === 0x2d)
     return { mime: "application/pdf", extensao: "pdf" };
-  // JPEG
   if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)
     return { mime: "image/jpeg", extensao: "jpg" };
-  // PNG
   if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a)
     return { mime: "image/png", extensao: "png" };
-  // Office Open XML (docx/xlsx) é ZIP; desambiguamos pelo nome remoto depois.
   return null;
 }
 
@@ -67,22 +74,41 @@ function tipoPorNome(nome: string | null): { mime: string; extensao: string } | 
     docx: { mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", extensao: "docx" },
     xls: { mime: "application/vnd.ms-excel", extensao: "xls" },
     xlsx: { mime: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", extensao: "xlsx" },
-    jpg: { mime: "image/jpeg", extensao: "jpg" },
-    jpeg: { mime: "image/jpeg", extensao: "jpg" },
+    jpg: { mime: "image/jpeg", extensao: "jpg" }, jpeg: { mime: "image/jpeg", extensao: "jpg" },
     png: { mime: "image/png", extensao: "png" },
   };
   return ext ? tipos[ext] ?? null : null;
 }
 
+function normalizarNome(nome: string): string {
+  return corrigirMojibake(nome)
+    .replace(/^fwd:\s*/i, "")
+    .replace(/^edif[ií]cio europa\s*[-–—:]\s*/i, "")
+    .replace(/\.[^.]+$/, "")
+    .replace(/[_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokens(nome: string): Set<string> {
+  return new Set(nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+}
+
 function categoriaAutomatica(nome: string): Documento["categoria"] {
-  const normalizado = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  if (normalizado.includes("ata")) return "ata";
-  if (normalizado.includes("regulamento")) return "regulamento";
-  if (normalizado.includes("contrato")) return "contrato";
-  if (normalizado.includes("apolice") || normalizado.includes("seguro")) return "apolice";
-  if (normalizado.includes("conta") || normalizado.includes("balancete") || normalizado.includes("orcamento") || normalizado.includes("quota") || normalizado.includes("extrato")) return "conta";
-  if (normalizado.includes("circular") || normalizado.includes("comunicacao")) return "circular";
+  const texto = nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const palavras = tokens(nome);
+  if (palavras.has("regulamento")) return "regulamento";
+  if (palavras.has("contrato")) return "contrato";
+  if (palavras.has("apolice") || palavras.has("seguro") || palavras.has("seguros")) return "apolice";
+  if (palavras.has("balancete") || palavras.has("extrato") || palavras.has("quotizacao") || palavras.has("quotizacoes") || palavras.has("quota") || palavras.has("quotas") || palavras.has("pagamento") || palavras.has("pagamentos") || palavras.has("conta") || palavras.has("contas") || palavras.has("orcamento")) return "conta";
+  if (palavras.has("ata") || /^ata\s+(n|nº|no)?\.?\s*\d/i.test(texto)) return "ata";
+  if (palavras.has("circular") || palavras.has("comunicacao")) return "circular";
   return "outro";
+}
+
+function anoAutomatico(nome: string): number | null {
+  const anos = nome.match(/\b(19|20)\d{2}\b/g)?.map(Number) ?? [];
+  return anos.length ? Math.max(...anos) : null;
 }
 
 export async function importarDriveParaAdministracao(itens: DriveImportItem[]): Promise<DriveImportResultado> {
@@ -114,14 +140,13 @@ export async function importarDriveParaAdministracao(itens: DriveImportItem[]): 
 
       const nomeRemoto = nomeDoContentDisposition(response.headers.get("content-disposition"));
       const extensaoHeader = extensaoPorMime(headerMime);
-      const tipo = extensaoHeader
-        ? { mime: headerMime, extensao: extensaoHeader }
-        : tipoPorAssinatura(new Uint8Array(data)) ?? tipoPorNome(nomeRemoto);
+      const tipo = extensaoHeader ? { mime: headerMime, extensao: extensaoHeader } : tipoPorAssinatura(new Uint8Array(data)) ?? tipoPorNome(nomeRemoto);
       if (!tipo) throw new Error(`tipo não suportado (${headerMime || "desconhecido"})`);
 
-      const tituloBase = (item.titulo || nomeRemoto?.replace(/\.[^.]+$/, "") || `Documento Drive ${driveId}`).trim().slice(0, 200);
-      const categoria = item.categoria && CATEGORIAS_VALIDAS.includes(item.categoria) ? item.categoria : categoriaAutomatica(nomeRemoto || tituloBase);
-      const ano = item.ano && item.ano >= 1900 && item.ano <= 2100 ? item.ano : null;
+      const nomeFonte = item.titulo ? corrigirMojibake(item.titulo) : (nomeRemoto ?? `Documento Drive ${driveId}`);
+      const tituloBase = normalizarNome(nomeFonte).slice(0, 200);
+      const categoria = item.categoria && CATEGORIAS_VALIDAS.includes(item.categoria) ? item.categoria : categoriaAutomatica(tituloBase);
+      const ano = item.ano && item.ano >= 1900 && item.ano <= 2100 ? item.ano : anoAutomatico(tituloBase);
 
       const { data: documento, error: insertError } = await supabase.from("documentos_administracao").insert({
         tenant_id: ctx.tenant.id,
