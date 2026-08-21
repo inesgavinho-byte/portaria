@@ -8,42 +8,79 @@ import type { Vista } from "@/lib/actions/vista";
 const GRUPOS_ADMIN: NavGrupo[] = [
   { itens: [{ href: "/inicio", label: "Início" }] },
   {
-    titulo: "Gestão",
+    titulo: "Operação",
     itens: [
       { href: "/configuracao/ocorrencias", label: "Ocorrências" },
-      { href: "/configuracao/assembleias", label: "Assembleias" },
-      { href: "/configuracao/documentos", label: "Documentos" },
-      { href: "/configuracao/documentos-administracao", label: "Arquivo confidencial" },
-      { href: "/comunicacoes", label: "Comunicações" },
-      { href: "/configuracao/avisos", label: "Avisos" },
-      { href: "/blueprints", label: "Modelos" },
+      {
+        href: "/configuracao/manutencao",
+        label: "Manutenção",
+        filhos: [
+          { href: "/calendario", label: "Calendário" },
+        ],
+      },
       { href: "/configuracao/reservas", label: "Reservas" },
-      { href: "/configuracao/financeiro", label: "Financeiro" },
-      { href: "/contribuicoes-extraordinarias", label: "Contribuições extraordinárias" },
-      { href: "/configuracao/manutencao", label: "Manutenção preventiva" },
     ],
   },
   {
-    titulo: "Registos",
+    titulo: "Condomínio",
     itens: [
-      { href: "/fracoes", label: "Frações" },
+      {
+        href: "/fracoes",
+        label: "Pessoas e frações",
+        filhos: [
+          { href: "/contactos", label: "Contactos" },
+        ],
+      },
+      {
+        href: "/configuracao/assembleias",
+        label: "Assembleias",
+        filhos: [
+          { href: "/votacoes", label: "Votações" },
+        ],
+      },
+      { href: "/configuracao/avisos", label: "Avisos" },
+      { href: "/comunicacoes", label: "Comunicações" },
+    ],
+  },
+  {
+    titulo: "Financeiro",
+    itens: [
+      {
+        href: "/configuracao/financeiro",
+        label: "Financeiro",
+        filhos: [
+          { href: "/contribuicoes-extraordinarias", label: "Contribuições extraordinárias" },
+        ],
+      },
       { href: "/fornecedores", label: "Fornecedores" },
-      { href: "/contactos", label: "Contactos" },
       { href: "/contratos", label: "Contratos" },
+    ],
+  },
+  {
+    titulo: "Documentos",
+    itens: [
+      { href: "/configuracao/documentos", label: "Documentos publicados" },
+      {
+        href: "/configuracao/documentos-administracao",
+        label: "Arquivo administrativo",
+        filhos: [
+          { href: "/configuracao/documentos-administracao/importar-drive", label: "Importar do Drive" },
+        ],
+      },
+      { href: "/blueprints", label: "Modelos" },
+    ],
+  },
+  {
+    titulo: "Conhecimento",
+    itens: [
+      { href: "/ia", label: "Assistente" },
+      { href: "/timeline", label: "Timeline" },
+      { href: "/pesquisa", label: "Pesquisa" },
       { href: "/conversas", label: "Conversas" },
     ],
   },
   {
-    titulo: "Consulta",
-    itens: [
-      { href: "/ia", label: "Assistente IA" },
-      { href: "/votacoes", label: "Votações" },
-      { href: "/calendario", label: "Calendário" },
-      { href: "/timeline", label: "Timeline" },
-      { href: "/pesquisa", label: "Pesquisa" },
-    ],
-  },
-  {
+    titulo: "Sistema",
     itens: [
       { href: "/integracoes", label: "Integrações" },
       { href: "/configuracao", label: "Configuração" },
@@ -61,13 +98,12 @@ const GRUPOS_CONDOMINO: NavGrupo[] = [
       { href: "/votacoes", label: "Votações" },
       { href: "/reservas", label: "Reservas" },
       { href: "/financeiro", label: "Financeiro" },
-      { href: "/ia", label: "Assistente IA" },
+      { href: "/ia", label: "Assistente" },
       { href: "/regulamento", label: "Regulamento" },
     ],
   },
 ];
 
-// Inquilino: mural + ocorrências + regulamento. Sem financeiro nem assembleias.
 const GRUPOS_INQUILINO: NavGrupo[] = [
   {
     itens: [
@@ -78,51 +114,25 @@ const GRUPOS_INQUILINO: NavGrupo[] = [
   },
 ];
 
-export default async function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const ctx = await getCurrentUserInTenant();
   if (!ctx) redirect("/login");
 
   const role = ctx.membership.role;
   const isAdmin = role === "admin";
-
-  // Vistas disponíveis: os admins podem pré-visualizar as três; um inquilino
-  // vê a vista de inquilino; os restantes veem a vista de condómino.
-  const vistas: Vista[] = isAdmin
-    ? ["admin", "condomino", "inquilino"]
-    : role === "inquilino"
-    ? ["inquilino"]
-    : ["condomino"];
+  const vistas: Vista[] = isAdmin ? ["admin", "condomino", "inquilino"] : role === "inquilino" ? ["inquilino"] : ["condomino"];
 
   const cookieStore = await cookies();
   const raw = cookieStore.get("portaria-vista")?.value as Vista | undefined;
-  const vista: Vista =
-    isAdmin && raw && vistas.includes(raw) ? raw : vistas[0];
-
-  const grupos =
-    vista === "admin"
-      ? GRUPOS_ADMIN
-      : vista === "inquilino"
-      ? GRUPOS_INQUILINO
-      : GRUPOS_CONDOMINO;
+  const vista: Vista = isAdmin && raw && vistas.includes(raw) ? raw : vistas[0];
+  const grupos = vista === "admin" ? GRUPOS_ADMIN : vista === "inquilino" ? GRUPOS_INQUILINO : GRUPOS_CONDOMINO;
 
   return (
-    <div className="min-h-screen bg-softCream/30 lg:flex">
-      <AppNav
-        tenantNome={ctx.tenant.nome}
-        userEmail={ctx.user.email ?? ""}
-        fracao={ctx.membership.fracao}
-        grupos={grupos}
-        vista={vista}
-        vistas={vistas}
-      />
-      <main className="flex-1 min-w-0 px-6 py-10 md:px-12 max-w-5xl">
-        {children}
+    <div className="min-h-screen lg:flex">
+      <AppNav tenantNome={ctx.tenant.nome} userEmail={ctx.user.email ?? ""} fracao={ctx.membership.fracao} grupos={grupos} vista={vista} vistas={vistas} />
+      <main className="min-w-0 flex-1 px-5 py-8 md:px-8 lg:px-10 xl:px-12">
+        <div className="mx-auto w-full max-w-6xl">{children}</div>
       </main>
-      {/* Conselheira: presença proactiva para a administração */}
       {vista === "admin" && <Conselheira />}
     </div>
   );
