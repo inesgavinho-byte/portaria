@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import { AppNav, type NavGrupo } from "@/components/layout/app-nav";
+import { PesquisaGlobal } from "@/components/layout/pesquisa-global";
 import { Conselheira } from "@/components/conselheira/conselheira";
 import type { Vista } from "@/lib/actions/vista";
 
@@ -75,7 +76,6 @@ const GRUPOS_ADMIN: NavGrupo[] = [
     itens: [
       { href: "/ia", label: "Assistente" },
       { href: "/timeline", label: "Timeline" },
-      { href: "/pesquisa", label: "Pesquisa" },
       { href: "/conversas", label: "Conversas" },
     ],
   },
@@ -130,9 +130,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen lg:flex">
       <AppNav tenantNome={ctx.tenant.nome} userEmail={ctx.user.email ?? ""} fracao={ctx.membership.fracao} grupos={grupos} vista={vista} vistas={vistas} />
-      <main className="min-w-0 flex-1 px-5 py-8 md:px-8 lg:px-10 xl:px-12">
-        <div className="mx-auto w-full max-w-6xl">{children}</div>
-      </main>
+      <div className="min-w-0 flex-1">
+        {vista === "admin" && (
+          <div className="sticky top-0 z-30 border-b border-white/60 bg-[#edf3f0]/75 px-5 py-3 backdrop-blur-xl md:px-8 lg:px-10 xl:px-12">
+            <PesquisaGlobal />
+          </div>
+        )}
+        <main className="px-5 py-8 md:px-8 lg:px-10 xl:px-12">
+          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        </main>
+      </div>
       {vista === "admin" && <Conselheira />}
     </div>
   );
