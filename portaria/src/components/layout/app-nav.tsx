@@ -40,7 +40,7 @@ export function AppNav({ tenantNome, userEmail, fracao, grupos, vista, vistas }:
 
       {aberto && <div onClick={() => setAberto(false)} className="lg:hidden fixed inset-0 z-40 bg-ink/20 backdrop-blur-sm" aria-hidden />}
 
-      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-svh w-72 shrink-0 border-r border-white/65 bg-white/62 backdrop-blur-glass flex flex-col shadow-[12px_0_40px_rgba(23,32,28,0.04)] transition-transform lg:translate-x-0 ${aberto ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-svh w-72 shrink-0 border-r border-white/70 bg-white/60 backdrop-blur-glass flex flex-col shadow-[12px_0_40px_rgba(23,32,28,0.04)] transition-transform lg:translate-x-0 ${aberto ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setAberto(false)}>
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-britishGreen text-sm font-semibold text-white shadow-float">E</span>
@@ -84,13 +84,13 @@ function NavItemLinha({ item, ativo, pathname, onNavigate }: { item: NavItem; at
   const ramoAtivo = hrefsDoItem(item).some((href) => pathname === href || pathname.startsWith(href + "/"));
 
   if (!temFilhos) {
-    return <li><Link href={item.href} onClick={onNavigate} className={`block rounded-xl px-3 py-2.5 font-body text-sm font-medium transition-all ${item.href === ativo ? "bg-britishGreen text-white shadow-float" : "text-oliveGray hover:bg-white/85 hover:text-britishGreen"}`}>{item.label}</Link></li>;
+    return <li><Link href={item.href} onClick={onNavigate} className={`block rounded-xl px-3 py-2.5 font-body text-sm font-medium transition-all ${item.href === ativo ? "bg-britishGreen text-white shadow-float" : "text-oliveGray hover:bg-white/90 hover:text-britishGreen"}`}>{item.label}</Link></li>;
   }
 
   return (
     <li>
       <details className="group" open={ramoAtivo || undefined}>
-        <summary className={`flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-body text-sm font-medium transition-all ${ramoAtivo ? "bg-britishGreenSoft/80 text-britishGreen" : "text-oliveGray hover:bg-white/85 hover:text-britishGreen"}`}>
+        <summary className={`flex cursor-pointer list-none items-center justify-between rounded-xl px-3 py-2.5 font-body text-sm font-medium transition-all ${ramoAtivo ? "bg-britishGreenSoft/80 text-britishGreen" : "text-oliveGray hover:bg-white/90 hover:text-britishGreen"}`}>
           <span>{item.label}</span>
           <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
         </summary>
@@ -108,12 +108,12 @@ const VISTA_LABEL: Record<Vista, string> = { admin: "Administração", condomino
 function VistaToggle({ vista, vistas }: { vista: Vista; vistas: Vista[] }) {
   const [isPending, startTransition] = useTransition();
   function mudar(nova: Vista) { if (nova !== vista) startTransition(() => definirVista(nova)); }
-  return <div className="px-4 pb-1"><div className="flex rounded-2xl border border-white/80 bg-white/55 p-1 shadow-sm backdrop-blur-xl">{vistas.map((v) => <button key={v} onClick={() => mudar(v)} disabled={isPending} className={`flex-1 rounded-xl px-2 py-2 font-body text-xs font-medium transition-all ${vista === v ? "bg-britishGreen text-white shadow-sm" : "text-oliveGray hover:bg-white hover:text-britishGreen"}`}>{VISTA_LABEL[v]}</button>)}</div></div>;
+  return <div className="px-4 pb-1"><div className="flex rounded-2xl border border-white/80 bg-white/50 p-1 shadow-sm backdrop-blur-xl">{vistas.map((v) => <button key={v} onClick={() => mudar(v)} disabled={isPending} className={`flex-1 rounded-xl px-2 py-2 font-body text-xs font-medium transition-all ${vista === v ? "bg-britishGreen text-white shadow-sm" : "text-oliveGray hover:bg-white hover:text-britishGreen"}`}>{VISTA_LABEL[v]}</button>)}</div></div>;
 }
 
 function UtilizadorRodape({ userEmail, fracao, vista }: { userEmail: string; fracao: string | null; vista: Vista }) {
   const router = useRouter();
   const supabase = createClient();
   async function sair() { await supabase.auth.signOut(); router.push("/"); router.refresh(); }
-  return <div className="m-3 rounded-2xl border border-white/75 bg-white/58 px-4 py-3 backdrop-blur-xl"><p className="truncate font-body text-xs text-oliveGray">{fracao && vista === "condomino" ? `${fracao} · ` : ""}{userEmail}</p><button onClick={sair} className="mt-2 font-body text-xs font-semibold text-britishGreen hover:text-britishGreenDeep">Sair</button></div>;
+  return <div className="m-3 rounded-2xl border border-white/75 bg-white/60 px-4 py-3 backdrop-blur-xl"><p className="truncate font-body text-xs text-oliveGray">{fracao && vista === "condomino" ? `${fracao} · ` : ""}{userEmail}</p><button onClick={sair} className="mt-2 font-body text-xs font-semibold text-britishGreen hover:text-britishGreenDeep">Sair</button></div>;
 }
