@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { AlertTriangle, CheckCircle2, Clock3 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock3, FileCheck2 } from "lucide-react";
 import type { LinhaMapaContas, MapaContasAnual } from "@/lib/actions/mapa-contas";
 
 function euro(cents: number | null | undefined) {
@@ -18,10 +18,25 @@ function isCabecalho(linha: LinhaMapaContas) {
   return ["1", "2", "3", "4"].includes(linha.codigo);
 }
 
-function badgeEstado(estado: LinhaMapaContas["estadoReconciliacao"]) {
-  if (estado === "reconciliado") return <span className="inline-flex items-center gap-1 text-xs text-emerald-700"><CheckCircle2 className="h-3.5 w-3.5" />Reconciliado</span>;
-  if (estado === "discrepancia") return <span className="inline-flex items-center gap-1 text-xs text-red-700"><AlertTriangle className="h-3.5 w-3.5" />Discrepância</span>;
-  return <span className="inline-flex items-center gap-1 text-xs text-amber-700"><Clock3 className="h-3.5 w-3.5" />{estado === "parcial" ? "Parcial" : "Por reconciliar"}</span>;
+function badgeEstado(linha: LinhaMapaContas, historico: boolean, discrepanciaDeclarada: boolean) {
+  if (discrepanciaDeclarada || linha.estadoReconciliacao === "discrepancia") {
+    return <span className="inline-flex items-center gap-1 text-xs font-medium text-red-700"><AlertTriangle className="h-3.5 w-3.5" />Discrepância</span>;
+  }
+  if (historico) {
+    return <span className="inline-flex items-center gap-1 text-xs text-oliveGray"><FileCheck2 className="h-3.5 w-3.5" />Fonte histórica</span>;
+  }
+  if (linha.estadoReconciliacao === "reconciliado") {
+    return <span className="inline-flex items-center gap-1 text-xs text-emerald-700"><CheckCircle2 className="h-3.5 w-3.5" />Reconciliado</span>;
+  }
+  return <span className="inline-flex items-center gap-1 text-xs text-amber-700"><Clock3 className="h-3.5 w-3.5" />{linha.estadoReconciliacao === "parcial" ? "Parcial" : "Por reconciliar"}</span>;
+}
+
+function classeDesvio(linha: LinhaMapaContas) {
+  const desvio = linha.desvioCents;
+  if (desvio === null || desvio === 0) return "text-ink";
+  const receita = linha.grupo === "receita_corrente" || linha.grupo === "receita_extraordinaria";
+  const favoravel = receita ? desvio > 0 : desvio < 0;
+  return favoravel ? "text-emerald-700" : "text-red-700";
 }
 
 export function MapaContasAnualView({ mapa }: { mapa: MapaContasAnual }) {
@@ -59,31 +74,44 @@ export function MapaContasAnualView({ mapa }: { mapa: MapaContasAnual }) {
               <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em] text-ink">{mapa.exercicio.titulo ?? `Mapa de contas ${mapa.ano}`}</h2>
               {mapa.exercicio.observacoes && <p className="mt-2 max-w-3xl text-sm leading-6 text-oliveGray">{mapa.exercicio.observacoes}</p>}
             </div>
-            <div className="rounded-full bg-britishGreenSoft px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-britishGreen">{mapa.exercicio.estado}</div>
+            <div className="rounded-full bg-britishGreenSoft px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-britishGreen">
+              {mapa.historico ? "Fonte histórica" : "Exercício vivo"}
+            </div>
           </div>
         </div>
       )}
 
-      <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <ResumoCard label="Orçamento despesas" valor={mapa.resumo.orcamentoDespesasCents} />
-        <ResumoCard label="Realizado despesas" valor={mapa.resumo.realizadoDespesasCents} />
-        <ResumoCard label="Comprometido" valor={mapa.resumo.comprometidoDespesasCents} />
-        <ResumoCard label="Orçamento receitas" valor={mapa.resumo.orcamentoReceitasCents} />
-        <ResumoCard label="Recebido" valor={mapa.resumo.realizadoReceitasCents} />
-        <ResumoCard label="Saldo projectado" valor={mapa.resumo.saldoProjetadoCents} destaque />
-      </div>
+      {mapa.historico ? (
+        <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <ResumoCard label="Orçamento despesas" valor={mapa.resumo.orcamentoDespesasCents} />
+          <ResumoCard label="Realizado despesas" valor={mapa.resumo.realizadoDespesasCents} />
+          <ResumoCard label="Orçamento receitas" valor={mapa.resumo.orcamentoReceitasCents} />
+          <ResumoCard label="Receitas realizadas" valor={mapa.resumo.realizadoReceitasCents} />
+          <ResumoCard label="Resultado do exercício" valor={mapa.resumo.resultadoExercicioCents} destaque />
+          <ResumoCard label="Saldo bancário de fecho" valor={mapa.exercicio?.saldoFinalBancarioCents ?? null} />
+        </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <ResumoCard label="Orçamento despesas" valor={mapa.resumo.orcamentoDespesasCents} />
+          <ResumoCard label="Realizado despesas" valor={mapa.resumo.realizadoDespesasCents} />
+          <ResumoCard label="Comprometido" valor={mapa.resumo.comprometidoDespesasCents} />
+          <ResumoCard label="Orçamento receitas" valor={mapa.resumo.orcamentoReceitasCents} />
+          <ResumoCard label="Recebido" valor={mapa.resumo.realizadoReceitasCents} />
+          <ResumoCard label="Resultado projectado" valor={mapa.resumo.resultadoProjetadoCents} destaque />
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-2xl border border-britishGreen/10 bg-white/75 backdrop-blur-xl">
         <div className="overflow-x-auto">
-          <table className="min-w-[980px] w-full border-collapse text-sm">
+          <table className={`${mapa.historico ? "min-w-[780px]" : "min-w-[980px]"} w-full border-collapse text-sm`}>
             <thead>
               <tr className="border-b border-britishGreen/10 bg-britishGreenSoft/45 text-left text-xs uppercase tracking-[0.08em] text-oliveGray">
                 <th className="px-4 py-3 font-semibold">Código</th>
                 <th className="px-4 py-3 font-semibold">Conta</th>
                 <th className="px-4 py-3 text-right font-semibold">Orçamento</th>
                 <th className="px-4 py-3 text-right font-semibold">Realizado</th>
-                <th className="px-4 py-3 text-right font-semibold">Comprometido</th>
-                <th className="px-4 py-3 text-right font-semibold">Previsão</th>
+                {!mapa.historico && <th className="px-4 py-3 text-right font-semibold">Comprometido</th>}
+                {!mapa.historico && <th className="px-4 py-3 text-right font-semibold">Previsão</th>}
                 <th className="px-4 py-3 text-right font-semibold">Desvio</th>
                 <th className="px-4 py-3 font-semibold">Estado</th>
               </tr>
@@ -98,17 +126,21 @@ export function MapaContasAnualView({ mapa }: { mapa: MapaContasAnual }) {
                     <td className={`px-4 py-3 font-mono text-xs ${cabecalho ? "font-bold text-britishGreen" : "text-oliveGray"}`}>{linha.codigo}</td>
                     <td className="px-4 py-3" style={{ paddingLeft: `${16 + depth * 18}px` }}>
                       <div className={cabecalho ? "font-semibold text-ink" : "text-ink"}>{linha.descricao}</div>
-                      {linha.fonteCalculo !== "manual" && <div className="mt-1 text-[11px] uppercase tracking-[0.06em] text-britishGreen">actualização automática</div>}
+                      {!mapa.historico && linha.fonteCalculo !== "manual" && <div className="mt-1 text-[11px] uppercase tracking-[0.06em] text-britishGreen">actualização automática</div>}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.orcamentoCents)}</td>
                     <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.realizadoCents)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.comprometidoCents)}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.previsaoCents)}</td>
-                    <td className={`px-4 py-3 text-right tabular-nums ${(linha.desvioCents ?? 0) < 0 ? "text-red-700" : "text-ink"}`}>
+                    {!mapa.historico && <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.comprometidoCents)}</td>}
+                    {!mapa.historico && <td className="px-4 py-3 text-right tabular-nums text-ink">{euro(linha.previsaoCents)}</td>}
+                    <td className={`px-4 py-3 text-right tabular-nums ${classeDesvio(linha)}`}>
                       {euro(linha.desvioCents)}
-                      {discrepanciaDeclarada && <div className="mt-1 text-[11px] text-red-700">fonte: {euro(linha.desvioDeclaradoCents)}</div>}
+                      {discrepanciaDeclarada && (
+                        <div className="mt-1 text-[11px] leading-4 text-red-700">
+                          documento: {euro(linha.desvioDeclaradoCents)}
+                        </div>
+                      )}
                     </td>
-                    <td className="px-4 py-3">{badgeEstado(linha.estadoReconciliacao)}</td>
+                    <td className="px-4 py-3">{badgeEstado(linha, mapa.historico, discrepanciaDeclarada)}</td>
                   </tr>
                 );
               })}
@@ -118,13 +150,15 @@ export function MapaContasAnualView({ mapa }: { mapa: MapaContasAnual }) {
       </div>
 
       {mapa.exercicio?.fonteReferencia && (
-        <p className="text-xs leading-5 text-oliveGray">Fonte base do exercício: <span className="font-medium text-ink">{mapa.exercicio.fonteReferencia}</span>. Os valores históricos permanecem ligados à fonte; os valores vivos são actualizados pelos movimentos reconciliados no PORTARIA.</p>
+        <p className="text-xs leading-5 text-oliveGray">
+          Fonte base do exercício: <span className="font-medium text-ink">{mapa.exercicio.fonteReferencia}</span>. {mapa.historico ? "O PORTARIA preserva os valores declarados e assinala diferenças matemáticas sem alterar a fonte." : "Os valores vivos são actualizados pelos movimentos reconciliados no PORTARIA."}
+        </p>
       )}
     </div>
   );
 }
 
-function ResumoCard({ label, valor, destaque = false }: { label: string; valor: number; destaque?: boolean }) {
+function ResumoCard({ label, valor, destaque = false }: { label: string; valor: number | null; destaque?: boolean }) {
   return (
     <div className={`rounded-2xl border p-4 ${destaque ? "border-britishGreen/20 bg-britishGreen text-white" : "border-white/80 bg-white/65"}`}>
       <p className={`text-[11px] font-semibold uppercase tracking-[0.08em] ${destaque ? "text-white/70" : "text-oliveGray"}`}>{label}</p>
