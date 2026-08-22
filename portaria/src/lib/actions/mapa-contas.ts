@@ -90,7 +90,12 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
     };
   }
 
-  const [{ data: contasData }, { data: despesasData }, { data: pagamentosData }] = await Promise.all([
+  const [
+    { data: contasData },
+    { data: despesasData },
+    { data: pagamentosData },
+    { data: movimentosBancariosData },
+  ] = await Promise.all([
     supabase
       .from("financeiro_contas_anuais")
       .select("id,codigo,descricao,grupo,ordem,orcamento_cents,realizado_declarado_cents,comprometido_declarado_cents,previsao_declarado_cents,desvio_declarado_cents,fonte_calculo,filtro_calculo,estado_reconciliacao,fonte_referencia")
@@ -99,12 +104,17 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
       .order("ordem", { ascending: true }),
     supabase
       .from("despesas")
-      .select("categoria,valor_cents,estado,data_documento,data_pagamento")
+      .select("id,categoria,valor_cents,estado,data_documento,data_pagamento")
       .eq("tenant_id", ctx.tenant.id),
     supabase
       .from("pagamentos")
       .select("valor_cents,data_pagamento")
       .eq("tenant_id", ctx.tenant.id),
+    supabase
+      .from("movimentos_bancarios")
+      .select("despesa_id,tipo,confirmado,data_movimento")
+      .eq("tenant_id", ctx.tenant.id)
+      .eq("confirmado", true),
   ]);
 
   const contas = contasData ?? [];
@@ -113,6 +123,15 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
     return data ? Number(String(data).slice(0, 4)) === ano : false;
   });
   const pagamentosAno = (pagamentosData ?? []).filter((p) => Number(String(p.data_pagamento).slice(0, 4)) === ano);
+  const movimentosDebitoAno = (movimentosBancariosData ?? []).filter(
+    (m) => m.tipo === "debito" && Number(String(m.data_movimento).slice(0, 4)) === ano,
+  );
+  const despesasComDebitoConfirmado = new Set(
+    movimentosDebitoAno.map((m) => m.despesa_id).filter((id): id is string => Boolean(id)),
+  );
+
+  const despesaEstaRealizada = (d: { id: string; estado: string }) =>
+    d.estado === "pago" || despesasComDebitoConfirmado.has(d.id);
 
   const linhas: LinhaMapaContas[] = contas.map((c) => {
     const fonte = c.fonte_calculo as "manual" | "despesas" | "pagamentos";
@@ -123,13 +142,16 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
 
     // Um exercício histórico mantém a fotografia declarada pela fonte.
     // Apenas exercícios vivos são recalculados a partir dos movimentos PORTARIA.
+    // Um movimento bancário confirmado prova que o dinheiro já saiu da conta,
+    // mesmo que a despesa permaneça documentalmente "a_reconciliar" até o
+    // comprovativo original ser associado ao arquivo.
     if (!historico && fonte === "despesas") {
       const matches = despesasAno.filter((d) => filtros.length === 0 || filtros.includes(d.categoria));
       realizado = matches
-        .filter((d) => d.estado === "pago")
+        .filter(despesaEstaRealizada)
         .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
       comprometido = matches
-        .filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
+        .filter((d) => !despesaEstaRealizada(d) && ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
         .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
     } else if (!historico && fonte === "pagamentos") {
       realizado = pagamentosAno.reduce((acc, p) => acc + Number(p.valor_cents ?? 0), 0);
@@ -173,11 +195,11 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
 
   const realizadoDespesas = historico
     ? soma(byCode.get("1")?.realizadoCents, byCode.get("1.10")?.realizadoCents, byCode.get("2")?.realizadoCents)
-    : despesasAno.filter((d) => d.estado === "pago").reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
+    : despesasAno.filter(despesaEstaRealizada).reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
   const comprometidoDespesas = historico
     ? null
     : despesasAno
-        .filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
+        .filter((d) => !despesaEstaRealizada(d) && ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
         .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
   const realizadoReceitas = historico
     ? soma(byCode.get("3")?.realizadoCents, byCode.get("4")?.realizadoCents)
