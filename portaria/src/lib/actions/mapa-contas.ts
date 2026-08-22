@@ -26,11 +26,13 @@ export type LinhaMapaContas = {
 export type MapaContasAnual = {
   anos: number[];
   ano: number;
+  historico: boolean;
   exercicio: {
     id: string;
     estado: string;
     titulo: string | null;
     saldoInicialCents: number | null;
+    saldoFinalBancarioCents: number | null;
     fonteReferencia: string | null;
     observacoes: string | null;
   } | null;
@@ -38,10 +40,11 @@ export type MapaContasAnual = {
   resumo: {
     orcamentoDespesasCents: number;
     realizadoDespesasCents: number;
-    comprometidoDespesasCents: number;
+    comprometidoDespesasCents: number | null;
     orcamentoReceitasCents: number;
     realizadoReceitasCents: number;
-    saldoProjetadoCents: number;
+    resultadoExercicioCents: number;
+    resultadoProjetadoCents: number | null;
   };
 };
 
@@ -58,7 +61,7 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
   const supabase = await createClient();
   const { data: exerciciosData } = await supabase
     .from("financeiro_exercicios")
-    .select("id,ano,estado,titulo,saldo_inicial_cents,fonte_referencia,observacoes")
+    .select("id,ano,estado,titulo,saldo_inicial_cents,saldo_final_bancario_cents,fonte_referencia,observacoes")
     .eq("tenant_id", ctx.tenant.id)
     .order("ano", { ascending: false });
 
@@ -66,14 +69,24 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
   const anos = exercicios.map((e) => Number(e.ano));
   const ano = anoPedido && anos.includes(anoPedido) ? anoPedido : (anos[0] ?? new Date().getFullYear());
   const exercicio = exercicios.find((e) => Number(e.ano) === ano) ?? null;
+  const historico = exercicio?.estado === "historico" || ano < new Date().getFullYear();
 
   if (!exercicio) {
     return {
       anos,
       ano,
+      historico,
       exercicio: null,
       linhas: [],
-      resumo: { orcamentoDespesasCents: 0, realizadoDespesasCents: 0, comprometidoDespesasCents: 0, orcamentoReceitasCents: 0, realizadoReceitasCents: 0, saldoProjetadoCents: 0 },
+      resumo: {
+        orcamentoDespesasCents: 0,
+        realizadoDespesasCents: 0,
+        comprometidoDespesasCents: historico ? null : 0,
+        orcamentoReceitasCents: 0,
+        realizadoReceitasCents: 0,
+        resultadoExercicioCents: 0,
+        resultadoProjetadoCents: historico ? null : 0,
+      },
     };
   }
 
@@ -104,22 +117,35 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
   const linhas: LinhaMapaContas[] = contas.map((c) => {
     const fonte = c.fonte_calculo as "manual" | "despesas" | "pagamentos";
     const filtros = Array.isArray(c.filtro_calculo) ? c.filtro_calculo : [];
-    let realizado = n(c.realizado_declarado_cents);
-    let comprometido = n(c.comprometido_declarado_cents);
+    const realizadoDeclarado = n(c.realizado_declarado_cents);
+    let realizado = realizadoDeclarado;
+    let comprometido = historico ? null : n(c.comprometido_declarado_cents);
 
-    if (fonte === "despesas") {
+    // Um exercício histórico mantém a fotografia declarada pela fonte.
+    // Apenas exercícios vivos são recalculados a partir dos movimentos PORTARIA.
+    if (!historico && fonte === "despesas") {
       const matches = despesasAno.filter((d) => filtros.length === 0 || filtros.includes(d.categoria));
-      realizado = matches.filter((d) => d.estado === "pago").reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
-      comprometido = matches.filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado)).reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
-    } else if (fonte === "pagamentos") {
+      realizado = matches
+        .filter((d) => d.estado === "pago")
+        .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
+      comprometido = matches
+        .filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
+        .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
+    } else if (!historico && fonte === "pagamentos") {
       realizado = pagamentosAno.reduce((acc, p) => acc + Number(p.valor_cents ?? 0), 0);
       comprometido = 0;
     }
 
     const orcamento = n(c.orcamento_cents);
     const previsaoDeclarada = n(c.previsao_declarado_cents);
-    const previsao = previsaoDeclarada ?? (realizado !== null ? realizado + (comprometido ?? 0) : null);
-    const desvio = orcamento !== null && previsao !== null ? orcamento - previsao : null;
+    const previsao = historico
+      ? null
+      : previsaoDeclarada ?? (realizado !== null ? realizado + (comprometido ?? 0) : null);
+
+    // Convenção única: execução/previsão - orçamento.
+    // Numa despesa, positivo significa derrapagem; numa receita, positivo significa superar o orçamento.
+    const baseDesvio = historico ? realizado : previsao;
+    const desvio = orcamento !== null && baseDesvio !== null ? baseDesvio - orcamento : null;
 
     return {
       id: c.id,
@@ -129,7 +155,7 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
       ordem: Number(c.ordem),
       orcamentoCents: orcamento,
       realizadoCents: realizado,
-      realizadoDeclaradoCents: n(c.realizado_declarado_cents),
+      realizadoDeclaradoCents: realizadoDeclarado,
       comprometidoCents: comprometido,
       previsaoCents: previsao,
       desvioCents: desvio,
@@ -145,25 +171,31 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
   const orcamentoDespesas = soma(byCode.get("1")?.orcamentoCents, byCode.get("1.10")?.orcamentoCents, byCode.get("2")?.orcamentoCents);
   const orcamentoReceitas = soma(byCode.get("3")?.orcamentoCents, byCode.get("4")?.orcamentoCents);
 
-  const historico = exercicio.estado === "historico" || ano < new Date().getFullYear();
   const realizadoDespesas = historico
     ? soma(byCode.get("1")?.realizadoCents, byCode.get("1.10")?.realizadoCents, byCode.get("2")?.realizadoCents)
     : despesasAno.filter((d) => d.estado === "pago").reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
   const comprometidoDespesas = historico
-    ? soma(byCode.get("1")?.comprometidoCents, byCode.get("1.10")?.comprometidoCents, byCode.get("2")?.comprometidoCents)
-    : despesasAno.filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado)).reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
+    ? null
+    : despesasAno
+        .filter((d) => ["pendente", "vencido", "a_reconciliar"].includes(d.estado))
+        .reduce((acc, d) => acc + Number(d.valor_cents ?? 0), 0);
   const realizadoReceitas = historico
     ? soma(byCode.get("3")?.realizadoCents, byCode.get("4")?.realizadoCents)
     : pagamentosAno.reduce((acc, p) => acc + Number(p.valor_cents ?? 0), 0);
 
+  const resultadoExercicio = realizadoReceitas - realizadoDespesas;
+  const resultadoProjetado = historico ? null : resultadoExercicio - (comprometidoDespesas ?? 0);
+
   return {
     anos,
     ano,
+    historico,
     exercicio: {
       id: exercicio.id,
       estado: exercicio.estado,
       titulo: exercicio.titulo,
       saldoInicialCents: n(exercicio.saldo_inicial_cents),
+      saldoFinalBancarioCents: n(exercicio.saldo_final_bancario_cents),
       fonteReferencia: exercicio.fonte_referencia,
       observacoes: exercicio.observacoes,
     },
@@ -174,7 +206,8 @@ export async function obterMapaContasAnual(anoPedido?: number): Promise<MapaCont
       comprometidoDespesasCents: comprometidoDespesas,
       orcamentoReceitasCents: orcamentoReceitas,
       realizadoReceitasCents: realizadoReceitas,
-      saldoProjetadoCents: realizadoReceitas - realizadoDespesas - comprometidoDespesas,
+      resultadoExercicioCents: resultadoExercicio,
+      resultadoProjetadoCents: resultadoProjetado,
     },
   };
 }
