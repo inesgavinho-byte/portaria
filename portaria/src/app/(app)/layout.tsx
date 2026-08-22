@@ -50,6 +50,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
         href: "/configuracao/financeiro",
         label: "Financeiro",
         filhos: [
+          { href: "/configuracao/financeiro/mapa", label: "Mapa de contas" },
           { href: "/contribuicoes-extraordinarias", label: "Contribuições extraordinárias" },
         ],
       },
