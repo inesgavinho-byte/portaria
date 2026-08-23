@@ -229,6 +229,9 @@ export type ContratoMemoriaEvidencia = {
   ia_documental_fontes: ContratoMemoriaFonte[];
 };
 
+/** Efeito de um acontecimento de memória sobre o objecto financeiro ligado. */
+export type ContratoMemoriaEfeito = "emissao" | "confirmacao_pagamento" | "retencao" | "suspensao";
+
 export type ContratoMemoriaEvento = {
   id: string;
   data_evento: string;
@@ -236,8 +239,36 @@ export type ContratoMemoriaEvento = {
   titulo: string;
   resumo: string;
   natureza: ContratoMemoriaNatureza;
+  /** Valor declarado pelo próprio documento. Não constitui prova bancária. */
+  valor_cents: number | null;
+  despesa_id: string | null;
+  movimento_id: string | null;
+  efeito: ContratoMemoriaEfeito | null;
   criado_em: string;
   contrato_memoria_evidencias: ContratoMemoriaEvidencia[];
+};
+
+export type MovimentoBancario = {
+  id: string;
+  tenant_id: string;
+  fornecedor_id: string | null;
+  despesa_id: string | null;
+  pagamento_id: string | null;
+  data_movimento: string;
+  data_valor: string | null;
+  tipo: "debito" | "credito";
+  valor_cents: number;
+  descricao: string;
+  contraparte: string | null;
+  referencia_externa: string | null;
+  origem: "extrato_bancario" | "comprovativo_transferencia" | "manual";
+  fonte_referencia: string | null;
+  confirmado: boolean;
+  estado_reconciliacao: "nao_reconciliado" | "parcial" | "reconciliado";
+  notas: string | null;
+  criado_por: string | null;
+  criado_em: string;
+  atualizado_em: string;
 };
 
 export type Contacto = {
