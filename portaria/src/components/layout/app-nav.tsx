@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { definirVista, type Vista } from "@/lib/actions/vista";
 import { NotificacoesBadge } from "@/components/layout/notificacoes-badge";
@@ -26,7 +26,31 @@ function hrefsDoItem(item: NavItem): string[] {
 
 export function AppNav({ tenantNome, userEmail, fracao, grupos, vista, vistas }: AppNavProps) {
   const [aberto, setAberto] = useState(false);
+  const [retraida, setRetraida] = useState(false);
+  const [desktop, setDesktop] = useState(false);
   const todosHrefs = grupos.flatMap((grupo) => grupo.itens.flatMap(hrefsDoItem));
+
+  useEffect(() => {
+    setRetraida(window.localStorage.getItem("portaria-sidebar-retraida") === "true");
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const atualizar = () => setDesktop(media.matches);
+    atualizar();
+    media.addEventListener("change", atualizar);
+    return () => media.removeEventListener("change", atualizar);
+  }, []);
+
+  function alternarSidebar() {
+    setRetraida((atual) => {
+      const proximo = !atual;
+      window.localStorage.setItem("portaria-sidebar-retraida", String(proximo));
+      return proximo;
+    });
+  }
+
+  const sidebarOculta = retraida && desktop;
 
   return (
     <>
@@ -40,7 +64,11 @@ export function AppNav({ tenantNome, userEmail, fracao, grupos, vista, vistas }:
 
       {aberto && <div onClick={() => setAberto(false)} className="lg:hidden fixed inset-0 z-40 bg-ink/20 backdrop-blur-sm" aria-hidden />}
 
-      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-svh w-72 shrink-0 border-r border-white/70 bg-white/60 backdrop-blur-glass flex flex-col shadow-[12px_0_40px_rgba(23,32,28,0.04)] transition-transform lg:translate-x-0 ${aberto ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside
+        aria-hidden={sidebarOculta || undefined}
+        inert={sidebarOculta || undefined}
+        className={`fixed lg:sticky top-0 left-0 z-50 h-svh w-72 shrink-0 border-r border-white/70 bg-white/60 backdrop-blur-glass flex flex-col shadow-[12px_0_40px_rgba(23,32,28,0.04)] transition-[transform,width,border-color,box-shadow] duration-200 ease-out lg:translate-x-0 ${aberto ? "translate-x-0" : "-translate-x-full"} ${retraida ? "lg:w-0 lg:overflow-hidden lg:border-r-0 lg:shadow-none" : "lg:w-72"}`}
+      >
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/" className="flex min-w-0 items-center gap-3" onClick={() => setAberto(false)}>
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-britishGreen text-sm font-semibold text-white shadow-float">E</span>
@@ -48,6 +76,7 @@ export function AppNav({ tenantNome, userEmail, fracao, grupos, vista, vistas }:
           </Link>
           <div className="flex items-center gap-1">
             <NotificacoesBadge />
+            <button onClick={alternarSidebar} aria-label="Retrair sidebar" title="Retrair sidebar" className="hidden lg:inline-flex rounded-xl p-1.5 text-oliveGray transition-colors hover:bg-white hover:text-britishGreen"><PanelLeftClose className="h-5 w-5" /></button>
             <button onClick={() => setAberto(false)} aria-label="Fechar menu" className="lg:hidden rounded-xl p-1.5 text-oliveGray hover:bg-white hover:text-britishGreen"><X className="h-5 w-5" /></button>
           </div>
         </div>
@@ -60,6 +89,8 @@ export function AppNav({ tenantNome, userEmail, fracao, grupos, vista, vistas }:
 
         <UtilizadorRodape userEmail={userEmail} fracao={fracao} vista={vista} />
       </aside>
+
+      {retraida && <button onClick={alternarSidebar} aria-label="Expandir sidebar" title="Expandir sidebar" className="fixed left-4 top-4 z-40 hidden rounded-xl border border-white/80 bg-white/75 p-2 text-oliveGray shadow-sm backdrop-blur-xl transition-colors hover:bg-white hover:text-britishGreen lg:inline-flex"><PanelLeftOpen className="h-5 w-5" /></button>}
     </>
   );
 }
