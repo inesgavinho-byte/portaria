@@ -4,8 +4,9 @@ import { ChevronLeft, Pencil, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { DownloadButton } from "@/components/app/download-button";
+import { ContratoMemoria } from "@/components/admin/contrato-memoria";
 import { DocumentoUploadInline } from "@/components/admin/documento-upload-inline";
-import type { Contrato, Documento } from "@/types/database";
+import type { Contrato, ContratoMemoriaEvento, Documento } from "@/types/database";
 
 function euros(v: number | null): string | null {
   if (v == null) return null;
@@ -27,13 +28,21 @@ export default async function ContratoPage({
   if (!contrato) notFound();
   const c = contrato as Contrato;
 
-  const [{ data: fornecedor }, { data: documentos }] = await Promise.all([
+  const [{ data: fornecedor }, { data: documentos }, { data: memoria }] = await Promise.all([
     c.fornecedor_id
       ? supabase.from("fornecedores").select("id, nome").eq("id", c.fornecedor_id).single()
       : Promise.resolve({ data: null }),
     supabase.from("documentos").select("*").eq("tenant_id", ctx.tenant.id).eq("contrato_id", id).order("upload_em", { ascending: false }),
+    supabase
+      .from("contrato_memoria_eventos")
+      .select("id,data_evento,tipo,titulo,resumo,natureza,criado_em,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url))")
+      .eq("tenant_id", ctx.tenant.id)
+      .eq("contrato_id", id)
+      .order("data_evento", { ascending: true })
+      .order("criado_em", { ascending: true }),
   ]);
   const docs = (documentos ?? []) as Documento[];
+  const eventos = (memoria ?? []) as ContratoMemoriaEvento[];
 
   const linhas = [
     ["Referência", c.referencia],
@@ -85,7 +94,9 @@ export default async function ContratoPage({
         </div>
       )}
 
-      <section>
+      <ContratoMemoria eventos={eventos} />
+
+      <section className="mt-10">
         <h2 className="font-title text-h3 text-warmBeige mb-4">Documentos</h2>
         {docs.length > 0 && (
           <ul className="bg-paper border border-warmBeige/20 divide-y divide-warmBeige/10 mb-6">
