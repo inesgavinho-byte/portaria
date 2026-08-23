@@ -186,9 +186,7 @@ export default async function HojePage() {
 
   const atencao: Atencao[] = [];
   if (prioridadeDespesa) {
-    const fornecedor = Array.isArray(prioridadeDespesa.fornecedores)
-      ? prioridadeDespesa.fornecedores[0]?.nome
-      : prioridadeDespesa.fornecedores?.nome;
+    const fornecedor = prioridadeDespesa.fornecedores?.[0]?.nome;
     atencao.push({
       titulo: "Pagamento por reconciliar",
       subtitulo: fornecedor ?? prioridadeDespesa.descricao,
@@ -214,9 +212,7 @@ export default async function HojePage() {
     });
   }
   if (contratoPrazo) {
-    const fornecedor = Array.isArray(contratoPrazo.fornecedores)
-      ? contratoPrazo.fornecedores[0]?.nome
-      : contratoPrazo.fornecedores?.nome;
+    const fornecedor = contratoPrazo.fornecedores?.[0]?.nome;
     atencao.push({
       titulo: contratoPrazo.titulo,
       subtitulo: fornecedor ?? "Contrato",
@@ -227,9 +223,7 @@ export default async function HojePage() {
       icon: <ShieldCheck className="h-5 w-5" />,
     });
   } else if (obrigacao) {
-    const fornecedor = Array.isArray(obrigacao.fornecedores)
-      ? obrigacao.fornecedores[0]?.nome
-      : obrigacao.fornecedores?.nome;
+    const fornecedor = obrigacao.fornecedores?.[0]?.nome;
     atencao.push({
       titulo: obrigacao.titulo,
       subtitulo: fornecedor ?? "Obrigação recorrente",
