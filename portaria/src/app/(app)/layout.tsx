@@ -7,7 +7,7 @@ import { Conselheira } from "@/components/conselheira/conselheira";
 import type { Vista } from "@/lib/actions/vista";
 
 const GRUPOS_ADMIN: NavGrupo[] = [
-  { itens: [{ href: "/inicio", label: "Início" }] },
+  { itens: [{ href: "/hoje", label: "Hoje" }] },
   {
     titulo: "Operação",
     itens: [
