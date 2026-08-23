@@ -29,7 +29,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/inicio");
+    router.push("/hoje");
     router.refresh();
   }
 
@@ -69,9 +69,7 @@ export function LoginForm() {
         />
       </div>
 
-      {error && (
-        <p className="font-body text-sm text-alert">{error}</p>
-      )}
+      {error && <p className="font-body text-sm text-alert">{error}</p>}
 
       <button
         type="submit"
