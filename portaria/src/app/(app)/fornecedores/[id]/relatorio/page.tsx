@@ -6,7 +6,7 @@ import { RelatorioFornecedorImprimir } from "@/components/admin/relatorio-fornec
 import { resolverValoresDocumentais, type FonteDocumentalValor } from "@/lib/relatorios/valores-documentais";
 import type { Contrato, ContratoMemoriaEvento, Despesa, Fornecedor } from "@/types/database";
 
-type Movimento = { id: string; despesa_id: string | null; data_movimento: string; tipo: "debito" | "credito"; valor_cents: number; descricao: string; contraparte: string | null; referencia_externa: string | null; confirmado: boolean; estado_reconciliacao: string; };
+type Movimento = { id: string; fornecedor_id: string | null; despesa_id: string | null; data_movimento: string; tipo: "debito" | "credito"; valor_cents: number; descricao: string; contraparte: string | null; referencia_externa: string | null; confirmado: boolean; estado_reconciliacao: string; };
 type Fonte = Omit<FonteDocumentalValor, "conteudo_markdown"> & { conteudo_markdown?: string | null };
 
 const euro = (cents: number) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(cents / 100);
@@ -29,7 +29,7 @@ export default async function RelatorioFornecedorPage({ params, searchParams }: 
   const cts = (contratos ?? []) as Contrato[];
   const contratoIds = cts.map((contrato) => contrato.id);
   const despesaQuery = supabase.from("despesas").select("*").eq("tenant_id", ctx.tenant.id).eq("fornecedor_id", id);
-  const memoriaQuery = contratoIds.length ? supabase.from("contrato_memoria_eventos").select("id,contrato_id,data_evento,tipo,titulo,resumo,natureza,criado_em,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url))").eq("tenant_id", ctx.tenant.id).in("contrato_id", contratoIds).order("data_evento", { ascending: true }).order("criado_em", { ascending: true }) : Promise.resolve({ data: [] });
+  const memoriaQuery = contratoIds.length ? supabase.from("contrato_memoria_eventos").select("id,contrato_id,data_evento,tipo,titulo,resumo,natureza,valor_cents,despesa_id,movimento_id,efeito,criado_em,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url))").eq("tenant_id", ctx.tenant.id).in("contrato_id", contratoIds).order("data_evento", { ascending: true }).order("criado_em", { ascending: true }) : Promise.resolve({ data: [] });
   const [{ data: despesas }, { data: memoria }, { data: fontesDocumentais }] = await Promise.all([
     despesaQuery.order("data_documento", { ascending: true }),
     memoriaQuery,
@@ -37,15 +37,18 @@ export default async function RelatorioFornecedorPage({ params, searchParams }: 
   ]);
   const ds = (despesas ?? []) as Despesa[];
   const despesaIds = ds.map((despesa) => despesa.id);
-  const termos = [f.nome, f.contacto_nome].filter((termo): termo is string => Boolean(termo)).flatMap((termo) => [`descricao.ilike.%${termo}%`, `contraparte.ilike.%${termo}%`]);
-  const movimentosQuery = supabase.from("movimentos_bancarios").select("id,despesa_id,data_movimento,tipo,valor_cents,descricao,contraparte,referencia_externa,confirmado,estado_reconciliacao").eq("tenant_id", ctx.tenant.id).order("data_movimento", { ascending: true });
-  if (despesaIds.length && termos.length) movimentosQuery.or(`despesa_id.in.(${despesaIds.join(",")}),${termos.join(",")}`);
-  else if (despesaIds.length) movimentosQuery.in("despesa_id", despesaIds);
-  else if (termos.length) movimentosQuery.or(termos.join(","));
-  else movimentosQuery.limit(0);
-  const { data: movimentos } = await movimentosQuery;
+  // A relação canónica movimento → fornecedor é `fornecedor_id`, não o texto
+  // da descrição ou da contraparte. Movimentos ligados apenas a uma despesa
+  // deste fornecedor continuam a ser recolhidos para não desaparecerem do
+  // relatório, mas ficam identificados como não atribuídos.
+  const movimentosSelect = "id,fornecedor_id,despesa_id,data_movimento,tipo,valor_cents,descricao,contraparte,referencia_externa,confirmado,estado_reconciliacao";
+  const [{ data: movimentosDoFornecedor }, { data: movimentosPorDespesa }] = await Promise.all([
+    supabase.from("movimentos_bancarios").select(movimentosSelect).eq("tenant_id", ctx.tenant.id).eq("fornecedor_id", id).order("data_movimento", { ascending: true }),
+    despesaIds.length ? supabase.from("movimentos_bancarios").select(movimentosSelect).eq("tenant_id", ctx.tenant.id).in("despesa_id", despesaIds).order("data_movimento", { ascending: true }) : Promise.resolve({ data: [] }),
+  ]);
+  const movimentos = [...new Map([...((movimentosDoFornecedor ?? []) as Movimento[]), ...((movimentosPorDespesa ?? []) as Movimento[])].map((m) => [m.id, m])).values()].sort((a, b) => a.data_movimento.localeCompare(b.data_movimento));
   const todosEventos = (memoria ?? []) as ContratoMemoriaEvento[];
-  const todosMovimentos = (movimentos ?? []) as Movimento[];
+  const todosMovimentos = movimentos;
   const anos = Array.from(new Set([...ds.map((d) => anoDe(d.data_documento ?? d.criado_em)), ...todosMovimentos.map((m) => anoDe(m.data_movimento)), ...todosEventos.map((e) => anoDe(e.data_evento))].filter((ano): ano is string => Boolean(ano)))).sort((a, b) => Number(b) - Number(a));
   const ano = filtros.ano && anos.includes(filtros.ano) ? filtros.ano : "";
   const financeiro = filtros.modo === "financeiro";
@@ -53,10 +56,13 @@ export default async function RelatorioFornecedorPage({ params, searchParams }: 
   const movimentosPeriodo = todosMovimentos.filter((m) => !ano || anoDe(m.data_movimento) === ano);
   const eventosPeriodo = todosEventos.filter((e) => !ano || anoDe(e.data_evento) === ano);
   const totalFacturado = despesasPeriodo.reduce((soma, d) => soma + d.valor_cents, 0);
-  const confirmadoBanco = movimentosPeriodo.filter((m) => m.tipo === "debito" && m.confirmado).reduce((soma, m) => soma + m.valor_cents, 0);
+  const confirmadoBanco = movimentosPeriodo.filter((m) => m.fornecedor_id === id && m.tipo === "debito" && m.confirmado).reduce((soma, m) => soma + m.valor_cents, 0);
   const pagoDocumental = despesasPeriodo.filter((d) => d.estado === "pago").reduce((soma, d) => soma + d.valor_cents, 0);
   const saldo = Math.max(0, totalFacturado - confirmadoBanco);
-  const retido = eventosPeriodo.some((e) => /retenção|retid/i.test(`${e.titulo} ${e.resumo}`)) ? despesasPeriodo.filter((d) => /2026\/8/i.test(`${d.numero_documento} ${d.referencia} ${d.descricao}`)).reduce((soma, d) => soma + d.valor_cents, 0) : 0;
+  // Retenção apurada estruturalmente: despesas referenciadas por um evento de
+  // memória com efeito de retenção. Sem interpretação de texto livre.
+  const despesasRetidas = new Set(eventosPeriodo.filter((e) => e.efeito === "retencao" && e.despesa_id).map((e) => e.despesa_id as string));
+  const retido = despesasPeriodo.filter((d) => despesasRetidas.has(d.id)).reduce((soma, d) => soma + d.valor_cents, 0);
   const conflitos = eventosPeriodo.filter((e) => e.natureza === "conflito");
   const pendencias = eventosPeriodo.filter((e) => e.natureza === "pendente");
   const fontes = fontesUnicas(eventosPeriodo);
@@ -73,7 +79,7 @@ export default async function RelatorioFornecedorPage({ params, searchParams }: 
     <Secao titulo="Reconciliação financeira"><div className="grid gap-3 md:grid-cols-3"><LinhaFinanceira titulo="Facturado" valor={totalFacturado} /><LinhaFinanceira titulo="Confirmado no banco" valor={confirmadoBanco} /><LinhaFinanceira titulo="Saldo documental" valor={saldo} /><LinhaFinanceira titulo="Retido / condicionado" valor={retido} /><LinhaFinanceira titulo="Pago documentalmente" valor={pagoDocumental} /><div className="border-l-2 border-warmBeige/50 bg-softCream/40 px-4 py-3 font-body text-xs leading-5 text-oliveGray">Os movimentos sem `despesa_id` são mantidos como confirmação bancária sem atribuição definitiva a uma factura. Não são distribuídos por documentos com o mesmo valor.</div></div></Secao>
     {!financeiro && <><Secao titulo="Contratos">{cts.length ? <div className="divide-y divide-britishGreen/10 border-y border-britishGreen/15">{cts.map((c) => <div key={c.id} className="py-4"><Link href={`/contratos/${c.id}`} className="font-body text-sm font-semibold text-ink hover:text-britishGreen">{c.titulo}</Link><p className="mt-1 font-body text-xs text-oliveGray">{[c.referencia, c.data_inicio ? `Início ${data(c.data_inicio)}` : null, c.data_fim ? `Fim ${data(c.data_fim)}` : null, c.valor !== null ? euro(c.valor * 100) : null].filter(Boolean).join(" · ")}</p>{c.descricao && <p className="mt-2 font-body text-sm text-oliveGray">{c.descricao}</p>}</div>)}</div> : <Vazio>Não existem contratos registados para este fornecedor.</Vazio>}</Secao><Secao titulo="Memória da contratação">{eventosPeriodo.length ? <div className="space-y-5 border-l border-britishGreen/20 pl-6">{eventosPeriodo.map((e) => <div key={e.id} className="relative"><span className="absolute -left-[1.8rem] top-1.5 h-3 w-3 rounded-full bg-britishGreen ring-4 ring-paper" /><p className="font-body text-xs uppercase tracking-widest text-oliveGray">{data(e.data_evento)} · {e.tipo}</p><p className="mt-1 font-body text-base font-semibold text-ink">{e.titulo}</p><p className="mt-1 font-body text-sm leading-6 text-oliveGray">{e.resumo}</p><span className={`mt-2 inline-block px-2 py-1 font-body text-[10px] uppercase tracking-widest ${naturezaClasse[e.natureza]}`}>{natureza[e.natureza]}</span>{e.contrato_memoria_evidencias.length > 0 && <div className="mt-3 space-y-2 border-l-2 border-britishGreen/15 pl-3">{e.contrato_memoria_evidencias.map((ev) => <p key={ev.id} className="font-body text-xs leading-5 text-oliveGray">{ev.ia_documental_fontes[0]?.titulo ?? "Fonte documental"}{ev.localizador ? ` · ${ev.localizador}` : ""}{ev.citacao ? ` — “${ev.citacao}”` : ""}</p>)}</div>}</div>)}</div> : <Vazio>Não existe memória estruturada da contratação.</Vazio>}</Secao></>}
     <Secao titulo="Facturas e despesas">{despesasPeriodo.length ? <Tabela><thead><tr><th>Data</th><th>Documento</th><th>Descrição</th><th>Valor</th><th>Estado documental</th><th>Banco</th></tr></thead><tbody>{despesasPeriodo.map((d) => { const temBanco = movimentosPeriodo.some((m) => m.despesa_id === d.id && m.confirmado); return <tr key={d.id}><td>{data(d.data_documento ?? d.criado_em)}</td><td>{d.numero_documento ?? d.referencia ?? "—"}</td><td>{d.descricao}</td><td>{euro(d.valor_cents)}</td><td>{d.estado.replaceAll("_", " ")}</td><td>{temBanco ? "Associado" : "Não individualizado"}</td></tr>; })}</tbody></Tabela> : <Vazio>Não existem facturas ou despesas registadas no período.</Vazio>}</Secao>
-    <Secao titulo="Movimentos financeiros">{movimentosPeriodo.length ? <Tabela><thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Contraparte / descrição</th><th>Confirmação</th><th>Reconciliação</th></tr></thead><tbody>{movimentosPeriodo.map((m) => <tr key={m.id}><td>{data(m.data_movimento)}</td><td>{m.tipo}</td><td>{euro(m.valor_cents)}</td><td>{m.contraparte ?? m.descricao}</td><td>{m.confirmado ? "Confirmado" : "Por confirmar"}</td><td>{m.despesa_id ? m.estado_reconciliacao : "Pagamento confirmado — factura exacta por identificar"}</td></tr>)}</tbody></Tabela> : <Vazio>Não existem movimentos bancários associados no período.</Vazio>}</Secao>
+    <Secao titulo="Movimentos financeiros">{movimentosPeriodo.length ? <Tabela><thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Contraparte / descrição</th><th>Confirmação</th><th>Reconciliação</th></tr></thead><tbody>{movimentosPeriodo.map((m) => <tr key={m.id}><td>{data(m.data_movimento)}</td><td>{m.tipo}</td><td>{euro(m.valor_cents)}</td><td>{m.contraparte ?? m.descricao}</td><td>{m.confirmado ? "Confirmado" : "Por confirmar"}</td><td>{m.despesa_id ? m.estado_reconciliacao : m.fornecedor_id === id ? "Fornecedor atribuído — factura exacta por identificar" : "Sem atribuição estrutural"}</td></tr>)}</tbody></Tabela> : <Vazio>Não existem movimentos bancários associados no período.</Vazio>}</Secao>
     {conflitos.length > 0 && <Secao titulo="Divergências e pontos por reconciliar"><ListaEventos eventos={conflitos} /></Secao>}
     {valoresDocumentais.historicos.length > 1 && <Secao titulo="Valor global histórico"><div className="border-l-2 border-alert/60 bg-alert/5 px-4 py-3"><p className="font-body text-[10px] font-semibold uppercase tracking-widest text-alert">Conflito</p><div className="mt-3 grid gap-3 md:grid-cols-3">{valoresDocumentais.historicos.map((valor) => <div key={`${valor.fonte.id}-${valor.descricao}`}><p className="font-body text-lg font-semibold text-ink">{euro(valor.cents)}</p><p className="font-body text-xs text-oliveGray">{valor.descricao}</p><p className="mt-1 font-body text-[11px] text-oliveGray">{valor.fonte.titulo}</p></div>)}</div></div></Secao>}
     <Secao titulo="Pendências">{pendencias.length ? <ListaEventos eventos={pendencias} /> : <Vazio>Não existem pendências estruturadas no período.</Vazio>}</Secao>
