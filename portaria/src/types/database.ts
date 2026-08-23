@@ -201,6 +201,45 @@ export type Contrato = {
   atualizado_em: string;
 };
 
+export type ContratoMemoriaNatureza = "facto" | "inferencia" | "conflito" | "pendente";
+export type ContratoMemoriaTipo =
+  | "proposta"
+  | "adjudicacao"
+  | "comunicacao"
+  | "fatura"
+  | "pagamento"
+  | "execucao"
+  | "decisao"
+  | "garantia"
+  | "conflito"
+  | "outro";
+
+export type ContratoMemoriaFonte = {
+  id: string;
+  titulo: string;
+  referencia: string | null;
+  url: string | null;
+};
+
+export type ContratoMemoriaEvidencia = {
+  id: string;
+  localizador: string | null;
+  citacao: string;
+  papel: "primaria" | "corroboracao" | "contradicao";
+  ia_documental_fontes: ContratoMemoriaFonte[];
+};
+
+export type ContratoMemoriaEvento = {
+  id: string;
+  data_evento: string;
+  tipo: ContratoMemoriaTipo;
+  titulo: string;
+  resumo: string;
+  natureza: ContratoMemoriaNatureza;
+  criado_em: string;
+  contrato_memoria_evidencias: ContratoMemoriaEvidencia[];
+};
+
 export type Contacto = {
   id: string;
   tenant_id: string;
