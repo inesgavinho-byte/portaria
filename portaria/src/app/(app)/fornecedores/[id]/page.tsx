@@ -258,6 +258,12 @@ export default async function FornecedorPage({
           >
             <Pencil className="h-3.5 w-3.5" /> Editar
           </Link>
+          <Link
+            href={`/fornecedores/${id}/relatorio`}
+            className="inline-flex items-center gap-2 rounded-xl bg-britishGreen px-4 py-2.5 font-body text-xs font-semibold text-white transition-colors hover:bg-britishGreenDeep"
+          >
+            <FileText className="h-3.5 w-3.5" /> Relatório
+          </Link>
           <FornecedorArquivar fornecedorId={id} ativo={f.ativo} />
         </div>
       </div>

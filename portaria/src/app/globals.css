@@ -43,6 +43,15 @@
   }
 }
 
+@media print {
+  @page { size: A4; margin: 16mm; }
+  .no-print, nav, aside, header + div { display: none !important; }
+  body { background: #fff !important; color: #17201c !important; }
+  .print-report { max-width: none !important; padding: 0 !important; }
+  .print-report section, .print-report tr, .print-report li { break-inside: avoid; }
+  .print-report a { color: inherit !important; text-decoration: none !important; }
+}
+
 @layer components {
   .container-prose {
     @apply max-w-3xl mx-auto px-6;
