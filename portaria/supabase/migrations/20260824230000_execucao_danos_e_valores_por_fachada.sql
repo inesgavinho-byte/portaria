@@ -1,0 +1,35 @@
+-- Execução, danos e valores por fachada — registo das migrations aplicadas
+-- em 24-08-2026 a partir da correspondência da administração anterior.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   mapa_abril_2026_e_acompanhamento_tecnico
+--   danos_causados_pela_obra_2025
+--   reclamacao_11_andar_novembro_2025
+--   reclamacao_estores_2_direito_dezembro_2025
+--
+-- Fontes indexadas
+--   Mapa de valores pagos e por pagar, 29-04-2026
+--   Acompanhamento técnico — Eng. Jaime Correia, cédula 22228
+--   Reclamação de parede danificada, 11.º andar, 06-11-2025
+--   Reclamação de danos na caleira e drenagem, 10.º Esq., 16-11-2025
+--   Reclamação de estores danificados, 2.º Dt.º, 09-12-2025
+--   Pedido de substituição de vidro partido, 12.º andar, 12-12-2025
+--
+-- Acontecimentos
+--   30-07-2025  conflito     Pedidos de esclarecimento técnico sem resposta
+--   08-09-2025  comunicacao  Mandato de acompanhamento técnico e visita semanal
+--   06-11-2025  conflito     Parede danificada no 11.º andar
+--   16-11-2025  conflito     Danos na caleira imputados aos trabalhos
+--   09-12-2025  conflito     Estores danificados no 2.º Dt.º
+--   09-12-2025  conflito     Tardoz liquidada com três reclamações por resolver
+--   12-12-2025  conflito     Vidro partido no hall do 12.º andar
+--   29-04-2026  pagamento    Mapa detalha 45.000 EUR pagos por fachada
+--   29-04-2026  conflito     Total passa a 63.400 EUR, perdido o desconto de conjunto
+--   15-05-2026  conflito     Redução de 1.700 EUR na frente e na lateral
+--
+-- Reconciliação de valores que estas fontes permitem:
+--   010125     global 68.700   parcelas 16.700 + 35.700 + 16.700 = 69.100
+--   010125-R   global 63.000   parcelas 16.700 + 30.000 + 16.700 = 63.400
+--   fraccionamento: passa a usar-se 63.400, perdido o desconto de 400
+--   Abril/Maio 2026: frente e lateral reduzidas 1.700 cada => 60.000
+--   010125-ADIT confirma a lateral por 15.000 + IVA
