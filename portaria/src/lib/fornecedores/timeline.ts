@@ -14,6 +14,11 @@
  *    coincidência de data e valor;
  *  - um pagamento declarado num mapa administrativo nunca é apresentado nem
  *    contabilizado como saída bancária confirmada;
+ *  - `tipo === "pagamento"` designa UM movimento de dinheiro. Um mapa que
+ *    agrega pagamentos, ou uma mensagem que confirma o recebimento de um
+ *    pagamento já registado, descreve-o em vez de o constituir e não é um
+ *    pagamento: tipificá-lo como tal soma-o às parcelas que resume e
+ *    inflaciona o total de declarados;
  *  - "saídas confirmadas" depende de `movimentos_bancarios.fornecedor_id` e
  *    não exige `despesa_id`: saber a quem se pagou não é saber que factura se
  *    pagou;

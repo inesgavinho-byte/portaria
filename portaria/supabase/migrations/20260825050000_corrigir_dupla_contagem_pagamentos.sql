@@ -1,0 +1,53 @@
+-- Correcção de dupla contagem nos pagamentos históricos declarados.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   corrigir_dupla_contagem_pagamentos_declarados
+--
+-- SINTOMA
+-- A ficha do fornecedor anunciava 102.000,00 EUR em pagamentos históricos
+-- declarados. O mapa da administração declara 45.000,00 EUR.
+--
+-- CAUSA
+-- `resumirFinanceiroFornecedor` soma `valor_cents` de todos os acontecimentos
+-- com `tipo = 'pagamento'` e sem `movimento_id`. Três acontecimentos estavam
+-- tipificados como pagamento sem o serem:
+--
+--   d1668361  "Adjudicatária confirma por escrito o recebimento"   12.000,00
+--             É uma comunicação. Duplicava o pagamento n.º 1, do mesmo dia e
+--             do mesmo valor.
+--   7205fcdc  "Mapa de controlo detalha 45.000 EUR pagos"          45.000,00
+--             É um documento de controlo. Somava o agregado às sete parcelas
+--             que o compõem.
+--   5b5a8b9b  "Mapa administrativo consolida 45.000 EUR pagos"         (nulo)
+--             Mesmo género, sem impacto numérico.
+--
+--   102.000,00 - 12.000,00 - 45.000,00 = 45.000,00
+--
+-- CORRECÇÃO
+--   d1668361 -> comunicacao
+--   7205fcdc -> outro
+--   5b5a8b9b -> outro
+-- Os valores são preservados. Só muda o tipo, e com ele a leitura de que estes
+-- acontecimentos DESCREVEM movimentos em vez de os constituírem.
+--
+-- VERIFICAÇÃO
+-- Os sete pagamentos declarados somam exactamente 45.000,00 EUR:
+--   n.º 1  12.000,00 | n.º 2  12.000,00 | n.º 3   2.000,00 | n.º 4  4.000,00
+--   n.º 5   6.000,00 | n.º 6   6.000,00 | n.º 7   3.000,00
+-- Repartidos por fachada: tardoz 12.000 + 12.000 + 6.000 = 30.000,00 EUR;
+-- frente 2.000 + 4.000 + 6.000 + 3.000 = 15.000,00 EUR.
+--
+-- PREVENÇÃO
+-- A regra passou a estar escrita no bloco de invariantes de
+-- `src/lib/fornecedores/timeline.ts`, onde é aplicada: `tipo === "pagamento"`
+-- designa UM movimento de dinheiro.
+--
+-- ESTADO DA FICHA APÓS A CORRECÇÃO
+--   Saídas confirmadas em banco      6.360,00 EUR   (1 movimento, 11-06-2026)
+--   Despesas registadas             15.900,00 EUR   (Facturas 2026/4, 7 e 8)
+--   Em aberto                        9.540,00 EUR
+--   Pagamentos declarados           45.000,00 EUR   (sem prova bancária)
+--
+-- A distância entre 6.360,00 e 45.000,00 não é um erro do sistema: é o
+-- processo. Só um dos 51.360,00 EUR movimentados tem simultaneamente factura e
+-- comprovativo bancário no registo.
