@@ -1,0 +1,73 @@
+-- Exigibilidade da tranche de conclusão, termo de garantia em falta e prazo da
+-- interpelação expirado.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   exigibilidade_da_tranche_de_conclusao_e_termo_de_garantia
+--   interpelacao_sem_resposta_prazo_expirado
+--
+-- ====================================================================
+-- CORRECÇÃO DE FUNDAMENTO
+-- ====================================================================
+-- Uma redacção anterior ancorava a retenção da tranche final na deliberação
+-- da AGE de 07-07-2026. Estava errada quanto ao fundamento.
+--
+-- A retenção não é discricionária nem decorre de deliberação. Decorre da
+-- obrigação: a prestação não se venceu.
+--
+-- O orçamento 010125-ADIT, proposto pela própria empreiteira, estipula:
+--
+--   "Pagamento: 40% na adjudicação da obra, 40% a meio da obra,
+--    20% NA CONCLUSÃO DOS TRABALHOS."
+--
+--   "Damos garantia por um período de 5 anos aos trabalhos executados.
+--    APÓS A CONCLUSÃO DA OBRA SERÁ EMITIDO UM TERMO DE GARANTIA."
+--
+--   "A adjudicação só será considerada após a entrega do duplicado da
+--    proposta devidamente assinada."
+--
+-- O termo de garantia é, no desenho do próprio proponente, o marco documental
+-- da conclusão. Não existe. Não há termo de garantia, auto de recepção,
+-- vistoria nem parecer que ateste a conclusão — apesar de o acompanhamento
+-- técnico estar em cópia em toda a correspondência do período.
+--
+-- A obra não foi entregue e a garantia não foi prestada. A deliberação da AGE
+-- confirma a posição do condomínio; não a funda. O fundamento está no
+-- contrato.
+--
+-- ====================================================================
+-- CORRECÇÃO DE FACTO: o prazo do ADIT é de 30 dias
+-- ====================================================================
+-- Uma citação anterior atribuiu ao ADIT o prazo de 45 dias, que é o do
+-- orçamento 010125-R. O ADIT diz 30 dias. Citação e evento corrigidos.
+--
+-- ====================================================================
+-- PENDÊNCIA NOVA: termo de garantia nunca emitido
+-- ====================================================================
+-- A cláusula do termo de garantia consta de TODAS as versões da proposta —
+-- 010125 de Janeiro/2025, a reenviada em Junho/2025, o 010125-R e o ADIT.
+--
+-- Não consta do processo um único termo de garantia:
+--   fachada tardoz   dada como liquidada em 30.000,00 EUR — sem termo
+--   fachada frente   dada como liquidada em 15.000,00 EUR — sem termo
+--   fachada lateral  tranche de conclusão reclamada judicialmente — sem termo
+--
+-- Duplo efeito. Nas fachadas já pagas, o condomínio pagou a totalidade sem
+-- receber o título que formaliza a garantia de cinco anos — relevante para as
+-- anomalias por sanar. Na lateral, a ausência do termo é o indício documental
+-- de que a conclusão que a factura pressupõe não ocorreu.
+--
+-- ====================================================================
+-- PRAZO EXPIRADO
+-- ====================================================================
+-- Carta de 31-07-2026, prazo de 10 dias a contar da recepção. A 24-08-2026
+-- decorreram 24 dias sobre a data da carta e não consta resposta.
+--
+-- O silêncio não faz precludir os fundamentos do condomínio, que podem ser
+-- invocados em juízo, mas priva-o do registo extrajudicial de os ter invocado
+-- em tempo.
+--
+-- Duas diligências prévias a qualquer decisão:
+--   1. apurar a DATA DE ASSINATURA DO AVISO DE RECEPÇÃO — é a que faz correr
+--      o prazo e a que fixaria a mora;
+--   2. verificar se já foi instaurada acção, uma vez que a carta anunciava
+--      recurso imediato à via judicial "sem mais avisos".
