@@ -33,3 +33,12 @@
 --   fraccionamento: passa a usar-se 63.400, perdido o desconto de 400
 --   Abril/Maio 2026: frente e lateral reduzidas 1.700 cada => 60.000
 --   010125-ADIT confirma a lateral por 15.000 + IVA
+
+-- Aplicada ainda: danos_cobertura_e_estores_9esq
+--   23-12-2025  conflito  Pontos de amarração das cordas danificados na cobertura
+--   23-12-2025  conflito  Porta de acesso à cobertura deixada aberta
+--   23-12-2025  conflito  Padrão de resposta da empreiteira às reclamações
+--   06-01-2026  conflito  Estore danificado no 9.º Esq.
+--
+-- Seis reclamações de danos entre 06-11-2025 e 06-01-2026, todas com resposta
+-- da empreiteira limitada a confirmações de recepção de duas a sete palavras.
