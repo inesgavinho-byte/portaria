@@ -1,0 +1,23 @@
+-- Reconciliação documental da empreitada das fachadas — registo das migrations
+-- aplicadas em 24-08-2026 a partir da correspondência da administração anterior.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   * orcamento_010125R_e_inicio_dos_trabalhos
+--   * ausencia_caderno_encargos_e_ambito_consultado
+--
+-- Fontes indexadas
+--   Orçamento 010125-R, documento original (md5 c9936e0411f7161db90ea0220f76b4b4)
+--   Aviso de obras aos condóminos, início 01-09-2025
+--   Thread Filipe Roque / administração, 07-01-2025 e 15-09-2025
+--
+-- Acontecimentos criados
+--   07-01-2025  conflito     Empreitada consultada e adjudicada sem caderno de encargos
+--   07-01-2025  comunicacao  Âmbito consultado e pedido de valores por fachada em separado
+--   07-01-2025  conflito     Adjudicatária não consta da lista de empresas consultadas
+--   14-04-2025  conflito     Versão revista altera a cláusula de IVA para "a combinar"
+--   14-04-2025  conflito     Traseiras negociadas com IVA incluído, documentadas sem IVA
+--   14-04-2025  conflito     Orçamento revisto mantém a data do original
+--   01-09-2025  execucao     Início dos trabalhos na fachada traseira
+--   16-09-2025  comunicacao  Parecer técnico de condómino engenheiro
+--
+-- Todos com evidência citada. Nenhum valor é eleito como verdadeiro.
