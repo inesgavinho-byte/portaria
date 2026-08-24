@@ -1,0 +1,21 @@
+-- Beneficiários terceiros, exclusão das varandas e defeitos das floreiras.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   varandas_excluidas_e_segundo_comprovativo
+--   segundo_beneficiario_terceiro_wagner
+--   (mais um evento avulso: tinta saltada na floreira do 11.º andar)
+--
+-- Beneficiários terceiros identificados nos pagamentos da obra:
+--   05-09-2025  Robert Gian / Guan Julio   Novo Banco        12.000,00 EUR
+--   14-11-2025  Wagner Ottoni Nascimento   Santander Totta    4.000,00 EUR
+-- Em ambos os casos a instrução parte da própria sociedade adjudicatária.
+-- Para o primeiro existe confirmação escrita de recebimento pela sociedade.
+--
+-- Acontecimentos
+--   05-09-2025  conflito  Divergência de grafia no beneficiário
+--   26-09-2025  conflito  Varandas declaradas excluídas e propostas a 500 EUR
+--                         directamente a cada condómino, contra o parecer do
+--                         acompanhamento técnico de 30-07-2025
+--   13-11-2025  conflito  IBAN de trabalhador da obra para receber pagamento
+--   13-11-2025  conflito  Montante não corresponde à percentagem invocada
+--   30-03-2026  conflito  Tinta saltada na floreira do 11.º andar
