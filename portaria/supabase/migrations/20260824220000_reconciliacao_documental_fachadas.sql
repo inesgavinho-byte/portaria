@@ -21,3 +21,17 @@
 --   16-09-2025  comunicacao  Parecer técnico de condómino engenheiro
 --
 -- Todos com evidência citada. Nenhum valor é eleito como verdadeiro.
+
+-- Aplicada ainda, no mesmo dia:
+--   * adjudicacao_por_assinar_e_situacao_laboral
+--
+-- Fontes: aviso de seguro de acidentes de trabalho (apólice 0009218058,
+-- 3 pessoas seguras, 09-09-2025 a 21-11-2025); thread de 26-09-2025 sobre
+-- documentos a enviar ao condómino do 4.º andar.
+--
+-- Acontecimentos:
+--   09-09-2025  garantia   Seguro de acidentes de trabalho — cobertura documentada
+--   26-09-2025  conflito   Orçamento assinado ainda por entregar depois de
+--                          iniciados os trabalhos
+--   26-09-2025  conflito   Empreiteira declara trabalhadores a recibos verdes
+--                          e ausência de declaração à Segurança Social
