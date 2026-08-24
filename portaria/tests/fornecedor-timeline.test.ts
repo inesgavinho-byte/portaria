@@ -86,7 +86,7 @@ function cenarioPinturasVerticais(): SupplierTimelineInput {
       memoria({ id: "e-adj", data_evento: "2026-05-26T00:00:00Z", tipo: "adjudicacao", titulo: "Adjudicação da empena direita" }),
       memoria({ id: "e-suspensao", data_evento: "2026-05-27T00:00:00Z", tipo: "decisao", titulo: "Pagamento suspenso", despesa_id: despesa4, efeito: "suspensao" }),
       memoria({ id: "e-exec-0906", data_evento: "2026-06-09T00:00:00Z", tipo: "execucao", titulo: "Metade dos trabalhos ultrapassada" }),
-      memoria({ id: "e-pag-banco", data_evento: "2026-06-11T00:00:00Z", tipo: "pagamento", titulo: "Pagamento bancário de 6.360 EUR — factura exacta por identificar", natureza: "pendente", valor_cents: 636000, movimento_id: movimento6360, efeito: "confirmacao_pagamento" }),
+      memoria({ id: "e-pag-banco", data_evento: "2026-06-11T00:00:00Z", tipo: "pagamento", titulo: "Pagamento bancário de 6.360 EUR imputado à Factura 2026/4", natureza: "inferencia", valor_cents: 636000, movimento_id: movimento6360, despesa_id: despesa4, efeito: "confirmacao_pagamento" }),
       memoria({ id: "e-ft8", data_evento: "2026-06-15T00:00:00Z", tipo: "fatura", titulo: "Emissão e envio da Factura 2026/8", natureza: "inferencia", valor_cents: 318000, despesa_id: despesa8, efeito: "emissao" }),
       memoria({ id: "e-retencao", data_evento: "2026-07-07T00:00:00Z", tipo: "decisao", titulo: "Retenção do pagamento final", despesa_id: despesa8, efeito: "retencao" }),
       memoria({ id: "e-reconciliacao", data_evento: "2026-08-23T00:00:00Z", tipo: "decisao", titulo: "Reconciliação financeira", natureza: "pendente" }),
@@ -197,15 +197,29 @@ describe("cronologia unificada do fornecedor", () => {
     expect(eventos.length).toBeGreaterThan(20);
   });
 
-  it("mostra o pagamento de 11/06 sem o associar à factura 2026/4 nem à 2026/7", () => {
+  it("mostra o pagamento de 11/06 com a imputação classificada como inferência", () => {
     const eventos = construirTimelineFornecedor(cenarioPinturasVerticais());
     const pagamento = eventos.find((evento) => evento.date.startsWith("2026-06-11"));
     expect(pagamento).toBeDefined();
-    expect(pagamento?.title).toContain("factura exacta por identificar");
     expect(pagamento?.amountCents).toBe(636000);
     expect(pagamento?.confirmation).toBe("banco");
-    expect(pagamento?.nature).toBe("pendente");
-    expect(pagamento?.mergedFrom?.some((origem) => origem.sourceType === "despesa")).not.toBe(true);
+    // O débito é facto bancário; a imputação a uma factura concreta não é
+    // promovida a facto documental.
+    expect(pagamento?.nature).toBe("inferencia");
+  });
+
+  it("não deixa o evento de pagamento absorver a factura que imputa", () => {
+    // O pagamento refere a Factura 2026/4, mas quem a emite é o evento de
+    // 26/05. Emissão e liquidação são acontecimentos distintos e a factura
+    // não pode desaparecer da cronologia por ser referida por um pagamento.
+    const eventos = construirTimelineFornecedor(cenarioPinturasVerticais());
+    const pagamento = eventos.find((evento) => evento.sourceId === "e-pag-banco");
+    expect(pagamento?.mergedFrom).toEqual([{ sourceType: "movimento", sourceId: "m-11-06" }]);
+
+    const emissao = eventos.find((evento) => evento.sourceId === "e-ft4");
+    expect(emissao?.date).toContain("2026-05-26");
+    expect(emissao?.mergedFrom).toEqual([{ sourceType: "despesa", sourceId: "d-2026-4" }]);
+    expect(eventos.filter((evento) => evento.amountCents === 636000)).toHaveLength(3);
   });
 
   it("funde memória e despesa da mesma factura em vez de duplicar", () => {
