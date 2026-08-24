@@ -1,0 +1,27 @@
+-- Aprovação técnica da última tranche da fachada tardoz e correcção de registo.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   aprovacao_tecnica_da_ultima_tranche_tardoz
+--
+-- Correcção relevante: um evento anterior descrevia a tranche final da
+-- fachada tardoz como paga sem controlo. Os documentos desmentem-no. A
+-- sequência real foi:
+--   27-11-2025  empreiteiro pede os 20% finais (6.000 EUR), indicando IBAN de
+--               Gustavo José Matias da Silva
+--   01-12-2025  administração condiciona o pagamento ao parecer do Eng. Jaime
+--               Correia
+--   02-12-2025  o engenheiro RECUSA: falta a pintura ao nível do piso 0
+--   04-12-2025  empreiteiro envia fotos declarando concluído
+--   06-12-2025  o engenheiro verifica no local e APROVA
+--   09-12-2025  pagamento executado, comprovativo remetido
+--
+-- O evento foi reescrito em conformidade e a sua natureza passou de conflito
+-- para pendente: houve controlo técnico efectivo sobre a conclusão da pintura,
+-- mas não sobre os danos reclamados, que permaneceram por resolver e sem
+-- retenção.
+--
+-- Terceiro beneficiário terceiro identificado. Somando os três:
+--   Robert Gian / Guan Julio    12.000,00 EUR
+--   Wagner Ottoni Nascimento     4.000,00 EUR
+--   Gustavo José Matias da Silva 6.000,00 EUR
+--   Total                       22.000,00 EUR de 45.000,00 EUR

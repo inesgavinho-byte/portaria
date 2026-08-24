@@ -1,0 +1,23 @@
+-- Defeitos de execução e primeira prova bancária primária.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   escalada_caleira_terceira_versao_orcamento
+--   falha_impermeabilizacao_3dto_5dto
+--   comprovativo_bancario_setembro_2025_terceiro_titular
+--
+-- Acontecimentos
+--   11-06-2025  conflito   Terceira versão do orçamento com o mesmo número
+--   12-06-2025  conflito   Adjudicação referida como futura, nove dias após a data registada
+--   05-09-2025  pagamento  Adjudicatária confirma por escrito o recebimento
+--   05-09-2025  conflito   Pagamentos ordenados para conta de pessoa singular
+--   12-12-2025  conflito   Drenagem agrava-se para infiltração no interior
+--   12-01-2026  conflito   Fissura na fachada tardoz já liquidada
+--   05-02-2026  conflito   Quarto declarado inabitável
+--   09-02-2026  pendente   Administração admite pedir responsabilidade
+--   25-02-2026  conflito   Infiltrações indicam falha da impermeabilização contratada
+--   25-02-2026  conflito   Pagamento de 3.000 EUR no mesmo acto em que se reporta a falha
+--
+-- Três versões do mesmo orçamento, todas datadas de 07-01-2025:
+--   66032d3a  ORÇAMENTO N.º 010125     68.700
+--   b28f4a71  ORÇAMENTO N.º 010125     63.000
+--   c9936e04  ORÇAMENTO N.º 010125-R   63.000

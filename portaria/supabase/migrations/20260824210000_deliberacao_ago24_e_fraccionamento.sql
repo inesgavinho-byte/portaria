@@ -1,0 +1,35 @@
+-- Deliberação da AGO n.º 24 e fraccionamento da adjudicação das fachadas.
+--
+-- Aplicada em 24-08-2026 a partir da correspondência da administração anterior.
+--
+-- Constatações que esta migration regista:
+--   1. a obra foi deliberada no ponto 4 da AGO n.º 24, de 25-03-2025, e
+--      financiada por contribuição extraordinária de 62.000 EUR;
+--   2. a adjudicação por fachadas foi decisão expressa e comunicada da
+--      administração, fundamentada na cadência da cobrança, começando pela
+--      fachada tardoz — não foi trabalho adicional nem alteração de âmbito;
+--   3. a versão revista da proposta nasce de um pedido de 14-04-2025, sendo
+--      portanto posterior à deliberação da assembleia;
+--   4. a proposta identificada como aceite pela assembleia é, por checksum
+--      MD5, a de 68.700 EUR — e não a de 63.000 EUR que o contrato
+--      referencia. Fica registado como conflito, sem eleger versão.
+--
+-- O SQL aplicado consta do histórico de migrations do projecto Supabase sob
+-- o nome deliberacao_ago24_e_fraccionamento_fachadas. Este ficheiro reproduz
+-- a intenção e as fontes; ver esse histórico para o texto executado.
+
+-- Fontes indexadas:
+--   * Thread da administração de 14-04-2025 a 27-11-2025 — cobrança
+--     extraordinária (md5 b80a50a0585f9691db29c3c6fcd7f45d, 803109 bytes)
+--   * Orçamento Orçaconsulting II, 06-05-2025, 58.150,00 EUR
+--     (md5 1b654dc5c95da138a262144ba86be88b, 81092 bytes)
+--
+-- Acontecimentos criados no contrato de Pinturas Verticais:
+--   25-03-2025  decisao      AGO n.º 24 delibera as obras
+--   14-04-2025  decisao      Adjudicar por fachadas, começando pela tardoz
+--   14-04-2025  comunicacao  Pedido de proposta com preço rectificado
+--   14-04-2025  conflito     Proposta aprovada em assembleia diverge da
+--                            proposta referenciada no contrato
+--   06-05-2025  proposta     Orçamento Orçaconsulting II — 58.150,00 EUR
+--
+-- Todos com evidência citada a partir das fontes acima.
