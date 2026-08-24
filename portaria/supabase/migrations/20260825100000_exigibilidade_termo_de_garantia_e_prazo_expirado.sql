@@ -57,17 +57,36 @@
 -- de que a conclusão que a factura pressupõe não ocorreu.
 --
 -- ====================================================================
--- PRAZO EXPIRADO
+-- PRAZO EXPIRADO — datas fixadas
 -- ====================================================================
--- Carta de 31-07-2026, prazo de 10 dias a contar da recepção. A 24-08-2026
--- decorreram 24 dias sobre a data da carta e não consta resposta.
+-- Aplicada também sob o nome:
+--   data_do_aviso_de_recepcao_e_contagem_do_prazo
+--
+--   31-07-2026  sexta-feira   data da carta
+--   04-08-2026  terça-feira   AVISO DE RECEPÇÃO ASSINADO — é esta que conta
+--   14-08-2026  sexta-feira   termo dos 10 dias (dia útil, sem transferência)
+--   15-08-2026  sábado        abre-se a janela para a acção anunciada
+--   24-08-2026  segunda-feira 20 dias sobre a recepção, 10 sobre o termo
+--
+-- Não consta resposta. A carta declarara que, findo o prazo e no silêncio da
+-- administração, "sem mais avisos", recorreria imediatamente à via judicial.
 --
 -- O silêncio não faz precludir os fundamentos do condomínio, que podem ser
 -- invocados em juízo, mas priva-o do registo extrajudicial de os ter invocado
 -- em tempo.
 --
--- Duas diligências prévias a qualquer decisão:
---   1. apurar a DATA DE ASSINATURA DO AVISO DE RECEPÇÃO — é a que faz correr
---      o prazo e a que fixaria a mora;
---   2. verificar se já foi instaurada acção, uma vez que a carta anunciava
---      recurso imediato à via judicial "sem mais avisos".
+-- A data do AR releva para três coisas e NÃO releva para uma quarta:
+--   1. delimita a janela em que uma acção pode ter sido instaurada — aberta
+--      desde 15-08-2026. Verificar junto do tribunal competente é urgente.
+--   2. fixa o momento da interpelação para efeitos de mora quanto ao que seja
+--      exigível. Questão distinta: as facturas indicam data de vencimento
+--      coincidente com a de emissão, o que suscita saber se há termo
+--      convencionado ou se a mora só se constitui por interpelação.
+--   3. fixa o momento a partir do qual o silêncio é oponível ao condomínio na
+--      apreciação da conduta das partes.
+--   4. NÃO altera o mérito. A não exigibilidade da tranche de conclusão
+--      decorre de a obra não estar concluída nem garantida, e isso é
+--      indiferente ao decurso do prazo.
+--
+-- A caracterização jurídica de cada ponto deve ser confirmada por advogado do
+-- condomínio.
