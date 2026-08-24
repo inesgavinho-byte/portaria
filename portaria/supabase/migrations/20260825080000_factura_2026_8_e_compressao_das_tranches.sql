@@ -1,0 +1,58 @@
+-- Factura 2026/8 confirmada por documento e a compressão das três tranches da
+-- fachada lateral.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   factura_2026_8_confirmada_e_compressao_das_tranches
+--
+-- ====================================================================
+-- FACTURA 2026/8 — de inferência a facto
+-- ====================================================================
+--   ATCUD J62NRRCP-8 | emissão e vencimento 15-06-2026
+--   Base 3.000,00 | IVA 6,00% (incidência 3.000,00) 180,00 | Total 3.180,00
+--   Adquirente EDIFICIO EUROPA, NIF 900228288
+--   Descrição: "PINTURA DE PREDIO" — sem fachada, fase ou tranche
+--   Identificador de assinatura UGRt | programa certificado n.º 1137/AT
+--   O ficheiro traz ORIGINAL e DUPLICADO; é o comportamento do emissor.
+--
+-- O acontecimento estava registado por INFERÊNCIA quanto à data e ao valor.
+-- Com a entrega do documento original passa a FACTO.
+--
+-- ====================================================================
+-- A FACHADA LATERAL FICA INTEGRALMENTE FACTURADA
+-- ====================================================================
+--   2026/4  26-05-2026  40% adjudicação   6.000,00 + 360,00 =  6.360,00
+--   2026/7  09-06-2026  40% meio da obra  6.000,00 + 360,00 =  6.360,00
+--   2026/8  15-06-2026  20% conclusão     3.000,00 + 180,00 =  3.180,00
+--   ----------------------------------------------------------------
+--   Total                                15.000,00 + 900,00 = 15.900,00
+--
+-- 15.000,00 EUR é exactamente o orçamento 010125-ADIT. Taxa única de 6% em
+-- todas as tranches. A repartição 6%/23% anunciada em 04-09-2025 não tem
+-- expressão em nenhuma das três facturas.
+--
+-- Contraste que fica fixado: a fachada lateral, 15.900,00 EUR, está toda
+-- facturada. As fachadas tardoz e da frente, 45.000,00 EUR pagos, não têm uma
+-- única factura no processo.
+--
+-- ====================================================================
+-- CONFLITO NOVO — vinte dias
+-- ====================================================================
+--   26-05-2026  adjudicação comunicada
+--   26-05-2026  factura da adjudicação (40%)
+--   09-06-2026  factura de meio da obra (40%)
+--   15-06-2026  factura de conclusão (20%)
+--
+-- Vinte dias entre a adjudicação e a facturação integral. O próprio ADIT
+-- prevê "prazo expectável para a conclusão dos trabalhos após o início: 45
+-- dias". Facturar a tranche de conclusão ao vigésimo dia é declarar a obra
+-- concluída em menos de metade do prazo que o proponente indicou.
+--
+-- Não consta do processo auto de recepção, verificação técnica ou parecer que
+-- ateste a conclusão, apesar de o acompanhamento técnico estar em cópia em
+-- toda a correspondência. E quando a segunda factura foi emitida, a primeira
+-- ainda não estava paga — registado por escrito pela administração a
+-- 09-06-2026.
+--
+-- A deliberação da assembleia de 07-07-2026, que determina a retenção do
+-- pagamento final até à entrega da obra, é a resposta orgânica a esta
+-- sequência.
