@@ -1,0 +1,79 @@
+-- Interpelação extrajudicial para cobrança de 9.540,00 EUR — 31-07-2026.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   interpelacao_extrajudicial_para_cobranca_de_9540
+--
+-- Uma fonte nova, três eventos e a reescrita da imputação do pagamento de
+-- Junho.
+--
+-- ====================================================================
+-- A CARTA
+-- ====================================================================
+-- Rui Machado da Silva, advogado, mandatário de Reinaldo Ferreira - Trabalhos
+-- Verticais, Unip. Lda. (NIPC 515635952), à Administração do Condomínio do
+-- Edifício Europa (NIPC 900228288). Carta registada c/ AR, 31-07-2026.
+--
+--   Reclama 9.540,00 EUR, "titulado pelas facturas 2026/4, de 26/05/2026 e
+--   2026/8, de 15/06/2026, ambas vencidas e ainda sem contabilização de juros
+--   de mora".
+--   Prazo: 10 dias a contar da recepção.
+--   Cominação: "no silêncio de V. Ex.as e sem mais avisos, o direito da minha
+--   constituinte será acautelado com o imediato recurso à via judicial".
+--   Conta indicada: a da própria sociedade, Novo Banco — a mesma de
+--   25-05-2026.
+--
+-- ====================================================================
+-- O QUE A CARTA CONFIRMA
+-- ====================================================================
+-- 9.540,00 = 6.360,00 + 3.180,00. Coincide exactamente com o saldo em aberto
+-- apurado na reconciliação. Confirma que das três facturas da fachada lateral
+-- (15.900,00 EUR) só uma de 6.360,00 EUR foi liquidada — a única
+-- transferência bancária do processo para este fornecedor, de 11-06-2026.
+--
+-- ====================================================================
+-- A IMPUTAÇÃO PASSA A ESTAR DISPUTADA
+-- ====================================================================
+-- A 2026/4 e a 2026/7 têm o MESMO valor: 6.360,00 EUR. O montante reclamado
+-- seria idêntico qualquer que fosse a liquidada. O que a carta acrescenta não
+-- é o valor, é a DESIGNAÇÃO: ao omitir a 2026/7, a credora considera-a paga e
+-- imputa-lhe o pagamento de Junho.
+--
+-- Isso diverge de dois elementos do processo:
+--
+--   1. Da posição escrita da administração. A 09-06-2026, dois dias antes da
+--      transferência: "Recordo que se encontra por pagar a fatura (n.º 4) que
+--      enviaram há cerca de 2 semanas com a adjudicação [...] O valor total
+--      das mesmas é de 12.720,00€."
+--
+--   2. Do regime legal de imputação do cumprimento. Não tendo o devedor
+--      designado, e sendo ambas exigíveis, de igual valor, igual onerosidade e
+--      sem diferença de garantias, imputa-se à MAIS ANTIGA — a 2026/4.
+--
+-- Consequência prática: o montante em dívida é o mesmo nas duas leituras
+-- (9.540,00 EUR). O que difere é QUAL factura fica por liquidar e a partir de
+-- que data correriam juros de mora.
+--
+-- Qualquer pagamento futuro deve DESIGNAR EXPRESSAMENTE a factura a que
+-- respeita, sob pena de a ambiguidade se manter.
+--
+-- O evento do pagamento de Junho mantém-se classificado como INFERÊNCIA — não
+-- por falta de fundamento, mas porque a imputação está agora disputada entre
+-- as partes e nenhum documento do processo a fixa expressamente.
+--
+-- ====================================================================
+-- O QUE A CARTA NÃO DIZ
+-- ====================================================================
+-- Não refere a deliberação da AGE de 07-07-2026, vinte e quatro dias anterior:
+-- "o pagamento final deverá ficar retido até à entrega da obra".
+--
+-- Não refere as anomalias por resolver. À data da interpelação estavam
+-- pendentes as infiltrações do 3.º e do 5.º Dt.º, reclamadas em 25-02-2026, e
+-- a reparação prescrita pelo acompanhamento técnico em 08-04-2026 — "a
+-- imunização da ferrugem das armaduras de aço não foi bem feita" — sem
+-- resposta da empreiteira nem registo de execução.
+--
+-- E a Factura 2026/8 titula a tranche devida NA CONCLUSÃO. Foi emitida vinte
+-- dias após a adjudicação e não consta do processo auto de recepção,
+-- verificação técnica ou parecer que ateste que a obra ficou concluída. A
+-- exigibilidade da tranche depende do facto que a titula, e esse facto não
+-- está documentado.
