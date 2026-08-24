@@ -265,6 +265,10 @@ export type MovimentoBancario = {
   fonte_referencia: string | null;
   confirmado: boolean;
   estado_reconciliacao: "nao_reconciliado" | "parcial" | "reconciliado";
+  /** Decidido que o movimento não tem fornecedor (encargo estatal, banca, condómino). */
+  fornecedor_nao_aplicavel: boolean;
+  fornecedor_atribuido_em: string | null;
+  fornecedor_atribuido_por: string | null;
   notas: string | null;
   criado_por: string | null;
   criado_em: string;
