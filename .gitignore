@@ -1,2 +1,16 @@
 .next/
 node_modules/
+
+# graphify — artefactos do grafo de conhecimento
+#
+# O grafo em si (.graphify/graph.json, GRAPH_REPORT.md, studio/, wiki/) é
+# committável e é o que dá valor a quem clona: permite consultar o repositório
+# sem o reprocessar.
+#
+# Estes quatro são estado local por checkout — ramo actual, worktree, marca de
+# desactualização e cache. Committá-los cria conflitos a cada troca de ramo, e
+# a própria ferramenta pede que fiquem de fora.
+.graphify/branch.json
+.graphify/worktree.json
+.graphify/needs_update
+.graphify/cache/
