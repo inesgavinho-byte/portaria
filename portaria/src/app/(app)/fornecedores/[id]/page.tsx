@@ -106,10 +106,21 @@ function formatCurrency(cents: number | null | undefined) {
   return new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(cents / 100);
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(
-    new Date(value),
-  );
+/**
+ * Formata uma data, tolerando valores inválidos.
+ *
+ * `Intl.DateTimeFormat.format()` lança `RangeError: Invalid time value` quando
+ * recebe uma Data inválida. Num Server Component isso derruba o render inteiro
+ * e o utilizador vê apenas um digest. Uma data ilegível deve degradar para um
+ * travessão, não para uma página em branco.
+ *
+ * A página do relatório já tinha esta guarda; esta não tinha.
+ */
+function formatDate(value: string | null | undefined) {
+  if (!value) return "—";
+  const instante = new Date(value);
+  if (Number.isNaN(instante.getTime())) return "—";
+  return new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(instante);
 }
 
 function iconFor(kind: SupplierTimelineKind) {
@@ -126,13 +137,64 @@ function iconFor(kind: SupplierTimelineKind) {
   return <FileText className={className} />;
 }
 
-export default async function FornecedorPage({
-  params,
-  searchParams,
-}: {
+type FornecedorProps = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ vista?: string; natureza?: string; q?: string }>;
-}) {
+};
+
+/**
+ * Invólucro de diagnóstico.
+ *
+ * Em produção o Next.js substitui a mensagem de qualquer excepção não capturada
+ * por um digest, para não expor detalhes. O efeito prático é que uma falha aqui
+ * se torna indiagnosticável sem acesso aos logs da plataforma — que é
+ * exactamente a situação em que esta página esteve.
+ *
+ * Capturando a excepção dentro do nosso próprio código, a mensagem continua a
+ * ser nossa e pode ser mostrada. O destinatário é um administrador autenticado
+ * do condomínio, a ver o seu próprio dossiê: proporcional, e a alternativa é um
+ * número opaco. É o mesmo tratamento que a página do relatório já tem.
+ */
+export default async function FornecedorPage(props: FornecedorProps) {
+  try {
+    return await CorpoFornecedor(props);
+  } catch (erro) {
+    // `redirect()` e `notFound()` sinalizam-se por excepção, com um digest
+    // prefixado por NEXT_. Essas têm de passar intactas, ou a navegação e o 404
+    // deixam de funcionar. Só se captura o que é falha genuína.
+    const digest = (erro as { digest?: unknown } | null)?.digest;
+    if (typeof digest === "string" && digest.startsWith("NEXT_")) throw erro;
+    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const pilha = erro instanceof Error ? (erro.stack ?? "").split("\n").slice(1, 6).join("\n") : "";
+    console.error("[fornecedor] falha ao compor o dossiê", erro);
+    return (
+      <div className="mx-auto max-w-2xl py-16">
+        <div className="portaria-panel px-6 py-7">
+          <h1 className="font-title text-h3 text-ink">Não foi possível abrir o dossiê do fornecedor</h1>
+          <p className="mt-2 font-body text-sm leading-6 text-oliveGray">
+            Os dados do fornecedor estão intactos. A falha ocorreu ao compor a página.
+          </p>
+          <p className="mt-4 font-body text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">Causa</p>
+          <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap rounded-lg bg-softCream px-3 py-2.5 font-mono text-[0.7rem] leading-5 text-ink">
+            {mensagem}
+          </pre>
+          {pilha && (
+            <>
+              <p className="mt-4 font-body text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">
+                Origem
+              </p>
+              <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap rounded-lg bg-softCream px-3 py-2.5 font-mono text-[0.66rem] leading-5 text-oliveGray">
+                {pilha}
+              </pre>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
   const [{ id }, filtros] = await Promise.all([params, searchParams]);
   const ctx = await requireAdmin();
   if (!ctx) redirect("/avisos");
