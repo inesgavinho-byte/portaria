@@ -13,25 +13,39 @@ Rules:
 - Read `.graphify/GRAPH_REPORT.md` only for broad architecture review or when `query` / `path` / `explain` do not surface enough context
 - After modifying code files in this session, run `npx graphify hook-rebuild` to keep the graph current
 
-### Regras específicas do PORTARIA (medidas, não presumidas)
+### Regras específicas do PORTARIA (medidas e ratificadas)
 
-Estas prevalecem sobre as genéricas acima. Ver `portaria/docs/decisoes/graphify.md`
-para os números e `scripts/graphify-medicao.sh` para os reproduzir.
+Estas prevalecem sobre as genéricas acima. São política decidida, não sugestão.
+Números em `portaria/docs/decisoes/graphify.md`; reproduzem-se com
+`scripts/graphify-medicao.sh`.
 
-- **Localizar um símbolo ou orientar-se:** `graphify query`. Mede-se 7x menos
-  contexto do que grep + ler os ficheiros, com a resposta certa.
-- **Quem importa/chama o quê (blast radius):** `get_neighbors`, não `query`. Na
-  mesma pergunta o `query` gasta 6 038 B e devolve só a definição; o
-  `get_neighbors` gasta 2 328 B e devolve os importadores — 204x menos do que a
-  leitura tradicional.
-- **Não usar `shortest_path`/`graphify path` neste repositório.** `server.ts` é
-  importado por quase tudo e funciona como hub: o caminho mais curto entre dois
-  nós atravessa-o e sai válido no grafo mas errado como resposta. Seguir a
-  cadeia com `get_neighbors` salto a salto.
-- **O grafo não é exaustivo na camada de rotas.** Só 30% dos nós sob `app/` têm
-  aresta de import, contra 62% no resto de `src/`. Antes de mudar uma assinatura
-  usada em toda a app, confirmar com `grep -rl` — o grafo dá o mapa, o grep dá a
-  garantia.
-- **Reconstruir são três passos**, não um: `graphify update .` volta a introduzir
-  179 nós de histórico git que arrastam metade das arestas. Correr sempre
-  `node scripts/graphify-podar-git.mjs` e `graphify cluster-only .` a seguir.
+1. **O Graphify é a camada graph-first de redução de contexto.** Para orientação
+   e localização, grafo primeiro: mede-se 7x a 204x menos contexto do que grep
+   mais leitura dos ficheiros.
+2. **A poda de nós git é determinística e obrigatória depois de cada
+   `graphify update`.** Reconstruir são três passos, nunca um: `graphify update .`
+   volta a introduzir 179 nós de histórico que arrastam metade das arestas;
+   correr `node scripts/graphify-podar-git.mjs` e `graphify cluster-only .` a
+   seguir.
+3. **Blast radius é sempre `get_neighbors`.** Na mesma pergunta o `query` gasta
+   6 038 B e devolve só a definição; o `get_neighbors` gasta 2 328 B e devolve os
+   importadores.
+4. **`query` é para discovery, não para cobertura exaustiva.** Faz BFS por
+   semelhança de texto: encontra onde um símbolo vive. Não serve para responder
+   «estão aqui todos os sítios afectados».
+5. **`shortest_path` / `graphify path` não é fonte de verdade neste repositório.**
+   `server.ts` é importado por quase tudo e funciona como hub: o caminho mais
+   curto entre dois nós atravessa-o e sai válido no grafo mas errado como
+   resposta. Perguntas transitivas resolvem-se com `get_neighbors` salto a salto.
+6. **Alteração transversal — três passos, nesta ordem:** Graphify para o mapa,
+   `grep` para verificar a cobertura, leitura do código real para confirmar. Só
+   30% dos nós sob `app/` têm aresta de import, contra 62% no resto de `src/`:
+   o grafo dá o mapa, o grep dá a garantia.
+7. **Alteração local em ficheiro já conhecido não obriga a consultar o
+   Graphify.** Ir directo ao ficheiro. Os hooks são consultivos, não uma
+   barreira: consultar o grafo para editar uma linha num ficheiro já
+   identificado gasta contexto em vez de o poupar.
+8. **O benchmark mantém-se reproduzível.** Os tokens são hoje bytes/4, uma
+   aproximação assumida; substituem-se por contagem real quando houver
+   contador disponível. Não alterar o Graphify com o único fim de melhorar os
+   números.

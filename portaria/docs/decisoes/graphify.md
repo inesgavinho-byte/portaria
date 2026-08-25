@@ -112,10 +112,23 @@ dos 74 ficheiros que mencionam `requireAdmin`. Os ficheiros estão lá — 86 do
 `app/` têm aresta de import, contra 62% no resto de `src/`. O extractor lê bem
 módulos de biblioteca e acções, e mal os Server Components do App Router.
 
-### Regra de operação que daqui resulta
+### Política de operação (ratificada)
 
-1. **Orientação e localização:** grafo primeiro. É onde os 7x–204x estão.
-2. **Exaustividade** — mudar uma assinatura, uma migração a sério: o grafo dá o
-   mapa, o `grep` dá a garantia. Aqueles 54/74 são 20 ficheiros que compilariam
-   mal sem aviso.
-3. **Perguntas transitivas:** `get_neighbors` salto a salto, não `shortest_path`.
+O resultado do benchmark foi considerado suficiente para validar a estratégia.
+As regras abaixo são decisão, e estão replicadas em `CLAUDE.md` e `AGENTS.md`
+para vincularem tanto o Claude como o Codex.
+
+1. Graphify mantém-se como camada graph-first de redução de contexto.
+2. A poda determinística dos nós git corre **depois de cada** `graphify update`.
+3. `get_neighbors` é a ferramenta preferencial para blast radius.
+4. `query` é para discovery, não para cobertura exaustiva.
+5. `shortest_path` não é fonte de verdade neste repositório.
+6. Alteração transversal: Graphify → grep de verificação → leitura do código real.
+7. Alteração local em ficheiro já conhecido não obriga a consultar o Graphify.
+8. O benchmark mantém-se reproduzível. Os tokens são hoje bytes/4, aproximação
+   assumida, a substituir por contagem real quando houver contador disponível.
+
+Uma consequência explícita: **não se altera o Graphify com o único fim de
+melhorar os números do benchmark.** As duas falhas registadas acima — o
+`shortest_path` e a cobertura da camada de rotas — ficam como estão, medidas e
+contornadas por regra, e não maquilhadas.

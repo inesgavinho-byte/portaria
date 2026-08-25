@@ -6,7 +6,9 @@
 # entrariam na janela de contexto, e se a resposta do grafo esta certa face a
 # uma verdade conhecida. Uma resposta 100x mais barata e errada nao e um ganho.
 #
-# Unidade: bytes exactos. Tokens = bytes/4, aproximacao convencional.
+# Unidade: bytes exactos -- essa parte nao e estimada. Tokens = bytes/4, que e
+# aproximacao convencional e assumida como tal; substituir por contagem real
+# quando houver contador disponivel, sem tocar no resto da medicao.
 # Reproduzivel: correr de qualquer directorio.
 set -uo pipefail
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
