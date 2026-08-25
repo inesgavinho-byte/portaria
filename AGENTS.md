@@ -53,3 +53,10 @@ Números em `portaria/docs/decisoes/graphify.md`; reproduzem-se com
    aproximação assumida; substituem-se por contagem real quando houver
    contador disponível. Não alterar o Graphify com o único fim de melhorar os
    números.
+
+### Migrations
+
+Production migrations are not applied before PR approval/merge, except for an
+explicitly authorised hotfix. Normal flow: branch → migration → local/Supabase
+branch validation → PR → review → merge → production migration → verification
+query.
