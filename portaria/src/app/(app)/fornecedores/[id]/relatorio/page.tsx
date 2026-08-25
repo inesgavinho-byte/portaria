@@ -33,7 +33,62 @@ const anoDe = (value: string | null) => {
 const natureza = { facto: "Facto", inferencia: "Inferência", conflito: "Conflito", pendente: "Pendente" } as const;
 const naturezaClasse = { facto: "bg-britishGreenSoft text-britishGreen", inferencia: "bg-softCream text-oliveGray", conflito: "bg-alert/10 text-alert", pendente: "bg-warmBeige/15 text-ink" } as const;
 
-export default async function RelatorioFornecedorPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ ano?: string; modo?: string }> }) {
+type RelatorioProps = { params: Promise<{ id: string }>; searchParams: Promise<{ ano?: string; modo?: string }> };
+
+/**
+ * Invólucro de diagnóstico.
+ *
+ * Em produção o Next.js substitui a mensagem de qualquer excepção não capturada
+ * por um digest, para não expor detalhes. O efeito prático é que uma falha aqui
+ * se torna indiagnosticável sem acesso aos logs da plataforma.
+ *
+ * Capturando a excepção dentro do nosso próprio código, a mensagem continua a
+ * ser nossa e pode ser mostrada. O destinatário é um administrador autenticado
+ * do condomínio, a ver o seu próprio dossiê: proporcional, e a alternativa é
+ * um número opaco.
+ */
+export default async function RelatorioFornecedorPage(props: RelatorioProps) {
+  try {
+    return await CorpoRelatorio(props);
+  } catch (erro) {
+    // `redirect()` e `notFound()` sinalizam-se por excepção, com um digest
+    // prefixado por NEXT_. Essas têm de passar intactas, ou a navegação e o
+    // 404 deixam de funcionar. Só se captura o que é falha genuína.
+    const digest = (erro as { digest?: unknown } | null)?.digest;
+    if (typeof digest === "string" && digest.startsWith("NEXT_")) throw erro;
+    const mensagem = erro instanceof Error ? erro.message : String(erro);
+    const pilha = erro instanceof Error ? (erro.stack ?? "").split("\n").slice(1, 6).join("\n") : "";
+    console.error("[relatorio-fornecedor] falha ao compor o documento", erro);
+    return (
+      <div className="mx-auto max-w-2xl py-16">
+        <div className="portaria-panel px-6 py-7">
+          <h1 className="font-title text-h3 text-ink">Não foi possível compor o relatório</h1>
+          <p className="mt-2 font-body text-sm leading-6 text-oliveGray">
+            O dossiê do fornecedor está intacto. A falha ocorreu ao gerar o documento.
+          </p>
+          <p className="mt-4 font-body text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">
+            Causa
+          </p>
+          <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap rounded-lg bg-softCream px-3 py-2.5 font-mono text-[0.7rem] leading-5 text-ink">
+            {mensagem}
+          </pre>
+          {pilha && (
+            <>
+              <p className="mt-4 font-body text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">
+                Origem
+              </p>
+              <pre className="mt-1.5 overflow-x-auto whitespace-pre-wrap rounded-lg bg-softCream px-3 py-2.5 font-mono text-[0.66rem] leading-5 text-oliveGray">
+                {pilha}
+              </pre>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+async function CorpoRelatorio({ params, searchParams }: RelatorioProps) {
   const [{ id }, filtros] = await Promise.all([params, searchParams]);
   const ctx = await requireAdmin();
   if (!ctx) redirect("/avisos");
