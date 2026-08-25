@@ -1,0 +1,52 @@
+# Âmbito do grafo do PORTARIA: código-fonte apenas.
+#
+# O objectivo é reduzir tokens e leituras redundantes de CÓDIGO. Tudo o que
+# entra no grafo sem valor arquitectural dilui as consultas e aumenta o custo
+# de cada resposta — o contrário do que se pretende.
+
+# ---------------------------------------------------------------------------
+# Migrações SQL — 67 ficheiros, sem valor arquitectural
+#
+# São registo histórico de decisões e de dados, não estrutura do sistema. Uma
+# boa parte é comentário. O esquema que o código realmente usa está tipado em
+# src/types/database.ts, que fica no grafo.
+# ---------------------------------------------------------------------------
+portaria/supabase/migrations/
+portaria/supabase/.branches/
+portaria/supabase/.temp/
+
+# ---------------------------------------------------------------------------
+# Documentação — 29 ficheiros, excluída por decisão desta fase
+#
+# Nesta fase o grafo é code-only: não se ingere documentação nem PDFs. Os
+# dossiês de processo (docs/processos/) são registo documental de empreitadas,
+# sem relação com a arquitectura do software.
+# ---------------------------------------------------------------------------
+portaria/docs/
+
+# ---------------------------------------------------------------------------
+# Artefactos de build e dependências
+# ---------------------------------------------------------------------------
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---------------------------------------------------------------------------
+# Lockfiles — grafos de dependências de pacotes, não do nosso código
+# ---------------------------------------------------------------------------
+package-lock.json
+pnpm-lock.yaml
+
+# ---------------------------------------------------------------------------
+# Estáticos e configuração de ferramentas sem estrutura a extrair
+# ---------------------------------------------------------------------------
+public/
+*.svg
+*.ico
+.env.example
+
+# O próprio grafo
+.graphify/

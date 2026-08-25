@@ -1,0 +1,15 @@
+# Acesso MCP read-only ao grafo de conhecimento do PORTARIA.
+#
+# Caminho relativo por desenho: o Codex arranca o servidor com a raiz do
+# repositório como directório de trabalho, e um caminho absoluto tornaria
+# este ficheiro dependente da máquina (`graphify portable-check` rejeita-o).
+#
+# Superfície exposta: first_hop_summary, review_delta, review_analysis,
+# recommend_commits, query_graph, get_node, get_neighbors, get_community,
+# god_nodes, graph_stats, shortest_path — todas de leitura. `graphify serve`
+# abre graph.json e nunca o reescreve; para reconstruir é preciso o comando
+# `graphify update`, que não é exposto por MCP.
+[mcp_servers.graphify]
+command = "graphify"
+args = ["serve", ".graphify/graph.json"]
+startup_timeout_sec = 30
