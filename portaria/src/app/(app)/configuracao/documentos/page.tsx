@@ -5,17 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import type { Documento } from "@/types/database";
 import { DocumentoActions } from "@/components/admin/documento-actions";
-
-const CATEGORIA_LABEL: Record<Documento["categoria"], string> = {
-  ata: "Ata",
-  conta: "Contas",
-  contrato: "Contrato",
-  regulamento: "Regulamento",
-  manual: "Manual",
-  apolice: "Apólice",
-  circular: "Circular",
-  outro: "Outro",
-};
+import { CATEGORIA_LABEL } from "@/lib/documentos";
 
 export default async function ConfigDocumentosPage() {
   const ctx = await getCurrentUserInTenant();

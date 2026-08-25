@@ -39,7 +39,7 @@ const EVENTOS: EventoRelatorio[] = [
         citacao: "Valor global: €63.000.",
         papel: "primaria",
         ia_documental_fontes: [
-          { id: "f-proposta", titulo: "Pinturas Verticais — proposta e adjudicação", referencia: null, url: null },
+          { id: "f-proposta", titulo: "Pinturas Verticais — proposta e adjudicação", referencia: null, url: null, documento_id: null },
         ],
       },
       {
@@ -47,14 +47,14 @@ const EVENTOS: EventoRelatorio[] = [
         localizador: "mapa 2025/2026, quadro-resumo",
         citacao: "Valor total da obra indicado: 60.000 EUR.",
         papel: "contradicao",
-        ia_documental_fontes: [{ id: "f-mapa", titulo: "Mapa de controlo 2025/2026", referencia: null, url: null }],
+        ia_documental_fontes: [{ id: "f-mapa", titulo: "Mapa de controlo 2025/2026", referencia: null, url: null, documento_id: null }],
       },
       {
         id: "ev-62",
         localizador: "mapa de contribuições extraordinárias",
         citacao: "Total da contribuição extraordinária: 62.000,00 EUR.",
         papel: "contradicao",
-        ia_documental_fontes: [{ id: "f-contrib", titulo: "Contribuições extraordinárias", referencia: null, url: null }],
+        ia_documental_fontes: [{ id: "f-contrib", titulo: "Contribuições extraordinárias", referencia: null, url: null, documento_id: null }],
       },
     ],
   }),

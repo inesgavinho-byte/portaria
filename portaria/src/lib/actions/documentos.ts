@@ -9,6 +9,10 @@ import type { Documento } from "@/types/database";
 
 const CATEGORIAS_VALIDAS: Documento["categoria"][] = [
   "ata", "conta", "contrato", "regulamento", "manual", "apolice", "circular", "outro",
+  // Categorias do dossiê documental. Um processo de empreitada vive de
+  // comunicações, orçamentos e comprovativos — não de "outro".
+  "comunicacao", "orcamento", "factura", "comprovativo", "ficha_tecnica",
+  "parecer", "interpelacao",
 ];
 
 const TAMANHO_MAXIMO_MB = 25;
@@ -17,7 +21,7 @@ const TAMANHO_MAXIMO_BYTES = TAMANHO_MAXIMO_MB * 1024 * 1024;
 export type DocumentoFormState = {
   error?: string;
   fieldErrors?: Partial<
-    Record<"titulo" | "categoria" | "ficheiro" | "ano", string>
+    Record<"titulo" | "categoria" | "ficheiro" | "ano" | "data_documento" | "n_mensagens", string>
   >;
 };
 
@@ -44,6 +48,11 @@ export async function criarDocumento(
   // Associações opcionais (upload a partir do detalhe de fornecedor/contrato)
   const fornecedorId = String(formData.get("fornecedor_id") ?? "").trim() || null;
   const contratoId = String(formData.get("contrato_id") ?? "").trim() || null;
+  // Metadados do documento em si, distintos dos do upload. A data de um email
+  // não é a data em que foi arquivado, e é a primeira que importa ao dossiê.
+  const dataDocumento = String(formData.get("data_documento") ?? "").trim() || null;
+  const contraparte = String(formData.get("contraparte") ?? "").trim() || null;
+  const nMensagensStr = String(formData.get("n_mensagens") ?? "").trim();
   const rawRedirect = String(formData.get("redirect_to") ?? "").trim();
   const redirectTo =
     rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
@@ -75,6 +84,20 @@ export async function criarDocumento(
     }
   }
 
+  let nMensagens: number | null = null;
+  if (nMensagensStr) {
+    const parsed = parseInt(nMensagensStr, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      fieldErrors.n_mensagens = "Número de mensagens inválido.";
+    } else {
+      nMensagens = parsed;
+    }
+  }
+
+  if (dataDocumento && !/^\d{4}-\d{2}-\d{2}$/.test(dataDocumento)) {
+    fieldErrors.data_documento = "Data inválida.";
+  }
+
   if (Object.keys(fieldErrors).length > 0 || !file) {
     return { fieldErrors };
   }
@@ -96,6 +119,9 @@ export async function criarDocumento(
       upload_por: ctx.user.id,
       fornecedor_id: fornecedorId,
       contrato_id: contratoId,
+      data_documento: dataDocumento,
+      contraparte,
+      n_mensagens: nMensagens,
     })
     .select()
     .single();

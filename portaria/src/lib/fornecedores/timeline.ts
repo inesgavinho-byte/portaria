@@ -26,6 +26,7 @@
  */
 
 import type {
+  ContratoMemoriaFonte,
   ContratoMemoriaEvidencia,
   ContratoMemoriaNatureza,
   ContratoMemoriaTipo,
@@ -87,6 +88,12 @@ export type SupplierTimelineEvent = {
   mergedFrom?: { sourceType: SupplierTimelineSource; sourceId: string }[];
   evidence: SupplierTimelineEvidence[];
   evidenceCount: number;
+  /**
+   * Identificador do acontecimento de memória, quando o evento tem origem nele.
+   * É a chave necessária para lhe juntar evidência: os eventos derivados de
+   * despesas, movimentos ou obrigações não são citáveis por si.
+   */
+  memoriaId?: string;
   group: SupplierTimelineGroup;
   href?: string;
 };
@@ -96,7 +103,7 @@ export type SupplierTimelineEvidence = {
   localizador: string | null;
   citacao: string;
   papel: "primaria" | "corroboracao" | "contradicao";
-  fonte: { id: string; titulo: string; referencia: string | null; url: string | null } | null;
+  fonte: ContratoMemoriaFonte | null;
 };
 
 export type MemoriaEventoTimeline = {
@@ -277,6 +284,7 @@ function eventoDeMemoria(
 
   return {
     id: `memoria-${evento.id}`,
+    memoriaId: evento.id,
     date: evento.data_evento,
     kind,
     title: evento.titulo,

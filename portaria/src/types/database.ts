@@ -219,6 +219,8 @@ export type ContratoMemoriaFonte = {
   titulo: string;
   referencia: string | null;
   url: string | null;
+  /** Ficheiro arquivado de que esta fonte é a leitura, quando existe. */
+  documento_id: string | null;
 };
 
 export type ContratoMemoriaEvidencia = {
@@ -333,12 +335,38 @@ export type AssembleiaPonto = {
   criado_em: string;
 };
 
+/**
+ * Categorias do arquivo documental.
+ *
+ * As sete últimas foram acrescentadas porque um processo de empreitada vive de
+ * comunicações, orçamentos e comprovativos, e classificá-los como "outro"
+ * torna o arquivo inútil no momento em que é preciso citá-los.
+ */
+export type DocumentoCategoria =
+  | "ata"
+  | "conta"
+  | "contrato"
+  | "regulamento"
+  | "manual"
+  | "apolice"
+  | "circular"
+  | "outro"
+  | "obra"
+  | "seguro"
+  | "comunicacao"
+  | "orcamento"
+  | "factura"
+  | "comprovativo"
+  | "ficha_tecnica"
+  | "parecer"
+  | "interpelacao";
+
 export type Documento = {
   id: string;
   tenant_id: string;
   titulo: string;
   descricao: string | null;
-  categoria: "ata" | "conta" | "contrato" | "regulamento" | "manual" | "apolice" | "circular" | "outro";
+  categoria: DocumentoCategoria;
   ano: number | null;
   ficheiro_path: string;
   ficheiro_tamanho: number | null;
@@ -349,6 +377,14 @@ export type Documento = {
   fornecedor_id: string | null;
   contrato_id: string | null;
   blueprint_id: string | null;
+  /** Data do documento em si — do email, da factura, do parecer. */
+  data_documento: string | null;
+  /** Remetente, destinatário ou emitente, conforme a natureza. */
+  contraparte: string | null;
+  /** Número de mensagens, quando o documento é um fio de correspondência. */
+  n_mensagens: number | null;
+  /** Resumo criptográfico. Distingue cópias de versões sob a mesma referência. */
+  checksum: string | null;
 };
 
 /** Documento confidencial, visível apenas a administradores do tenant. */
