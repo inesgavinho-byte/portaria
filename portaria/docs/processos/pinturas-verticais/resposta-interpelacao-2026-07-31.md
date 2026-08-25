@@ -40,11 +40,15 @@ Todas as versões da proposta apresentada pela Empreiteira — o orçamento n.º
 
 > «A adjudicação só será considerada após a entrega do duplicado da proposta devidamente assinada.»
 
+(cfr. **Doc. 1** e **Doc. 2**)
+
 **Não existe, no processo do condomínio, qualquer orçamento ou contrato assinado pela Empreiteira. Não existe quanto à fachada tardoz, não existe quanto à fachada da frente, não existe quanto à fachada lateral.**
 
 Não se trata de omissão superveniente. Em 25 de Setembro de 2025 — com a obra em curso desde 1 de Setembro e com € 22.000,00 já pagos — a administração então em funções solicitou por escrito à Empreiteira, «com urgência», o orçamento adjudicado assinado. A Empreiteira respondeu no dia seguinte que os documentos «já foram enviados em tempo e continuam válidos à presente data». Oito minutos depois, a administração contrapôs, por escrito:
 
 > «Quanto ao orçamento assinado, não temos qualquer exemplar com assinatura, pelo que agradeço o respetivo envio.»
+
+(cfr. **Doc. 3**)
 
 O documento nunca foi entregue. Nem então, nem depois.
 
@@ -72,11 +76,13 @@ Em 14 de Abril de 2025 a administração decidiu adjudicar por fachadas, começa
 | 2.ª (b28f4a71) | reenviada em 11-06-2025 | € 63.000,00 | «acresce IVA, a combinar» | 2 meses | M001 a M003 |
 | 3.ª (c9936e04) — o «010125-R» | entregue em 04-09-2025 | € 63.000,00 | «acresce IVA, a combinar» | 45 dias | M001 a **M004** |
 
+(cfr. **Doc. 2**, **Doc. 4** e **Doc. 5**)
+
 Três observações, todas verificáveis nos próprios documentos:
 
 **i)** A versão que a assembleia aceitou **não é** a versão a que o processo veio a referir-se como contratual.
 
-**ii)** O orçamento n.º 010125-R, embora datado de «Agualva-Cacém, 07 de janeiro de 2025», foi entregue ao condomínio em **4 de Setembro de 2025**, como anexo ao e-mail dessa data e sob a designação de «orçamento retificado» — isto é, oito meses depois da data que ostenta, e três dias depois de os trabalhos terem começado.
+**ii)** O orçamento n.º 010125-R, embora datado de «Agualva-Cacém, 07 de janeiro de 2025», foi entregue ao condomínio em **4 de Setembro de 2025**, como anexo ao e-mail dessa data e sob a designação de «orçamento retificado» (**Doc. 5**) — isto é, oito meses depois da data que ostenta, e três dias depois de os trabalhos terem começado.
 
 **iii)** A especificação da impermeabilização das floreiras — «aplicação de duas demãos de argamassa de impermeabilização Hidrostop flex» e o correspondente material M004 — **só existe nesta terceira versão**. Não constava da proposta aceite em assembleia.
 
@@ -86,6 +92,8 @@ Em 30 de Julho de 2025, um condómino — Eng.º Jaime Correia, que viria a assu
 
 > «Da leitura da vossa proposta, não vemos a descrição dos procedimentos de impermeabilização das floreiras e de reparação de elementos de betão à vista. Solicitamos, portanto, que **antes do início dos trabalhos** sejam apresentados ao condomínio a descrição destes procedimentos e as respetivas fichas técnicas dos materiais.»
 
+(cfr. **Doc. 5**)
+
 Os trabalhos iniciaram-se em **1 de Setembro de 2025** sem que qualquer desses elementos tivesse sido apresentado.
 
 Em 3 de Setembro de 2025, a administração reiterou o pedido, condicionando expressamente o pagamento da adjudicação à resposta, e acrescentando a questão dos condóminos sobre a ausência de previsão de «impermeabilização total do interior das floreiras (Geotêxtil, Isolante Térmico, Barreira anti raízes, Folha de proteção/Membrana de impermeabilização), sendo este plano considerado um trabalho fundamental para não causar infiltrações».
@@ -94,13 +102,13 @@ A resposta da Empreiteira, de 4 de Setembro de 2025, consistiu no envio do já r
 
 **O sistema questionado não foi o sistema contratado.** Perguntou-se por um sistema de quatro camadas; especificou-se uma argamassa cimentícia. E nenhuma das três versões do orçamento contém qualquer referência a ralo, tubo de queda, caleira, tela, membrana, pendente ou drenagem — ausência que verificámos por varrimento exaustivo dos três documentos.
 
-Fazemos ainda notar que a ficha técnica do produto especificado, entregue pela própria Empreiteira, determina que «o HIDROSTOP FLEX deve estar protegido sempre contra a exposição à radiação U.V.» — protecção que o orçamento não prevê para as floreiras.
+Fazemos ainda notar que a ficha técnica do produto especificado, entregue pela própria Empreiteira, determina que «o HIDROSTOP FLEX deve estar protegido sempre contra a exposição à radiação U.V.» (**Doc. 6**) — protecção que o orçamento não prevê para as floreiras.
 
 ### C. Documentação obrigatória nunca entregue
 
 Em 25 de Setembro de 2025 a administração solicitou, «com urgência»: o orçamento adjudicado assinado, a lista de trabalhadores afectos à empreitada, as folhas da Segurança Social e os seguros obrigatórios.
 
-Foi remetido **um único documento**: um aviso de prémio de seguro. Os restantes nunca foram entregues, tendo a administração declarado por escrito, no mesmo dia, que nunca recebera as folhas da Segurança Social nem qualquer exemplar assinado.
+Foi remetido **um único documento**: um aviso de prémio de seguro. Os restantes nunca foram entregues, tendo a administração declarado por escrito, no mesmo dia, que nunca recebera as folhas da Segurança Social nem qualquer exemplar assinado (**Doc. 3**).
 
 ### D. Identidade de quem recebeu o preço
 
@@ -139,15 +147,19 @@ Foram sucessivamente comunicados à Empreiteira, sem que conste do processo resp
 | 30-03-2026 | Tinta saltada na floreira do 11.º andar |
 | 08-04-2026 | Ferrugem em armaduras na floreira do 11.º andar |
 
+(cfr., quanto às duas últimas, **Doc. 7** e **Doc. 8**; a documentação relativa às restantes ocorrências encontra-se no processo do condomínio e será facultada a solicitação de V. Ex.ª)
+
 Quanto à última, o acompanhamento técnico do condomínio pronunciou-se por escrito, dirigindo-se directamente à Empreiteira em 8 de Abril de 2026:
 
 > «As fotografias em anexo mostram que **a imunização da ferrugem das armaduras de aço não foi bem feita**, pelo que deverão picar e raspar a zona em causa, com pelo menos 15 cm para cada lado da zona visível com ferrugem e aplicar de novo o Weberep Fer e depois o Weberep express, seguido do esquema de pintura.»
+
+(cfr. **Doc. 8**)
 
 **Não consta do processo resposta da Empreiteira, nem registo de que esta reparação tenha sido executada.**
 
 ### G. Fachada lateral
 
-Em 25 de Maio de 2026 foi recebido o orçamento n.º 010125-ADIT, no valor de € 15.000,00 acrescido de IVA à taxa de 6%, com pagamento repartido em 40% na adjudicação, 40% a meio da obra e 20% na conclusão, e prazo expectável de conclusão de 30 dias após o início.
+Em 25 de Maio de 2026 foi recebido o orçamento n.º 010125-ADIT, no valor de € 15.000,00 acrescido de IVA à taxa de 6%, com pagamento repartido em 40% na adjudicação, 40% a meio da obra e 20% na conclusão, e prazo expectável de conclusão de 30 dias após o início (**Doc. 1**).
 
 A sequência subsequente foi a seguinte:
 
@@ -161,7 +173,7 @@ A sequência subsequente foi a seguinte:
 
 **Vinte dias separam a adjudicação da facturação integral da obra**, num contrato cujo prazo expectável de conclusão, indicado pela própria Empreiteira, é de trinta dias.
 
-Nenhuma das três facturas identifica fachada, fase ou tranche: todas se limitam a descrever «pintura do prédio».
+Nenhuma das três facturas identifica fachada, fase ou tranche: todas se limitam a descrever «pintura do prédio» (**Doc. 9**).
 
 ---
 
@@ -184,6 +196,8 @@ Titula a tranche de 20% que o orçamento n.º 010125-ADIT faz depender da **conc
 
 > «Damos garantia por um período de 5 anos aos trabalhos executados. **Após a conclusão da obra será emitido um termo de garantia.**»
 
+(cfr. **Doc. 1**)
+
 O termo de garantia é, no desenho contratual proposto pela Empreiteira, o acto que documenta a conclusão. **Não foi emitido.** Não foi realizada vistoria, não foi lavrado auto de recepção, não foi emitido parecer do acompanhamento técnico que ateste a conclusão — não obstante este se encontrar em cópia na totalidade da correspondência do período.
 
 A obra não foi entregue e a garantia não foi prestada. Uma prestação cuja exigibilidade o contrato faz depender da conclusão não se vence enquanto a conclusão não ocorrer e não for reconhecida (cfr. art. 1211.º, n.º 2, do Código Civil).
@@ -205,6 +219,8 @@ Não tendo havido designação pelo devedor, e sendo ambas as dívidas vencidas,
 Era essa, aliás, a intenção documentada. Em 9 de Junho de 2026, dois dias antes da transferência, a administração fez consignar por escrito:
 
 > «Recordo que se encontra por pagar a fatura (n.º 4) que enviaram há cerca de 2 semanas com a adjudicação dos trabalhos da fachada lateral. O valor total das mesmas é de € 12.720,00.»
+
+(cfr. **Doc. 10**)
 
 Deve, pois, ter-se por liquidada a factura n.º 2026/4 e por não liquidada a n.º 2026/7. O montante global não se altera; altera-se o documento que permanece em dívida e qualquer data a partir da qual se pretendam contar juros — pretensão que, de resto, se contesta pelos fundamentos expostos.
 
@@ -264,13 +280,19 @@ _______________________________________
 
 ---
 
-**Anexos** (a confirmar antes do envio)
+**DOCUMENTOS QUE SE JUNTAM**
 
-1. Orçamento n.º 010125-ADIT, de 25-05-2026 — condições de pagamento e garantia
-2. Orçamentos n.os 010125 (versões de 07-01-2025 e 11-06-2025) e 010125-R
-3. Correspondência de 30-07-2025, 03-09-2025 e 04-09-2025 — esclarecimentos técnicos
-4. Correspondência de 25-09-2025 e 26-09-2025 — documentação solicitada e não entregue
-5. Comunicação de 25-02-2026 — infiltrações no 3.º Dt.º e 5.º Dt.º
-6. Comunicação do acompanhamento técnico de 08-04-2026 — defeito de imunização de armaduras
-7. Comunicação da administração de 09-06-2026 — designação da factura n.º 2026/4 como pendente
-8. Facturas n.os 2026/4, 2026/7 e 2026/8
+| | Documento | Sustenta |
+| --- | --- | --- |
+| **1** | Orçamento n.º 010125-ADIT, de 25-05-2026 (fachada lateral) | Cláusula de eficácia da adjudicação; tranche de 20% «na conclusão»; termo de garantia; prazo de 30 dias |
+| **2** | Orçamento n.º 010125-R | Cláusula de eficácia; data de 07-01-2025 no cabeçalho; material M004 |
+| **3** | Correspondência de 25 e 26-09-2025 — pedido de documentos e resposta | Ausência de contrato assinado; documentação nunca entregue |
+| **4** | Orçamento n.º 010125, versão de 07-01-2025 (€ 68.700,00) | Divergência face à versão contratual; cláusula de IVA original |
+| **5** | Correspondência de 30-07-2025, 03-09-2025 e 04-09-2025 — pedido de esclarecimentos e resposta | Entrega do «orçamento retificado» em Setembro; pedido anterior ao início da obra |
+| **6** | Ficha técnica Hidrostop Flex (SECIL TEK) | Exigência de protecção contra radiação U.V. |
+| **7** | Comunicação de 25-02-2026 — infiltrações no 3.º Dt.º e 5.º Dt.º | Defeitos comunicados e não sanados |
+| **8** | Comunicação do acompanhamento técnico de 08-04-2026 | Declaração de defeito de execução e reparação prescrita |
+| **9** | Facturas n.os 2026/4, 2026/7 e 2026/8 | Descrição genérica; datas; taxa de IVA praticada |
+| **10** | Comunicação da administração de 09-06-2026 | Designação da factura n.º 2026/4 como pendente |
+
+Mais se informa que a demais documentação referida na presente — designadamente a relativa às restantes ocorrências elencadas em II.F e às indicações de contas para pagamento — se encontra no processo do condomínio e será facultada a solicitação de V. Ex.ª ou em sede própria.
