@@ -44,12 +44,83 @@
 }
 
 @media print {
-  @page { size: A4; margin: 16mm; }
-  .no-print, nav, aside, header + div { display: none !important; }
-  body { background: #fff !important; color: #17201c !important; }
-  .print-report { max-width: none !important; padding: 0 !important; }
-  .print-report section, .print-report tr, .print-report li { break-inside: avoid; }
-  .print-report a { color: inherit !important; text-decoration: none !important; }
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+
+  /* Esconde apenas o que é cromo da aplicação. A regra anterior era
+     `nav, aside, header + div`, que apagava indiscriminadamente conteúdo em
+     qualquer página — incluindo dentro do próprio relatório. */
+  .no-print,
+  [data-chrome="app"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #141a17 !important;
+  }
+
+  .print-report {
+    max-width: none !important;
+    padding: 0 !important;
+    font-size: 9.5pt;
+    line-height: 1.45;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Um título nunca fica órfão no fim de uma página. */
+  .print-report h1,
+  .print-report h2,
+  .print-report h3 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  /* `break-inside: avoid` pertence aos itens, não às secções. Numa secção com
+     uma centena de acontecimentos, evitar o corte empurra o bloco inteiro para
+     a página seguinte e deixa metade de uma folha em branco. */
+  .print-report tr,
+  .print-report li,
+  .print-report [data-print-item] {
+    break-inside: avoid;
+  }
+
+  .print-report section {
+    break-inside: auto;
+    margin-top: 8mm;
+  }
+
+  /* Uma tabela que continua na página seguinte repete o cabeçalho. */
+  .print-report thead {
+    display: table-header-group;
+  }
+  .print-report tfoot {
+    display: table-footer-group;
+  }
+
+  /* O contentor de scroll horizontal cortava a tabela no papel. */
+  .print-report .overflow-x-auto {
+    overflow: visible !important;
+  }
+  .print-report table {
+    min-width: 0 !important;
+    width: 100% !important;
+    font-size: 8.5pt;
+  }
+
+  .print-report a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  /* Preserva as cores que carregam significado — a marca de conflito, o realce
+     de retenção — e achata as que só existem no ecrã. */
+  .print-report [class*="bg-alert"],
+  .print-report [class*="border-alert"] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 
 @layer components {
