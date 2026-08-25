@@ -1,0 +1,64 @@
+-- Factura 2026/7, ponto de tesouraria de 09-06-2026 e reforço da imputação do
+-- pagamento de 11-06-2026.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   factura_2026_7_e_imputacao_do_pagamento_de_junho
+--
+-- Uma fonte nova (MD5 b3ff2d80), três eventos e a reescrita de um.
+--
+-- ====================================================================
+-- FACTURA 2026/7 — 09-06-2026
+-- ====================================================================
+--   ATCUD J62NRRCP-7 | emissão e vencimento 09-06-2026
+--   Base 6.000,00 | IVA 6,00% (incidência 6.000,00) 360,00 | Total 6.360,00
+--   Adquirente EDIFICIO EUROPA, NIF 900228288
+--   Descrição: "Pintura do predio Morada rua professor Ribeiro jorge n7
+--   miraflores Algés" — sem fachada, sem fase, sem tranche.
+--
+-- Segunda factura do processo. Repete a estrutura da 2026/4: taxa ÚNICA de 6%
+-- sobre a totalidade. A repartição 6%/23% que o empreiteiro anunciara em
+-- 04-09-2025 continua sem qualquer expressão na facturação real.
+--
+-- ====================================================================
+-- O PONTO DE TESOURARIA — o documento que faltava
+-- ====================================================================
+-- 09-06-2026, 18:27, a administração aos administradores e ao Eng. Correia:
+--
+--   "Encaminho e-mail recebido do empreiteiro com a fatura (n.º 7) dos 40%
+--    referentes à execução de metade dos trabalhos de impermeabilização e
+--    pintura da fachada lateral.
+--    Recordo que se encontra por pagar a fatura (n.º 4) que enviaram há cerca
+--    de 2 semanas com a adjudicação dos trabalhos da fachada lateral [...]
+--    O valor total das mesmas é de 12.720,00€. O saldo da conta DO do
+--    condomínio, à data de hoje, é de 17.012,00€."
+--
+-- Este email faz duas coisas que os documentos fiscais não fazem:
+--   1. imputa expressamente cada factura à fachada lateral e à sua tranche;
+--   2. fixa que, a 09-06-2026, NENHUMA das duas estava liquidada.
+--
+-- ====================================================================
+-- A IMPUTAÇÃO DOS 6.360,00 EUR DE 11-06-2026
+-- ====================================================================
+-- Continua a ser inferência — duas facturas do processo têm exactamente o
+-- mesmo valor e nenhuma identifica a tranche. Mas a margem estreitou-se:
+--
+--   09-06-2026  a 2026/4 é assinalada por escrito como pendente há duas
+--               semanas; total em dívida 12.720,00 EUR
+--   11-06-2026  sai da conta exactamente 6.360,00 EUR — metade do total
+--
+-- Pagamento da factura mais antiga, dois dias depois de ela ter sido
+-- assinalada. O critério da antiguidade passa a ter suporte documental, mas
+-- não confirmação expressa: o evento mantém-se classificado como INFERÊNCIA.
+--
+-- ====================================================================
+-- PENDÊNCIA NOVA
+-- ====================================================================
+-- Adjudicação 26-05-2026. Factura de meio da obra 09-06-2026. Catorze dias.
+-- O 010125-ADIT prevê 40% / 40% / 20% mas não define como se afere o "meio da
+-- obra" nem quem o certifica. A afirmação de que metade foi ultrapassada é do
+-- próprio empreiteiro e não consta verificação técnica que a confirme, apesar
+-- de o acompanhamento técnico estar em cópia.
+--
+-- É o mesmo padrão da fachada tardoz, onde a tranche final só não foi paga
+-- sem controlo porque o Eng. Jaime Correia se deslocou ao local e RECUSOU a
+-- 02-12-2025, aprovando apenas a 06-12-2025.

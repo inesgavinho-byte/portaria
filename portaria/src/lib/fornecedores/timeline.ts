@@ -14,6 +14,11 @@
  *    coincidência de data e valor;
  *  - um pagamento declarado num mapa administrativo nunca é apresentado nem
  *    contabilizado como saída bancária confirmada;
+ *  - `tipo === "pagamento"` designa UM movimento de dinheiro. Um mapa que
+ *    agrega pagamentos, ou uma mensagem que confirma o recebimento de um
+ *    pagamento já registado, descreve-o em vez de o constituir e não é um
+ *    pagamento: tipificá-lo como tal soma-o às parcelas que resume e
+ *    inflaciona o total de declarados;
  *  - "saídas confirmadas" depende de `movimentos_bancarios.fornecedor_id` e
  *    não exige `despesa_id`: saber a quem se pagou não é saber que factura se
  *    pagou;
@@ -21,6 +26,7 @@
  */
 
 import type {
+  ContratoMemoriaFonte,
   ContratoMemoriaEvidencia,
   ContratoMemoriaNatureza,
   ContratoMemoriaTipo,
@@ -82,6 +88,12 @@ export type SupplierTimelineEvent = {
   mergedFrom?: { sourceType: SupplierTimelineSource; sourceId: string }[];
   evidence: SupplierTimelineEvidence[];
   evidenceCount: number;
+  /**
+   * Identificador do acontecimento de memória, quando o evento tem origem nele.
+   * É a chave necessária para lhe juntar evidência: os eventos derivados de
+   * despesas, movimentos ou obrigações não são citáveis por si.
+   */
+  memoriaId?: string;
   group: SupplierTimelineGroup;
   href?: string;
 };
@@ -91,7 +103,7 @@ export type SupplierTimelineEvidence = {
   localizador: string | null;
   citacao: string;
   papel: "primaria" | "corroboracao" | "contradicao";
-  fonte: { id: string; titulo: string; referencia: string | null; url: string | null } | null;
+  fonte: ContratoMemoriaFonte | null;
 };
 
 export type MemoriaEventoTimeline = {
@@ -272,6 +284,7 @@ function eventoDeMemoria(
 
   return {
     id: `memoria-${evento.id}`,
+    memoriaId: evento.id,
     date: evento.data_evento,
     kind,
     title: evento.titulo,

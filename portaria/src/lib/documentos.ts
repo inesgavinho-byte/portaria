@@ -1,3 +1,5 @@
+import type { DocumentoCategoria } from "@/types/database";
+
 /**
  * Constantes partilhadas do domínio Documentos.
  * Whitelist de tipos: o que a UI promete ("PDF, Word, Excel ou imagem").
@@ -18,8 +20,9 @@ export const DOCUMENTO_TIPOS_VALIDOS: Record<string, string> = {
 /** Valor para o atributo accept do input de ficheiro. */
 export const DOCUMENTO_ACCEPT = Object.keys(DOCUMENTO_TIPOS_VALIDOS).join(",");
 
-/** Rótulos das categorias — fonte única (antes duplicado em 3 sítios). */
-export const CATEGORIA_LABEL = {
+/** Rótulos das categorias — fonte única. Tipada sobre DocumentoCategoria para
+ *  que acrescentar uma categoria ao enum obrigue a dar-lhe um rótulo aqui. */
+export const CATEGORIA_LABEL: Record<DocumentoCategoria, string> = {
   ata: "Atas",
   conta: "Contas e Orçamentos",
   contrato: "Contratos",
@@ -27,12 +30,38 @@ export const CATEGORIA_LABEL = {
   manual: "Manuais",
   apolice: "Apólices",
   circular: "Circulares",
+  obra: "Obra",
+  seguro: "Seguros",
+  comunicacao: "Comunicações",
+  orcamento: "Orçamentos",
+  factura: "Facturas",
+  comprovativo: "Comprovativos",
+  ficha_tecnica: "Fichas técnicas",
+  parecer: "Pareceres técnicos",
+  interpelacao: "Interpelações",
   outro: "Outros",
-} as const;
+};
 
-export const CATEGORIAS = Object.keys(
-  CATEGORIA_LABEL
-) as (keyof typeof CATEGORIA_LABEL)[];
+export const CATEGORIAS = Object.keys(CATEGORIA_LABEL) as DocumentoCategoria[];
+
+/**
+ * Categorias do dossiê de um fornecedor, na ordem em que fazem sentido num
+ * processo de empreitada: primeiro o que o funda, depois o que o executa,
+ * depois o que o disputa.
+ */
+export const CATEGORIAS_DOSSIER: DocumentoCategoria[] = [
+  "comunicacao",
+  "orcamento",
+  "contrato",
+  "factura",
+  "comprovativo",
+  "parecer",
+  "ficha_tecnica",
+  "apolice",
+  "interpelacao",
+  "ata",
+  "outro",
+];
 
 /** Temas administrativos do Arquivo confidencial. */
 export const TEMA_DOCUMENTO_LABEL = {

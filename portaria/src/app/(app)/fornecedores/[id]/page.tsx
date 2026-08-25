@@ -11,13 +11,13 @@ import {
   Landmark,
   Pencil,
   ReceiptText,
+  Search,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { DownloadButton } from "@/components/app/download-button";
-import { DocumentoUploadInline } from "@/components/admin/documento-upload-inline";
 import { FornecedorArquivar } from "@/components/admin/fornecedor-arquivar";
 import {
   GRUPOS_TIMELINE,
@@ -34,6 +34,13 @@ import {
   type SupplierTimelineGroup,
   type SupplierTimelineKind,
 } from "@/lib/fornecedores/timeline";
+import { DossierArquivo, type ArquivoItem } from "@/components/admin/dossier-arquivo";
+import {
+  EvidenciaJuntar,
+  EvidenciaRemover,
+  type DocumentoEscolha,
+} from "@/components/admin/evidencia-juntar";
+import { CATEGORIA_LABEL } from "@/lib/documentos";
 import type { Documento, Fornecedor } from "@/types/database";
 
 const TIPO_LABEL: Record<SupplierTimelineKind, string> = {
@@ -52,6 +59,27 @@ const TIPO_LABEL: Record<SupplierTimelineKind, string> = {
   documento: "Documento",
   outro: "Registo",
 };
+
+/** Filtros por natureza. A ordem é a da utilidade: primeiro o que está em aberto. */
+const NATUREZAS_FILTRO: { valor: string; label: string }[] = [
+  { valor: "tudo", label: "Todas" },
+  { valor: "pendente", label: "Pendentes" },
+  { valor: "conflito", label: "Conflitos" },
+  { valor: "inferencia", label: "Inferências" },
+  { valor: "facto", label: "Factos" },
+];
+
+const PAPEL_LABEL_CURTO = {
+  primaria: "Primária",
+  corroboracao: "Corrobora",
+  contradicao: "Contradiz",
+} as const;
+
+const PAPEL_CLASSE = {
+  primaria: "bg-britishGreenSoft text-britishGreen",
+  corroboracao: "bg-softCream text-oliveGray",
+  contradicao: "bg-alert/10 text-alert",
+} as const;
 
 const NATUREZA_LABEL = {
   facto: "Facto",
@@ -103,7 +131,7 @@ export default async function FornecedorPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ vista?: string }>;
+  searchParams: Promise<{ vista?: string; natureza?: string; q?: string }>;
 }) {
   const [{ id }, filtros] = await Promise.all([params, searchParams]);
   const ctx = await requireAdmin();
@@ -142,6 +170,8 @@ export default async function FornecedorPage({
       .select("*")
       .eq("tenant_id", tenantId)
       .eq("fornecedor_id", id)
+      // A data do documento manda; o upload é só quando entrou no arquivo.
+      .order("data_documento", { ascending: false, nullsFirst: false })
       .order("upload_em", { ascending: false }),
     supabase
       .from("despesas")
@@ -159,7 +189,7 @@ export default async function FornecedorPage({
       ? supabase
           .from("contrato_memoria_eventos")
           .select(
-            "id,contrato_id,data_evento,tipo,titulo,resumo,natureza,valor_cents,despesa_id,movimento_id,efeito,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url))",
+            "id,contrato_id,data_evento,tipo,titulo,resumo,natureza,valor_cents,despesa_id,movimento_id,efeito,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url,documento_id))",
           )
           .eq("tenant_id", tenantId)
           .in("contrato_id", contratoIds)
@@ -212,12 +242,63 @@ export default async function FornecedorPage({
   const eventos = construirTimelineFornecedor(entrada);
   const resumo = resumirFinanceiroFornecedor(entrada);
 
+  // Quantas vezes cada documento do arquivo é citado no histórico. Um documento
+  // que ninguém cita é um ficheiro; a contagem torna isso visível.
+  const citacoesPorDocumento = new Map<string, number>();
+  for (const evento of eventos) {
+    for (const evidencia of evento.evidence) {
+      const documentoId = evidencia.fonte?.documento_id;
+      if (documentoId) {
+        citacoesPorDocumento.set(documentoId, (citacoesPorDocumento.get(documentoId) ?? 0) + 1);
+      }
+    }
+  }
+  const arquivo: ArquivoItem[] = docs.map((documento) => ({
+    id: documento.id,
+    titulo: documento.titulo,
+    categoria: documento.categoria,
+    data_documento: documento.data_documento,
+    contraparte: documento.contraparte,
+    n_mensagens: documento.n_mensagens,
+    citado: citacoesPorDocumento.get(documento.id) ?? 0,
+  }));
+  const escolhas: DocumentoEscolha[] = docs.map((documento) => ({
+    id: documento.id,
+    titulo: documento.titulo,
+    categoria: CATEGORIA_LABEL[documento.categoria],
+  }));
+
   const grupoAtivo = GRUPOS_TIMELINE.some((grupo) => grupo.valor === filtros.vista)
     ? (filtros.vista as SupplierTimelineGroup | "tudo")
     : "tudo";
-  const eventosVisiveis =
-    grupoAtivo === "tudo" ? eventos : eventos.filter((evento) => evento.group === grupoAtivo);
+  const naturezaAtiva = NATUREZAS_FILTRO.some((n) => n.valor === filtros.natureza)
+    ? filtros.natureza
+    : "tudo";
+  const termo = (filtros.q ?? "").trim().toLowerCase();
+
+  const eventosVisiveis = eventos.filter((evento) => {
+    if (grupoAtivo !== "tudo" && evento.group !== grupoAtivo) return false;
+    if (naturezaAtiva !== "tudo" && evento.nature !== naturezaAtiva) return false;
+    if (!termo) return true;
+    return (
+      evento.title.toLowerCase().includes(termo) ||
+      (evento.summary ?? "").toLowerCase().includes(termo) ||
+      evento.evidence.some((e) => e.citacao.toLowerCase().includes(termo))
+    );
+  });
   const eventosPorAno = agruparTimelinePorAno(eventosVisiveis);
+  const pendentes = eventos.filter((evento) => evento.nature === "pendente");
+  const filtrado = grupoAtivo !== "tudo" || naturezaAtiva !== "tudo" || termo.length > 0;
+  const rota = `/fornecedores/${id}`;
+  const comFiltros = (mudanca: Record<string, string | undefined>) => {
+    const params = new URLSearchParams();
+    const base = { vista: grupoAtivo, natureza: naturezaAtiva, q: filtros.q ?? "", ...mudanca };
+    for (const [chave, valor] of Object.entries(base)) {
+      if (valor && valor !== "tudo") params.set(chave, valor);
+    }
+    const query = params.toString();
+    return query ? `${rota}?${query}` : rota;
+  };
 
   const linhas = [
     ["Categoria", f.categoria],
@@ -229,7 +310,7 @@ export default async function FornecedorPage({
   ].filter(([, v]) => v) as [string, string][];
 
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto w-full max-w-[1680px]">
       <Link
         href="/fornecedores"
         className="mb-6 inline-flex items-center gap-1 font-body text-xs font-semibold uppercase tracking-[0.12em] text-oliveGray transition-colors hover:text-britishGreen"
@@ -268,14 +349,38 @@ export default async function FornecedorPage({
         </div>
       </div>
 
-      <div className="mb-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Resumo label="Despesas registadas" valor={formatCurrency(resumo.despesasRegistadasCents)} />
-        <Resumo label="Saídas confirmadas" valor={formatCurrency(resumo.saidasConfirmadasCents)} nota="Débitos com prova bancária" />
+      <div className="mb-3 grid gap-3 grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
+        <Resumo
+          label="Facturado"
+          valor={formatCurrency(resumo.despesasRegistadasCents)}
+          nota="Documento fiscal emitido"
+        />
+        <Resumo
+          label="Comprovado"
+          valor={formatCurrency(resumo.saidasConfirmadasCents)}
+          nota="Débitos com prova bancária"
+        />
+        <Resumo
+          label="Declarado"
+          valor={formatCurrency(resumo.pagamentosDeclaradosCents)}
+          nota="Sem prova bancária"
+          alerta={resumo.pagamentosDeclaradosCents > 0}
+        />
         <Resumo
           label="Em aberto"
           valor={formatCurrency(resumo.emAbertoCents)}
           destaque={resumo.emAbertoCents > 0}
-          nota={resumo.condicionadoCents > 0 ? `dos quais ${formatCurrency(resumo.condicionadoCents)} retidos` : undefined}
+          nota={
+            resumo.condicionadoCents > 0
+              ? `${formatCurrency(resumo.condicionadoCents)} retidos`
+              : undefined
+          }
+        />
+        <Resumo
+          label="Pendências"
+          valor={String(pendentes.length)}
+          alerta={pendentes.length > 0}
+          nota={pendentes.length > 0 ? "por resolver" : undefined}
         />
         <Resumo
           label="Obrigações activas"
@@ -313,8 +418,47 @@ export default async function FornecedorPage({
         </div>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.55fr)]">
-        <main className="min-w-0">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(300px,340px)] 2xl:grid-cols-[minmax(0,1fr)_380px]">
+        <main className="min-w-0 space-y-6">
+          {pendentes.length > 0 && !filtrado && (
+            <section className="portaria-panel overflow-hidden">
+              <div className="border-b border-britishGreen/10 px-5 py-4 md:px-6">
+                <p className="font-body text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-alert">
+                  Em aberto
+                </p>
+                <h2 className="mt-1 font-title text-h3 text-ink">
+                  {pendentes.length} {pendentes.length === 1 ? "pendência" : "pendências"}
+                </h2>
+                <p className="mt-1 font-body text-xs leading-5 text-oliveGray">
+                  O que falta resolver, decidir ou documentar. É esta a lista de trabalho do dossiê.
+                </p>
+              </div>
+              <ul className="divide-y divide-britishGreen/10">
+                {pendentes.slice(0, 8).map((evento) => (
+                  <li key={evento.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-3 md:px-6">
+                    <span className="w-20 shrink-0 font-body text-xs tabular-nums text-oliveGray">
+                      {formatDate(evento.date)}
+                    </span>
+                    <span className="min-w-0 flex-1 font-body text-sm text-ink">{evento.title}</span>
+                    {evento.amountCents !== undefined && (
+                      <span className="font-body text-sm font-semibold tabular-nums text-ink">
+                        {formatCurrency(evento.amountCents)}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {pendentes.length > 8 && (
+                <Link
+                  href={comFiltros({ natureza: "pendente", vista: "tudo" })}
+                  className="block border-t border-britishGreen/10 px-5 py-3 font-body text-xs font-semibold text-britishGreen transition-colors hover:bg-white/60 md:px-6"
+                >
+                  Ver as {pendentes.length} pendências no histórico
+                </Link>
+              )}
+            </section>
+          )}
+
           <section className="portaria-panel overflow-hidden">
             <div className="border-b border-britishGreen/10 px-5 py-4 md:px-6">
               <p className="font-body text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-britishGreen">
@@ -322,7 +466,71 @@ export default async function FornecedorPage({
               </p>
               <h2 className="mt-1 font-title text-h3 text-ink">Relação com o condomínio</h2>
               {eventos.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-1.5">
+                <form action={rota} className="mt-4 flex flex-wrap items-center gap-2">
+                  {grupoAtivo !== "tudo" && <input type="hidden" name="vista" value={grupoAtivo} />}
+                  {naturezaAtiva !== "tudo" && (
+                    <input type="hidden" name="natureza" value={naturezaAtiva} />
+                  )}
+                  <label className="relative flex min-w-[13rem] flex-1 items-center">
+                    <Search className="pointer-events-none absolute left-3 h-3.5 w-3.5 text-oliveGray" />
+                    <input
+                      name="q"
+                      defaultValue={filtros.q ?? ""}
+                      placeholder="Procurar no histórico e nas citações"
+                      className="w-full rounded-lg border border-britishGreen/15 bg-paper py-2 pl-9 pr-3 font-body text-xs text-ink placeholder:text-oliveGray/70 focus:border-britishGreen/40 focus:outline-none"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-britishGreen px-3 py-2 font-body text-[0.7rem] font-semibold text-white transition-colors hover:bg-britishGreenDeep"
+                  >
+                    Procurar
+                  </button>
+                  {filtrado && (
+                    <Link
+                      href={rota}
+                      className="rounded-lg border border-britishGreen/15 px-3 py-2 font-body text-[0.7rem] font-semibold text-oliveGray transition-colors hover:text-britishGreen"
+                    >
+                      Limpar
+                    </Link>
+                  )}
+                </form>
+              )}
+
+              {eventos.length > 0 && (
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  <span className="mr-1 font-body text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">
+                    Natureza
+                  </span>
+                  {NATUREZAS_FILTRO.map((natureza) => {
+                    const total =
+                      natureza.valor === "tudo"
+                        ? eventos.length
+                        : eventos.filter((evento) => evento.nature === natureza.valor).length;
+                    if (total === 0) return null;
+                    const activo = natureza.valor === naturezaAtiva;
+                    return (
+                      <Link
+                        key={natureza.valor}
+                        href={comFiltros({ natureza: natureza.valor })}
+                        className={`rounded-lg px-2.5 py-1 font-body text-[0.7rem] font-semibold transition-colors ${
+                          activo
+                            ? "bg-britishGreen text-white"
+                            : "border border-britishGreen/15 text-oliveGray hover:text-britishGreen"
+                        }`}
+                      >
+                        {natureza.label} <span className="tabular-nums opacity-70">{total}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+
+              {eventos.length > 0 && (
+                <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <span className="mr-1 font-body text-[0.64rem] font-semibold uppercase tracking-[0.1em] text-oliveGray">
+                    Vista
+                  </span>
                   {GRUPOS_TIMELINE.map((grupo) => {
                     const total =
                       grupo.valor === "tudo"
@@ -333,7 +541,7 @@ export default async function FornecedorPage({
                     return (
                       <Link
                         key={grupo.valor}
-                        href={grupo.valor === "tudo" ? `/fornecedores/${id}` : `/fornecedores/${id}?vista=${grupo.valor}`}
+                        href={comFiltros({ vista: grupo.valor })}
                         className={`rounded-lg px-2.5 py-1 font-body text-[0.7rem] font-semibold transition-colors ${
                           ativo
                             ? "bg-britishGreen text-white"
@@ -347,6 +555,12 @@ export default async function FornecedorPage({
                 </div>
               )}
             </div>
+
+            {filtrado && eventosVisiveis.length > 0 && (
+              <p className="border-b border-britishGreen/10 bg-white/40 px-5 py-2.5 font-body text-[0.7rem] text-oliveGray md:px-6">
+                {eventosVisiveis.length} de {eventos.length} acontecimentos correspondem ao filtro.
+              </p>
+            )}
 
             {eventosVisiveis.length === 0 ? (
               <p className="px-6 py-10 font-body text-sm text-oliveGray">
@@ -369,7 +583,12 @@ export default async function FornecedorPage({
                     </div>
                     <div className="space-y-0">
                       {eventosAno.map((evento) => (
-                        <Evento key={evento.id} evento={evento} />
+                        <Evento
+                          key={evento.id}
+                          evento={evento}
+                          escolhas={escolhas}
+                          rota={rota}
+                        />
                       ))}
                     </div>
                   </div>
@@ -377,6 +596,10 @@ export default async function FornecedorPage({
               </div>
             )}
           </section>
+
+          <DossierArquivo fornecedorId={id} redirectTo={rota} itens={arquivo}>
+            {(item) => <DownloadButton documentoId={item.id} />}
+          </DossierArquivo>
         </main>
 
         <aside className="space-y-6">
@@ -429,36 +652,6 @@ export default async function FornecedorPage({
             )}
           </section>
 
-          <section className="portaria-panel overflow-hidden">
-            <div className="border-b border-britishGreen/10 px-5 py-4">
-              <p className="font-body text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-britishGreen">
-                Documentos
-              </p>
-              <p className="mt-1 font-body text-[0.7rem] leading-4 text-oliveGray">
-                Fontes do dossiê. Um documento é fonte; um acontecimento vive no histórico.
-              </p>
-            </div>
-            {docs.length > 0 && (
-              <ul className="divide-y divide-britishGreen/10">
-                {docs.map((d) => (
-                  <li key={d.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
-                    <span className="flex min-w-0 items-center gap-2.5">
-                      <FileText className="h-4 w-4 shrink-0 text-britishGreen" />
-                      <span className="truncate font-body text-sm text-ink">{d.titulo}</span>
-                    </span>
-                    <DownloadButton documentoId={d.id} />
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="border-t border-britishGreen/10 bg-white/40 p-4">
-              <DocumentoUploadInline
-                fornecedorId={id}
-                redirectTo={`/fornecedores/${id}`}
-                categoriaDefault="regulamento"
-              />
-            </div>
-          </section>
         </aside>
       </div>
     </div>
@@ -469,19 +662,25 @@ function Resumo({
   label,
   valor,
   destaque = false,
+  alerta = false,
   nota,
 }: {
   label: string;
   valor: string;
   destaque?: boolean;
+  /** Marca o mosaico como merecedor de atenção sem o tratar como erro. */
+  alerta?: boolean;
   nota?: string;
 }) {
+  const cor = destaque ? "text-alert" : alerta ? "text-britishGreenDeep" : "text-ink";
   return (
-    <div className="portaria-panel px-4 py-4">
-      <p className="font-body text-[0.67rem] font-semibold uppercase tracking-[0.11em] text-oliveGray">{label}</p>
-      <p
-        className={`mt-2 font-body text-xl font-semibold tracking-[-0.025em] ${destaque ? "text-alert" : "text-ink"}`}
-      >
+    <div
+      className={`portaria-panel px-4 py-4 ${alerta && !destaque ? "ring-1 ring-inset ring-warmBeige/70" : ""}`}
+    >
+      <p className="font-body text-[0.67rem] font-semibold uppercase tracking-[0.11em] text-oliveGray">
+        {label}
+      </p>
+      <p className={`mt-2 font-body text-xl font-semibold tracking-[-0.025em] tabular-nums ${cor}`}>
         {valor}
       </p>
       {nota && <p className="mt-1.5 font-body text-[0.68rem] leading-4 text-oliveGray">{nota}</p>}
@@ -499,12 +698,20 @@ function Aviso({ tom, children }: { tom: "neutro" | "alerta"; children: React.Re
   );
 }
 
-function Evento({ evento }: { evento: SupplierTimelineEvent }) {
+function Evento({
+  evento,
+  escolhas,
+  rota,
+}: {
+  evento: SupplierTimelineEvent;
+  escolhas: DocumentoEscolha[];
+  rota: string;
+}) {
   const mostrarNatureza = evento.nature !== undefined && evento.nature !== "facto";
   const resumoCurto = evento.summary && evento.summary.length > 190;
 
   const conteudo = (
-    <div className="grid grid-cols-[82px_30px_minmax(0,1fr)_auto] gap-2 py-3.5 md:grid-cols-[96px_34px_minmax(0,1fr)_auto]">
+    <div className="grid grid-cols-[72px_28px_minmax(0,1fr)] gap-x-2 gap-y-1 py-3.5 sm:grid-cols-[86px_32px_minmax(0,1fr)_auto] md:grid-cols-[104px_34px_minmax(0,1fr)_auto] md:gap-x-3">
       <div className="pt-0.5 font-body text-xs text-oliveGray">{formatDate(evento.date)}</div>
       <div className="relative flex justify-center">
         <span className="absolute bottom-[-14px] top-6 w-px bg-britishGreen/10 last:hidden" />
@@ -558,26 +765,43 @@ function Evento({ evento }: { evento: SupplierTimelineEvent }) {
             <p className="mt-1 font-body text-xs leading-5 text-oliveGray">{evento.summary}</p>
           </details>
         )}
-        {evento.evidenceCount > 0 && (
-          <details className="mt-2">
-            <summary className="cursor-pointer list-none font-body text-[0.68rem] font-semibold text-britishGreen">
-              Ver evidência ({evento.evidenceCount})
-            </summary>
-            <ul className="mt-2 space-y-2 border-l-2 border-britishGreen/15 pl-3">
+        <details className="mt-2" open={evento.evidenceCount === 0 ? false : undefined}>
+          <summary className="cursor-pointer list-none font-body text-[0.68rem] font-semibold text-britishGreen">
+            {evento.evidenceCount > 0 ? (
+              <>Evidência ({evento.evidenceCount})</>
+            ) : (
+              <span className="text-oliveGray">Sem evidência associada</span>
+            )}
+          </summary>
+          {evento.evidenceCount > 0 && (
+            <ul className="mt-2 space-y-2.5 border-l-2 border-britishGreen/15 pl-3">
               {evento.evidence.map((evidencia) => (
                 <li key={evidencia.id} className="font-body text-[0.7rem] leading-5 text-oliveGray">
-                  <span className="font-semibold text-ink">{evidencia.fonte?.titulo ?? "Fonte documental"}</span>
-                  {evidencia.localizador ? ` · ${evidencia.localizador}` : ""}
-                  {evidencia.papel !== "primaria" ? ` · ${evidencia.papel}` : ""}
-                  <br />
-                  <span className="italic">“{evidencia.citacao}”</span>
+                  <span className="flex flex-wrap items-baseline gap-x-1.5">
+                    <span className="font-semibold text-ink">
+                      {evidencia.fonte?.titulo ?? "Fonte documental"}
+                    </span>
+                    {evidencia.localizador && <span>· {evidencia.localizador}</span>}
+                    <span className={`rounded px-1.5 py-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.06em] ${PAPEL_CLASSE[evidencia.papel]}`}>
+                      {PAPEL_LABEL_CURTO[evidencia.papel]}
+                    </span>
+                    <EvidenciaRemover evidenciaId={evidencia.id} redirectTo={rota} />
+                  </span>
+                  <span className="mt-0.5 block border-l-2 border-warmBeige/60 pl-2 italic">
+                    “{evidencia.citacao}”
+                  </span>
                 </li>
               ))}
             </ul>
-          </details>
-        )}
+          )}
+          {evento.memoriaId && (
+            <div className="mt-2.5">
+              <EvidenciaJuntar eventoId={evento.memoriaId} redirectTo={rota} documentos={escolhas} />
+            </div>
+          )}
+        </details>
       </div>
-      <div className="pl-2 text-right font-body text-sm font-semibold tabular-nums text-ink">
+      <div className="col-start-3 font-body text-sm font-semibold tabular-nums text-ink sm:col-start-4 sm:pl-2 sm:text-right">
         {evento.amountCents !== undefined ? formatCurrency(evento.amountCents) : ""}
       </div>
     </div>

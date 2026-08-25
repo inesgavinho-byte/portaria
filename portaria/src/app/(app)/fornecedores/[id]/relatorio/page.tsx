@@ -29,7 +29,7 @@ export default async function RelatorioFornecedorPage({ params, searchParams }: 
   const cts = (contratos ?? []) as Contrato[];
   const contratoIds = cts.map((contrato) => contrato.id);
   const despesaQuery = supabase.from("despesas").select("*").eq("tenant_id", ctx.tenant.id).eq("fornecedor_id", id);
-  const memoriaQuery = contratoIds.length ? supabase.from("contrato_memoria_eventos").select("id,contrato_id,data_evento,tipo,titulo,resumo,natureza,valor_cents,despesa_id,movimento_id,efeito,criado_em,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url))").eq("tenant_id", ctx.tenant.id).in("contrato_id", contratoIds).order("data_evento", { ascending: true }).order("criado_em", { ascending: true }) : Promise.resolve({ data: [] });
+  const memoriaQuery = contratoIds.length ? supabase.from("contrato_memoria_eventos").select("id,contrato_id,data_evento,tipo,titulo,resumo,natureza,valor_cents,despesa_id,movimento_id,efeito,criado_em,contrato_memoria_evidencias(id,localizador,citacao,papel,ia_documental_fontes(id,titulo,referencia,url,documento_id))").eq("tenant_id", ctx.tenant.id).in("contrato_id", contratoIds).order("data_evento", { ascending: true }).order("criado_em", { ascending: true }) : Promise.resolve({ data: [] });
   const [{ data: despesas }, { data: memoria }] = await Promise.all([
     despesaQuery.order("data_documento", { ascending: true }),
     memoriaQuery,
