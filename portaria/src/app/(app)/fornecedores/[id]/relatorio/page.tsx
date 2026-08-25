@@ -3,7 +3,13 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { RelatorioFornecedor, type MovimentoRelatorio } from "@/components/relatorios/relatorio-fornecedor";
 import { apurarTotais } from "@/lib/relatorios/apuramentos";
-import type { Contrato, ContratoMemoriaEvento, Despesa, Fornecedor } from "@/types/database";
+import type {
+  Contrato,
+  ContratoMemoriaEvento,
+  Despesa,
+  Fornecedor,
+  PosicaoImputacao,
+} from "@/types/database";
 
 const anoDe = (valor: string | null) => {
   if (!valor) return null;
@@ -137,6 +143,22 @@ async function CorpoRelatorio({ params, searchParams }: RelatorioProps) {
   ].sort((a, b) => a.data_movimento.localeCompare(b.data_movimento));
   const todosEventos = (memoria ?? []) as ContratoMemoriaEvento[];
 
+  // Posições das partes sobre a imputação dos pagamentos deste fornecedor.
+  // Consulta separada e por movimento: as posições não pertencem à memória do
+  // contrato, e nenhum apuramento financeiro as lê.
+  const movimentoIds = todosMovimentos.map((movimento) => movimento.id);
+  const { data: posicoesData } = movimentoIds.length
+    ? await supabase
+        .from("imputacoes_posicoes")
+        .select(
+          "id,tenant_id,movimento_id,despesa_id,parte,parte_descricao,tipo,fundamento,estado,data_posicao,observacoes,criado_em,atualizado_em,imputacoes_posicoes_evidencias(id,localizador,citacao,ia_documental_fontes(id,titulo,referencia,url,documento_id))",
+        )
+        .eq("tenant_id", ctx.tenant.id)
+        .in("movimento_id", movimentoIds)
+        .order("data_posicao", { ascending: true })
+    : { data: [] };
+  const todasPosicoes = (posicoesData ?? []) as PosicaoImputacao[];
+
   const anos = Array.from(
     new Set(
       [
@@ -163,6 +185,9 @@ async function CorpoRelatorio({ params, searchParams }: RelatorioProps) {
       despesas={despesasPeriodo}
       movimentos={movimentosPeriodo}
       eventos={eventosPeriodo}
+      posicoes={todasPosicoes.filter((posicao) =>
+        movimentosPeriodo.some((movimento) => movimento.id === posicao.movimento_id),
+      )}
       anos={anos}
       ano={ano}
       financeiro={financeiro}

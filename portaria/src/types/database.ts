@@ -234,6 +234,61 @@ export type ContratoMemoriaEvidencia = {
 /** Efeito de um acontecimento de memória sobre o objecto financeiro ligado. */
 export type ContratoMemoriaEfeito = "emissao" | "confirmacao_pagamento" | "retencao" | "suspensao";
 
+/* ------------------------------------------------------- posições de imputação */
+
+/**
+ * Quem sustenta uma posição sobre a imputação de um pagamento.
+ *
+ * `terceiro` cobre acompanhamento técnico, perito ou mandatário de outra parte
+ * — quem não é o condomínio nem a contraparte do contrato.
+ */
+export type PosicaoParte = "condominio" | "contraparte" | "terceiro";
+
+/** O que sustenta. `reserva` é declarar expressamente que não se toma posição. */
+export type PosicaoTipo = "imputa" | "nao_imputa" | "reserva";
+
+/**
+ * Em que pé está. Uma posição retirada ou superada não se apaga: o processo
+ * precisa de saber que existiu e quando deixou de ser sustentada.
+ */
+export type PosicaoEstado = "sustentada" | "aceite" | "retirada" | "superada";
+
+/**
+ * Posição de uma parte sobre a imputação de um movimento bancário a uma
+ * despesa.
+ *
+ * Nunca substitui `movimentos_bancarios.despesa_id`, que continua a significar
+ * uma só coisa: a factura que o processo demonstra ter sido liquidada por
+ * aquele movimento. Uma posição vive ao lado dessa ligação, não dentro dela, e
+ * nenhum apuramento financeiro a lê.
+ */
+export type PosicaoImputacao = {
+  id: string;
+  tenant_id: string;
+  movimento_id: string;
+  /** Factura candidata. Nula apenas quando a posição é de reserva. */
+  despesa_id: string | null;
+  parte: PosicaoParte;
+  /** Quem em concreto, quando importa: "Rui Machado da Silva, mandatário". */
+  parte_descricao: string | null;
+  tipo: PosicaoTipo;
+  fundamento: string;
+  estado: PosicaoEstado;
+  /** Quando a parte a assumiu, não quando foi registada. */
+  data_posicao: string;
+  observacoes: string | null;
+  criado_em: string;
+  atualizado_em: string;
+  imputacoes_posicoes_evidencias?: PosicaoImputacaoEvidencia[];
+};
+
+export type PosicaoImputacaoEvidencia = {
+  id: string;
+  localizador: string | null;
+  citacao: string;
+  ia_documental_fontes: ContratoMemoriaFonte[];
+};
+
 export type ContratoMemoriaEvento = {
   id: string;
   data_evento: string;

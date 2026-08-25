@@ -18,6 +18,12 @@ import { RelatorioFornecedorImprimir } from "@/components/admin/relatorio-fornec
 import { conflitosDocumentais, propostasComValor } from "@/lib/relatorios/valores-fornecedor";
 import { agruparPorAno, indexarEvidencias, type IndiceEvidencias } from "@/lib/relatorios/evidencias";
 import {
+  agruparImputacoes,
+  PARTE_LABEL,
+  TIPO_LABEL,
+  type ImputacaoDeMovimento,
+} from "@/lib/relatorios/imputacoes";
+import {
   Celula,
   MarcaNatureza,
   NotaRodape,
@@ -31,7 +37,7 @@ import {
   euro,
   type Coluna,
 } from "@/components/relatorios/relatorio-ui";
-import type { Contrato, ContratoMemoriaEvento, Despesa, Fornecedor } from "@/types/database";
+import type { Contrato, ContratoMemoriaEvento, Despesa, Fornecedor, PosicaoImputacao } from "@/types/database";
 
 export type MovimentoRelatorio = {
   id: string;
@@ -68,6 +74,11 @@ export type DadosRelatorio = {
   despesas: Despesa[];
   movimentos: MovimentoRelatorio[];
   eventos: ContratoMemoriaEvento[];
+  /**
+   * Posições das partes sobre a imputação de pagamentos. Vazio no caso normal:
+   * um pagamento pacífico não tem posições, e a secção não aparece.
+   */
+  posicoes: PosicaoImputacao[];
   /** Anos com actividade, do mais recente para o mais antigo. */
   anos: string[];
   /** Ano seleccionado, ou "" para todo o histórico. */
@@ -86,6 +97,7 @@ export function RelatorioFornecedor({
   despesas: despesasPeriodo,
   movimentos: movimentosPeriodo,
   eventos: eventosPeriodo,
+  posicoes,
   anos,
   ano,
   financeiro,
@@ -107,6 +119,7 @@ export function RelatorioFornecedor({
   const pendencias = eventosPeriodo.filter((e) => e.natureza === "pendente");
   const propostas = propostasComValor(eventosPeriodo);
   const indice = indexarEvidencias(eventosPeriodo);
+  const imputacoes = agruparImputacoes(posicoes, movimentosPeriodo, despesasPeriodo);
 
   /*
    * O modo financeiro omite a secção de fontes. Uma referência `[E04]` sem a
@@ -299,6 +312,25 @@ export function RelatorioFornecedor({
             </div>
           )}
         </Secao>
+
+        {/* --------------------------------------------- imputação controvertida */}
+        {imputacoes.length > 0 && (
+          <Secao
+            titulo="Imputação de pagamentos"
+            nota={`${imputacoes.filter((i) => i.controvertida).length} em divergência`}
+          >
+            <div className="space-y-5">
+              {imputacoes.map((imputacao) => (
+                <BlocoImputacao key={imputacao.movimentoId} imputacao={imputacao} saldoGlobalCents={emAberto} />
+              ))}
+            </div>
+            <NotaRodape>
+              O pagamento é facto bancário. A factura que cada parte sustenta ter sido liquidada é posição, e como tal
+              fica identificada. Nenhuma posição é adoptada pelo relatório, e nenhuma entra no apuramento: o saldo é o
+              mesmo em qualquer das leituras.
+            </NotaRodape>
+          </Secao>
+        )}
 
         {/* ------------------------------------------------------- contratos */}
         {!financeiro && (
@@ -564,6 +596,90 @@ function Campo({ termo, valor }: { termo: string; valor: string }) {
     <div>
       <dt className="font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-oliveGray">{termo}</dt>
       <dd className="mt-1 font-body text-sm text-ink">{valor}</dd>
+    </div>
+  );
+}
+
+/**
+ * Um pagamento e o que cada parte sustenta sobre ele.
+ *
+ * A hierarquia visual é deliberada: primeiro o que está provado — saiu dinheiro,
+ * e que factura o processo reconcilia — depois, separado por um filete, o que
+ * cada parte sustenta. Nunca se escolhe uma das posições, e a linha do saldo
+ * fecha a leitura mostrando que ele não depende da escolha.
+ */
+function BlocoImputacao({
+  imputacao,
+  saldoGlobalCents,
+}: {
+  imputacao: ImputacaoDeMovimento;
+  saldoGlobalCents: number;
+}) {
+  return (
+    <div
+      data-bloco
+      data-realce={imputacao.controvertida ? "" : undefined}
+      className={`px-5 py-4 ${
+        imputacao.controvertida ? "border-l-2 border-alert/60 bg-alert/5" : "border-l-2 border-britishGreen/30 bg-paper"
+      }`}
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h3 className="font-body text-sm font-semibold text-ink">
+          Imputação do pagamento de {dataCurta(imputacao.dataMovimento)} — {euro(imputacao.valorCents)}
+        </h3>
+        {imputacao.controvertida && <MarcaNatureza natureza="conflito" />}
+      </div>
+
+      <dl className="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2">
+        <Facto termo="Pagamento bancário" valor={imputacao.confirmado ? "Confirmado" : "Por confirmar"} />
+        <Facto
+          termo="Factura identificada no movimento"
+          valor={imputacao.facturaReconciliada ?? "Não"}
+        />
+        {/*
+          Fecha a leitura: o saldo é o mesmo qualquer que seja a posição que
+          venha a prevalecer. O que difere é qual factura fica por liquidar e a
+          partir de que data correriam juros — não quanto se deve.
+        */}
+        <Facto termo="Saldo global" valor={`${euro(saldoGlobalCents)} em ambas as leituras`} />
+      </dl>
+
+      <ul className="mt-4 space-y-3 border-t border-britishGreen/15 pt-3">
+        {imputacao.posicoes.map((posicao) => (
+          <li key={posicao.id}>
+            <p className="font-body text-xs leading-5 text-ink">
+              <span className="font-semibold">Posição {PARTE_LABEL[posicao.parte]}</span>
+              {posicao.parteDescricao ? ` (${posicao.parteDescricao})` : ""} — {TIPO_LABEL[posicao.tipo]}
+              {posicao.facturaNumero ? ` ${posicao.facturaNumero}` : ""}
+              <span className="text-oliveGray"> · {dataCurta(posicao.data)}</span>
+              {posicao.estado !== "sustentada" && (
+                <span className="text-oliveGray"> · {posicao.estado}</span>
+              )}
+            </p>
+            <p className="mt-0.5 max-w-[85ch] font-body text-xs leading-5 text-oliveGray">{posicao.fundamento}</p>
+            {posicao.evidencias.length > 0 && (
+              <ul className="mt-1.5 space-y-1 border-l border-britishGreen/20 pl-3">
+                {posicao.evidencias.map((evidencia) => (
+                  <li key={evidencia.id} className="font-body text-[11px] leading-4 text-oliveGray">
+                    <span className="italic">“{evidencia.citacao}”</span>
+                    {evidencia.fonte ? ` — ${evidencia.fonte}` : ""}
+                    {evidencia.localizador ? `, ${evidencia.localizador}` : ""}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Facto({ termo, valor }: { termo: string; valor: string }) {
+  return (
+    <div className="flex flex-wrap items-baseline gap-x-3">
+      <dt className="font-body text-[10px] font-semibold uppercase tracking-[0.14em] text-oliveGray">{termo}</dt>
+      <dd className="font-body text-sm text-ink">{valor}</dd>
     </div>
   );
 }
