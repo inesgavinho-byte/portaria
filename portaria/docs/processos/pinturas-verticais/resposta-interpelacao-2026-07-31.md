@@ -32,31 +32,33 @@ Concluída essa reconstituição, e porque a V/ carta convoca a totalidade da re
 
 ---
 
-## I. A empreitada nunca teve contrato assinado
+## I. A folha de adjudicação antecede em três meses o documento que aparenta adjudicar
 
 Este é o ponto de partida, e condiciona todos os demais.
 
-Todas as versões da proposta apresentada pela Empreiteira — o orçamento n.º 010125, de Janeiro de 2025, as suas versões subsequentes, o orçamento n.º 010125-R e o orçamento n.º 010125-ADIT — contêm, sob as condições, a seguinte cláusula, redigida pela própria Empreiteira:
+O exemplar assinado do orçamento n.º 010125-R que se encontra na posse do condomínio é composto por oito páginas, sendo a oitava uma folha autónoma de **Adjudicação**, datada de «Agualva-Cacém, 03 de Junho de 2025», com assinatura sob a menção «O Empreiteiro» (**Doc. 2**).
 
-> «A adjudicação só será considerada após a entrega do duplicado da proposta devidamente assinada.»
+Sucede que o corpo a que essa folha se encontra aposta **só foi entregue ao condomínio em 4 de Setembro de 2025**, como anexo ao e-mail dessa data e sob a designação, dada pela própria Empreiteira, de «orçamento retificado» (**Doc. 5**).
 
-(cfr. **Doc. 1** e **Doc. 2**)
+Não se trata do mesmo texto que circulava em Junho. O corpo assinado contém:
 
-**Não existe, no processo do condomínio, qualquer orçamento ou contrato assinado pela Empreiteira. Não existe quanto à fachada tardoz, não existe quanto à fachada da frente, não existe quanto à fachada lateral.**
+- o prazo de conclusão de **45 dias**, quando as versões anteriores previam **2 meses**;
+- a cláusula «acresce IVA, **a combinar**», quando a versão aceite em assembleia dizia «acresce IVA **à taxa legal em vigor**»;
+- a especificação de «duas demãos de argamassa de impermeabilização **Hidrostop flex**» nas floreiras, e o correspondente material **M004** na ficha técnica.
 
-Não se trata de omissão superveniente. Em 25 de Setembro de 2025 — com a obra em curso desde 1 de Setembro e com € 22.000,00 já pagos — a administração então em funções solicitou por escrito à Empreiteira, «com urgência», o orçamento adjudicado assinado. A Empreiteira respondeu no dia seguinte que os documentos «já foram enviados em tempo e continuam válidos à presente data». Oito minutos depois, a administração contrapôs, por escrito:
+E, de forma decisiva: **em 11 de Junho de 2025 — oito dias depois da data que a folha de adjudicação ostenta — a Empreiteira remeteu à administração uma versão do mesmo orçamento que não contém a argamassa Hidrostop Flex nem o material M004**, listando apenas os materiais M001 a M003 (**Doc. 4-A**).
 
-> «Quanto ao orçamento assinado, não temos qualquer exemplar com assinatura, pelo que agradeço o respetivo envio.»
+Dito de outro modo: **o que foi assinado em 3 de Junho não pode ser o texto entregue em 4 de Setembro.** As especificações que hoje constam do exemplar assinado não existiam na versão que a própria Empreiteira remeteu oito dias após a data da adjudicação.
 
-(cfr. **Doc. 3**)
+Desta constatação decorrem três consequências, que se deixam expressas:
 
-O documento nunca foi entregue. Nem então, nem depois.
+**a)** A folha de adjudicação **não identifica qual das versões adjudica**. É uma folha autónoma, sem menção de valor, de âmbito, de fachada ou de qualquer elemento que permita associá-la a um texto determinado. Contém apenas a palavra «Adjudicação», o local, a data e os espaços de assinatura.
 
-Toda a execução, toda a facturação e a totalidade das quantias pagas assentam, pois, em propostas não assinadas — cuja versão de referência, como se verá, mudou três vezes sob a mesma numeração, e cujo âmbito foi sendo alterado por correspondência electrónica.
+**b)** O exemplar da proposta assinado que a Empreiteira se obrigou a devolver — e de que fez depender a eficácia da própria adjudicação, ao estipular que «a adjudicação só será considerada após a entrega do duplicado da proposta devidamente assinada» — **nunca foi entregue ao condomínio**. Em 25 de Setembro de 2025, com a obra em curso desde 1 de Setembro e com € 22.000,00 já pagos, a administração solicitou-o «com urgência». A Empreiteira respondeu que os documentos «já foram enviados em tempo e continuam válidos à presente data». Oito minutos depois, a administração contrapôs por escrito: «Quanto ao orçamento assinado, não temos qualquer exemplar com assinatura, pelo que agradeço o respetivo envio» (**Doc. 3**). O documento nunca chegou.
 
-Fazemos notar que é a Empreiteira quem invoca as suas propostas como título da dívida que reclama. Não pode invocá-las para o que lhe aproveita e desconsiderar a cláusula que nelas fez inscrever quanto à sua própria eficácia.
+**c)** O âmbito contratual foi, em consequência, **sendo definido por correspondência electrónica sobre uma base documental instável** — três ficheiros distintos sob a mesma referência 010125, divergentes entre si quanto ao valor global, à cláusula de IVA, ao prazo e aos materiais, como se detalha em II.A.
 
----
+Fazemos notar que é a Empreiteira quem invoca as suas propostas como título da dívida que reclama. Não pode invocá-las para o que lhe aproveita e desconsiderar quer a cláusula que nelas fez inscrever quanto à sua própria eficácia, quer a instabilidade do texto que ela própria produziu.
 
 ## II. Cronologia documentada
 
@@ -74,7 +76,7 @@ Em 14 de Abril de 2025 a administração decidiu adjudicar por fachadas, começa
 | --- | --- | --- | --- | --- | --- |
 | 1.ª (66032d3a) | 07-01-2025, comparada em 30-01-2025 e aceite em assembleia | € 68.700,00 | «acresce IVA à taxa legal em vigor» | 2 meses | M001 a M003 |
 | 2.ª (b28f4a71) | reenviada em 11-06-2025 | € 63.000,00 | «acresce IVA, a combinar» | 2 meses | M001 a M003 |
-| 3.ª (c9936e04) — o «010125-R» | entregue em 04-09-2025 | € 63.000,00 | «acresce IVA, a combinar» | 45 dias | M001 a **M004** |
+| 3.ª (c9936e04) — o «010125-R», **corpo do exemplar assinado** | entregue em 04-09-2025 | € 63.000,00 | «acresce IVA, a combinar» | 45 dias | M001 a **M004** |
 
 (cfr. **Doc. 2**, **Doc. 4** e **Doc. 5**)
 
@@ -285,9 +287,10 @@ _______________________________________
 | | Documento | Sustenta |
 | --- | --- | --- |
 | **1** | Orçamento n.º 010125-ADIT, de 25-05-2026 (fachada lateral) | Cláusula de eficácia da adjudicação; tranche de 20% «na conclusão»; termo de garantia; prazo de 30 dias |
-| **2** | Orçamento n.º 010125-R | Cláusula de eficácia; data de 07-01-2025 no cabeçalho; material M004 |
+| **2** | Orçamento n.º 010125-R — **exemplar assinado, 8 páginas** | Folha de adjudicação de 03-06-2025; corpo com 45 dias, «IVA a combinar» e material M004; data de início a 01/06/2025 na pág. 1 |
 | **3** | Correspondência de 25 e 26-09-2025 — pedido de documentos e resposta | Ausência de contrato assinado; documentação nunca entregue |
-| **4** | Orçamento n.º 010125, versão de 07-01-2025 (€ 68.700,00) | Divergência face à versão contratual; cláusula de IVA original |
+| **4** | Orçamento n.º 010125, versão de 07-01-2025 (€ 68.700,00) | Divergência face à versão contratual; cláusula de IVA original; prazo de 2 meses |
+| **4-A** | Orçamento n.º 010125, versão remetida em 11-06-2025 | Ausência de Hidrostop Flex e do material M004 oito dias após a data da adjudicação |
 | **5** | Correspondência de 30-07-2025, 03-09-2025 e 04-09-2025 — pedido de esclarecimentos e resposta | Entrega do «orçamento retificado» em Setembro; pedido anterior ao início da obra |
 | **6** | Ficha técnica Hidrostop Flex (SECIL TEK) | Exigência de protecção contra radiação U.V. |
 | **7** | Comunicação de 25-02-2026 — infiltrações no 3.º Dt.º e 5.º Dt.º | Defeitos comunicados e não sanados |
