@@ -1,23 +1,29 @@
 /**
- * Regressão do hotfix P0 "dossiê de fornecedor não renderiza em produção"
- * (digest 1775551007).
+ * Regressão do hotfix P0 "dossiê de fornecedor não renderiza em produção".
+ * Dois digests diferentes, duas variantes do mesmo problema estrutural: uma
+ * excepção algures no render de um Server Component que só é invocado mais
+ * tarde pelo motor de render do React (via JSX), fora do `try/catch`
+ * síncrono da página, acaba na fronteira de erro genérica da rota — só um
+ * digest, sem mensagem.
  *
- * Causa raiz: `DossierArquivo` (Client Component) recebia `children` como uma
- * FUNÇÃO passada a partir de um Server Component
- * (`{(item) => <DownloadButton documentoId={item.id} />}` em
- * `src/app/(app)/fornecedores/[id]/page.tsx`). Uma função não é serializável
- * através da fronteira Server → Client Component do React Server Components;
- * o erro ocorre na serialização da árvore devolvida por `CorpoFornecedor`,
- * fora do `try/catch` da página — daí o "Server Components render failure"
- * com apenas um digest, indiagnosticável.
+ * 1. Digest 1775551007 — `DossierArquivo` (Client Component) recebia
+ *    `children` como uma FUNÇÃO passada a partir de um Server Component
+ *    (`{(item) => <DownloadButton documentoId={item.id} />}` em
+ *    `src/app/(app)/fornecedores/[id]/page.tsx`). Uma função não é
+ *    serializável através da fronteira Server → Client Component.
+ *    Correcção: `DossierArquivo` deixa de aceitar `children`; renderiza
+ *    `DownloadButton` internamente (Client → Client, sem fronteira a
+ *    atravessar).
  *
- * Correcção: `DossierArquivo` deixa de aceitar `children`; renderiza
- * `DownloadButton` internamente (Client → Client, sem fronteira a atravessar).
- *
- * Reforço adicional (item 4 do hotfix): a secção "Imputação de pagamentos" do
- * relatório é complementar — uma falha a apurá-la não deve derrubar o
- * relatório inteiro. `RelatorioFornecedor` passa a isolar essa chamada num
- * try/catch próprio.
+ * 2. Digest 1292976283 — `src/app/(app)/fornecedores/[id]/relatorio/page.tsx`
+ *    devolvia `<RelatorioFornecedor .../>` (JSX, execução diferida) em vez de
+ *    chamar a função. Uma falha em qualquer ponto do corpo de
+ *    `RelatorioFornecedor` fora da secção de imputações (que já tinha
+ *    try/catch próprio, adicionado como reforço do item 4 do hotfix)
+ *    escapava ao `try/catch` de `RelatorioFornecedorPage`. Correcção:
+ *    `page.tsx` chama `RelatorioFornecedor(props)` directamente — chamada de
+ *    função normal, não JSX — para que toda a composição corra dentro desse
+ *    `try`.
  *
  * Não há forma de reproduzir aqui, em vitest/Node, o erro exacto de
  * serialização do React Flight (isso só existe no runtime RSC do Next.js).
@@ -32,6 +38,10 @@
  *      fornecedor sem imputações e sem movimentos continuam a renderizar;
  *      uma posição com dado corrompido não derruba o relatório — a secção
  *      fica assinalada como indisponível e o resto do documento é servido.
+ *   4. Uma falha fora da secção de imputações (data de acontecimento
+ *      corrompida) propaga-se como excepção JS normal quando
+ *      `RelatorioFornecedor` é chamado directamente — apanhável por um
+ *      try/catch comum, tal como `CorpoRelatorio` agora faz.
  */
 import { describe, expect, it } from "vitest";
 import { createElement } from "react";
@@ -281,6 +291,50 @@ describe("hotfix P0 — dossiê de fornecedor (digest 1775551007)", () => {
       // O resto do documento continua servido.
       expect(html).toContain("Pinturas Verticais");
       expect(html).toContain("Resumo executivo");
+    });
+  });
+
+  describe("CorpoRelatorio — a página chama RelatorioFornecedor directamente, não via JSX", () => {
+    /**
+     * Digest 1292976283: a rota /relatorio voltou a mostrar só um digest
+     * (desta vez através de `relatorio/error.tsx`, não do painel de
+     * diagnóstico de `page.tsx`). Causa: `page.tsx` devolvia
+     * `<RelatorioFornecedor .../>` — um elemento JSX, cuja execução real só
+     * acontece mais tarde, no motor de render do React Server Components,
+     * já fora do `try/catch` de `RelatorioFornecedorPage`. Uma falha em
+     * QUALQUER ponto do corpo de `RelatorioFornecedor` fora da secção de
+     * imputações (já isolada) escapava directamente para a fronteira de
+     * erro genérica da rota.
+     *
+     * Correcção: `page.tsx` passa a chamar `RelatorioFornecedor(props)`
+     * directamente — uma chamada de função normal, não JSX — para que toda
+     * a composição corra dentro do `try` da página.
+     *
+     * Este teste prova o mecanismo com uma falha deliberada, fora da
+     * secção de imputações (uma data de acontecimento corrompida, que
+     * `agruparPorAno` não protege): chamada directa + try/catch da página
+     * apanha-a; chamada via JSX não apanhava.
+     */
+    it("uma falha fora da secção de imputações é apanhada quando RelatorioFornecedor é chamado directamente", () => {
+      const eventoCorrompido = evento({
+        id: "e-corrompido",
+        data_evento: null as unknown as string,
+      });
+      const props = propsRelatorio({ eventos: [eventoCorrompido] });
+
+      // Confirma a premissa: isto de facto lança dentro de RelatorioFornecedor
+      // (fora do try/catch da secção de imputações).
+      expect(() => RelatorioFornecedor(props)).toThrow();
+
+      // A chamada directa (o padrão agora usado em page.tsx) deixa o erro
+      // disponível a um try/catch normal, tal como `CorpoRelatorio` usa.
+      let apanhado: unknown;
+      try {
+        RelatorioFornecedor(props);
+      } catch (e) {
+        apanhado = e;
+      }
+      expect(apanhado).toBeInstanceOf(Error);
     });
   });
 });
