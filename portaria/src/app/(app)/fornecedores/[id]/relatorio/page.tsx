@@ -176,31 +176,37 @@ async function CorpoRelatorio({ params, searchParams }: RelatorioProps) {
 
   const totais = apurarTotais({ id, despesasPeriodo, movimentosPeriodo, eventosPeriodo, contratos: cts });
 
-  return (
-    <RelatorioFornecedor
-      fornecedorId={id}
-      fornecedor={f}
-      tenantNome={ctx.tenant.nome}
-      contratos={cts}
-      despesas={despesasPeriodo}
-      movimentos={movimentosPeriodo}
-      eventos={eventosPeriodo}
-      posicoes={todasPosicoes.filter((posicao) =>
-        movimentosPeriodo.some((movimento) => movimento.id === posicao.movimento_id),
-      )}
-      anos={anos}
-      ano={ano}
-      financeiro={financeiro}
-      totais={totais}
-      geradoEm={new Date().toISOString()}
-      hrefFiltro={(novos) => {
-        const p = new URLSearchParams();
-        const a = novos.ano ?? ano;
-        const m = novos.modo ?? (financeiro ? "financeiro" : "completo");
-        if (a) p.set("ano", a);
-        if (m === "financeiro") p.set("modo", m);
-        return `/fornecedores/${id}/relatorio${p.size ? `?${p}` : ""}`;
-      }}
-    />
-  );
+  // Chamada directa, não `<RelatorioFornecedor .../>`: um elemento JSX só é
+  // executado mais tarde, pelo motor de render do React Server Components —
+  // já fora do `try/catch` de `RelatorioFornecedorPage`, que só cobre a
+  // execução síncrona desta função. Chamar a função aqui faz a composição
+  // inteira (incluindo tudo o que ainda não está protegido por um try/catch
+  // próprio, como a secção de imputações) correr dentro desse `try`, para
+  // que uma falha inesperada mostre a mensagem real em vez de cair na
+  // fronteira de erro genérica da rota (`error.tsx`, só com o digest).
+  return RelatorioFornecedor({
+    fornecedorId: id,
+    fornecedor: f,
+    tenantNome: ctx.tenant.nome,
+    contratos: cts,
+    despesas: despesasPeriodo,
+    movimentos: movimentosPeriodo,
+    eventos: eventosPeriodo,
+    posicoes: todasPosicoes.filter((posicao) =>
+      movimentosPeriodo.some((movimento) => movimento.id === posicao.movimento_id),
+    ),
+    anos,
+    ano,
+    financeiro,
+    totais,
+    geradoEm: new Date().toISOString(),
+    hrefFiltro: (novos) => {
+      const p = new URLSearchParams();
+      const a = novos.ano ?? ano;
+      const m = novos.modo ?? (financeiro ? "financeiro" : "completo");
+      if (a) p.set("ano", a);
+      if (m === "financeiro") p.set("modo", m);
+      return `/fornecedores/${id}/relatorio${p.size ? `?${p}` : ""}`;
+    },
+  });
 }
