@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { DownloadButton } from "@/components/app/download-button";
 import { FornecedorArquivar } from "@/components/admin/fornecedor-arquivar";
 import {
   GRUPOS_TIMELINE,
@@ -659,9 +658,7 @@ async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
             )}
           </section>
 
-          <DossierArquivo fornecedorId={id} redirectTo={rota} itens={arquivo}>
-            {(item) => <DownloadButton documentoId={item.id} />}
-          </DossierArquivo>
+          <DossierArquivo fornecedorId={id} redirectTo={rota} itens={arquivo} />
         </main>
 
         <aside className="space-y-6">
