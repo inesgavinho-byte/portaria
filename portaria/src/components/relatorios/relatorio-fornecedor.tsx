@@ -119,7 +119,20 @@ export function RelatorioFornecedor({
   const pendencias = eventosPeriodo.filter((e) => e.natureza === "pendente");
   const propostas = propostasComValor(eventosPeriodo);
   const indice = indexarEvidencias(eventosPeriodo);
-  const imputacoes = agruparImputacoes(posicoes, movimentosPeriodo, despesasPeriodo);
+
+  // A secção de imputações controvertidas é complementar: cruza posições,
+  // movimentos e despesas de uma forma que o resto do relatório não depende.
+  // Uma falha aqui (dado inesperado, relação por completar) não pode derrubar
+  // o documento inteiro — regista-se e a secção fica assinalada como
+  // indisponível, mas o relatório continua a abrir.
+  let imputacoes: ImputacaoDeMovimento[] = [];
+  let imputacoesIndisponiveis = false;
+  try {
+    imputacoes = agruparImputacoes(posicoes, movimentosPeriodo, despesasPeriodo);
+  } catch (erro) {
+    console.error("[relatorio-fornecedor] falha ao apurar imputações controvertidas", erro);
+    imputacoesIndisponiveis = true;
+  }
 
   /*
    * O modo financeiro omite a secção de fontes. Uma referência `[E04]` sem a
@@ -314,7 +327,14 @@ export function RelatorioFornecedor({
         </Secao>
 
         {/* --------------------------------------------- imputação controvertida */}
-        {imputacoes.length > 0 && (
+        {imputacoesIndisponiveis && (
+          <Secao titulo="Imputação de pagamentos">
+            <p className="font-body text-xs leading-5 text-oliveGray">
+              Secção indisponível nesta geração do relatório. O resto do documento não é afectado.
+            </p>
+          </Secao>
+        )}
+        {!imputacoesIndisponiveis && imputacoes.length > 0 && (
           <Secao
             titulo="Imputação de pagamentos"
             nota={`${imputacoes.filter((i) => i.controvertida).length} em divergência`}

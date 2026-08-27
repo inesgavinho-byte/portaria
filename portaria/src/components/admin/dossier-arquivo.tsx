@@ -5,6 +5,7 @@ import { FileText, Paperclip, Plus, Search, X } from "lucide-react";
 import { criarDocumento, type DocumentoFormState } from "@/lib/actions/documentos";
 import { CATEGORIA_LABEL, CATEGORIAS_DOSSIER, DOCUMENTO_ACCEPT } from "@/lib/documentos";
 import type { Documento, DocumentoCategoria } from "@/types/database";
+import { DownloadButton } from "@/components/app/download-button";
 
 export type ArquivoItem = Pick<
   Documento,
@@ -23,12 +24,10 @@ export function DossierArquivo({
   fornecedorId,
   redirectTo,
   itens,
-  children,
 }: {
   fornecedorId: string;
   redirectTo: string;
   itens: ArquivoItem[];
-  children?: (item: ArquivoItem) => React.ReactNode;
 }) {
   const [aberto, setAberto] = useState(false);
   const [busca, setBusca] = useState("");
@@ -144,7 +143,9 @@ export function DossierArquivo({
                   </div>
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2 pl-6 md:pl-0">{children?.(item)}</div>
+              <div className="flex shrink-0 items-center gap-2 pl-6 md:pl-0">
+                <DownloadButton documentoId={item.id} />
+              </div>
             </li>
           ))}
         </ul>
