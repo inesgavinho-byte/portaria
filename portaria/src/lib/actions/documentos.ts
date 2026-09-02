@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUserInTenant, requireAdmin } from "@/lib/supabase/tenant";
 import { garantirFonte, sincronizarFonte } from "@/lib/fornecedores/fontes";
+import { ingerirDocumento } from "@/lib/actions/ia-rag";
 import { DOCUMENTO_TIPOS_VALIDOS } from "@/lib/documentos";
 import type { Documento } from "@/types/database";
 
@@ -200,6 +201,19 @@ export async function criarDocumento(
     if (erroFonte) {
       console.error("Erro ao criar fonte documental do upload:", erroFonte);
     }
+  }
+
+  // 6. Ingestão na base de conhecimento do assistente (C1 — Fase C): PDFs
+  //    têm o texto extraído localmente e indexado. Nunca bloqueia o upload —
+  //    se a ingestão falhar (embeddings em baixo, PDF ilegível), o documento
+  //    fica válido e pode ser reindexado mais tarde em /ia/configuracao.
+  try {
+    const ingestao = await ingerirDocumento(documento.id);
+    if (ingestao.error) {
+      console.error("Ingestão IA do novo documento:", ingestao.error);
+    }
+  } catch (err) {
+    console.error("Ingestão IA do novo documento (excepção):", err);
   }
 
   revalidatePath("/documentos");

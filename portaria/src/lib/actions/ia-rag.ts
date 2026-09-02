@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUserInTenant, requireAdmin } from "@/lib/supabase/tenant";
 import { gerarEmbedding } from "@/lib/ai/openai";
+import { ePdf, extrairTextoPdfLocal } from "@/lib/ai/pdf-texto";
 import { deepseekChat, gerarTituloConversa } from "@/lib/ai/deepseek";
 import { chatTexto } from "@/lib/ai/openai";
 import type { ConversaIA, ConversaIAMensagem, ConhecimentoEmbedding } from "@/types/database";
@@ -168,21 +169,77 @@ export async function ingerirDocumento(documentoId: string): Promise<{
   if (!ctx) return { inseridos: 0, error: "Sem permissões." };
 
   const supabase = await createClient();
+  return ingerirDocumentoEm(supabase, ctx.tenant.id, documentoId);
+}
 
+/**
+ * Ingestão de um documento, com o cliente já autenticado — usada pela action
+ * pública acima e pela reindexação em série de reindexarTenant (evita repetir
+ * requireAdmin/createClient por documento).
+ *
+ * C1 (Fase C): para PDFs, o texto integral é extraído LOCALMENTE (pdf.js via
+ * unpdf — sem LLM, ver src/lib/ai/pdf-texto.ts) e indexado junto do título e
+ * da descrição. A extração nunca bloqueia a ingestão:
+ *
+ *   • texto extraído               → indexacao: "texto" (+ páginas, extrator)
+ *   • PDF digitalizado/corrompido  → indexacao: "metadados" + extracao:
+ *                                    "sem_texto" | "falha" — o documento
+ *                                    continua indexável e reindexável depois.
+ *   • chunks legados (sem campo)   → tratados como "metadados" pela UI.
+ */
+async function ingerirDocumentoEm(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  tenantId: string,
+  documentoId: string
+): Promise<{ inseridos: number; error?: string }> {
   // Buscar documento
   const { data: doc } = await supabase
     .from("documentos")
-    .select("titulo, descricao")
+    .select("titulo, descricao, ficheiro_tipo, ficheiro_path")
     .eq("id", documentoId)
-    .eq("tenant_id", ctx.tenant.id)
+    .eq("tenant_id", tenantId)
     .single();
 
   if (!doc) return { inseridos: 0, error: "Documento não encontrado." };
 
-  // NOTA (A1): apenas título + descrição são indexados — o conteúdo integral
-  // do PDF NÃO é extraído. metadata.indexacao='metadados' torna isto explícito
-  // para a UI distinguir "metadados indexados" de "conteúdo indexado".
-  const texto = `${doc.titulo}\n\n${doc.descricao ?? ""}`;
+  const baseTexto = `${doc.titulo}\n\n${doc.descricao ?? ""}`;
+  let texto = baseTexto;
+  let indexacao: "texto" | "metadados" = "metadados";
+  let infoExtracao: Record<string, unknown> = {};
+
+  if (ePdf(doc.ficheiro_tipo) && doc.ficheiro_path && doc.ficheiro_path !== "pending") {
+    // Download server-side do ficheiro já validado no upload (RLS de Storage).
+    let dados: Uint8Array | null = null;
+    try {
+      const { data: blob } = await supabase.storage
+        .from("documentos")
+        .download(doc.ficheiro_path);
+      if (blob) dados = new Uint8Array(await blob.arrayBuffer());
+    } catch (err) {
+      console.error("[ia-rag] download do PDF para extração falhou:", err);
+    }
+
+    if (dados) {
+      const resultado = await extrairTextoPdfLocal(dados);
+      if (resultado.estado === "texto") {
+        texto = `${baseTexto}\n\n${resultado.texto}`;
+        indexacao = "texto";
+        infoExtracao = {
+          extrator: "local",
+          paginas_total: resultado.paginasTotal,
+          paginas_extraidas: resultado.paginasExtraidas,
+          ...(resultado.truncado ? { truncado: true } : {}),
+        };
+      } else {
+        // "sem_texto" (PDF digitalizado) ou "falha" (corrompido/ilegível):
+        // segue com metadados, estado registado para a UI.
+        infoExtracao = { extracao: resultado.estado };
+      }
+    } else {
+      infoExtracao = { extracao: "falha" };
+    }
+  }
+
   if (!texto.trim()) {
     return { inseridos: 0, error: "Documento sem conteúdo indexável." };
   }
@@ -191,10 +248,15 @@ export async function ingerirDocumento(documentoId: string): Promise<{
   const itens = chunks.map((chunk, i) => ({
     origem_id: documentoId,
     conteudo: chunk,
-    metadata: { titulo: doc.titulo, chunk_index: i, indexacao: "metadados" as const },
+    metadata: {
+      titulo: doc.titulo,
+      chunk_index: i,
+      indexacao,
+      ...infoExtracao,
+    },
   }));
 
-  return reindexarOrigem(supabase, ctx.tenant.id, "documento", itens, {
+  return reindexarOrigem(supabase, tenantId, "documento", itens, {
     origemId: documentoId,
   });
 }
@@ -228,19 +290,39 @@ export async function ingerirOcorrenciasResolvidas(): Promise<{
 
 /**
  * Reindexar todo o conhecimento do tenant.
+ *
+ * C1 (Fase C): os documentos entram na reindexação — PDFs existentes passam a
+ * ter o texto extraído e indexado pelo mesmo caminho de ingerirDocumento. A
+ * reindexação é feita documento a documento, em série, para conter memória e
+ * duração numa função serverless; cada documento é substituído de forma não
+ * destrutiva (nova geração antes de apagar a anterior — A2).
  */
 export async function reindexarTenant(): Promise<{
   regulamento: number;
   ocorrencias: number;
+  documentos: number;
   error?: string;
 }> {
   const ctx = await requireAdmin();
-  if (!ctx) return { regulamento: 0, ocorrencias: 0, error: "Sem permissões." };
+  if (!ctx)
+    return { regulamento: 0, ocorrencias: 0, documentos: 0, error: "Sem permissões." };
 
-  // A2: NÃO se apaga tudo à cabeça. Cada origem é reindexada de forma segura
-  // (computa-se a nova geração antes de apagar a anterior — ver
-  // reindexarOrigem). Se o serviço de embeddings estiver em baixo, a base
-  // anterior é preservada e o erro é propagado.
+  const supabase = await createClient();
+
+  const { data: docs } = await supabase
+    .from("documentos")
+    .select("id")
+    .eq("tenant_id", ctx.tenant.id);
+
+  let documentos = 0;
+  let erroDocumentos: string | undefined;
+  for (const doc of docs ?? []) {
+    const resultado = await ingerirDocumentoEm(supabase, ctx.tenant.id, doc.id);
+    documentos += resultado.inseridos;
+    // Continua os restantes documentos; guarda o primeiro erro para reportar.
+    if (resultado.error && !erroDocumentos) erroDocumentos = resultado.error;
+  }
+
   const [regResult, ocorResult] = await Promise.all([
     ingerirRegulamento(),
     ingerirOcorrenciasResolvidas(),
@@ -252,11 +334,12 @@ export async function reindexarTenant(): Promise<{
   const erroReal =
     (regResult.error && regResult.error !== "Regulamento não encontrado."
       ? regResult.error
-      : undefined) ?? ocorResult.error;
+      : undefined) ?? ocorResult.error ?? erroDocumentos;
 
   return {
     regulamento: regResult.inseridos,
     ocorrencias: ocorResult.inseridos,
+    documentos,
     ...(erroReal ? { error: erroReal } : {}),
   };
 }
