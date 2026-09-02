@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { normalizar } from "@/lib/financeiro/atribuicao-movimentos";
 
 export type AtribuicaoResultado = { ok: true } | { ok: false; error: string };
 
@@ -51,13 +52,16 @@ export async function atribuirFornecedorMovimento(
     .update({
       fornecedor_id: fornecedorId,
       fornecedor_nao_aplicavel: false,
+      // Explícito: uma correcção humana sobrescreve sempre a proveniência
+      // 'regra' — uma decisão de pessoa vale mais do que uma regra.
+      fornecedor_origem: "manual",
       fornecedor_atribuido_em: fornecedorId ? new Date().toISOString() : null,
       fornecedor_atribuido_por: fornecedorId ? ctx.user.id : null,
       atualizado_em: new Date().toISOString(),
     })
     .eq("id", movimentoId)
     .eq("tenant_id", ctx.tenant.id)
-    .select("id,fornecedor_id")
+    .select("id,fornecedor_id,contraparte")
     .maybeSingle();
 
   if (error) {
@@ -65,6 +69,30 @@ export async function atribuirFornecedorMovimento(
     return { ok: false, error: "Erro ao guardar a atribuição." };
   }
   if (!data) return { ok: false, error: "Movimento não encontrado." };
+
+  // A memória dos aliases: quando uma pessoa confirma uma atribuição manual,
+  // a contraparte normalizada fica guardada como variante de nome do
+  // fornecedor — da próxima vez a sugestão nasce "exacta". É escrita SOZINHA
+  // aqui porque é literalmente o que a pessoa acabou de confirmar; falhar o
+  // alias não falha a atribuição (é um acelerador, não um dado de negócio).
+  // Em marcarMovimentoSemFornecedor nunca se grava alias: "sem fornecedor"
+  // não confirma contraparte nenhuma.
+  if (fornecedorId && data.contraparte) {
+    const alias = normalizar(data.contraparte);
+    if (alias) {
+      // Última confirmação ganha: um alias pode ter nascido de uma atribuição
+      // errada (ex.: transferência de um condómino cujo nome coincide com o
+      // de um fornecedor); re-atribuir a outro fornecedor sobrescreve o alias
+      // e auto-cura as sugestões. First-write-wins envenenava-as para sempre.
+      const { error: aliasError } = await supabase
+        .from("fornecedores_aliases")
+        .upsert(
+          { tenant_id: ctx.tenant.id, fornecedor_id: fornecedorId, alias },
+          { onConflict: "tenant_id,alias", ignoreDuplicates: false },
+        );
+      if (aliasError) console.error("Erro ao gravar alias de contraparte:", aliasError);
+    }
+  }
 
   revalidar(fornecedorId);
   return { ok: true };
@@ -88,6 +116,9 @@ export async function marcarMovimentoSemFornecedor(
     .update({
       fornecedor_id: null,
       fornecedor_nao_aplicavel: naoAplicavel,
+      // Decisão humana explícita: sobrescreve a proveniência 'regra'. Alias
+      // nunca é gravado aqui — ver comentário em atribuirFornecedorMovimento.
+      fornecedor_origem: "manual",
       fornecedor_atribuido_em: naoAplicavel ? new Date().toISOString() : null,
       fornecedor_atribuido_por: naoAplicavel ? ctx.user.id : null,
       atualizado_em: new Date().toISOString(),

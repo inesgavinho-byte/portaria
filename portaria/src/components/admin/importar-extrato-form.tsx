@@ -83,6 +83,9 @@ export function ImportarExtratoForm() {
             <Contador label="importados" valor={resultado.importados} />
             <Contador label="duplicados (já existiam)" valor={resultado.duplicados} />
             <Contador label="ignorados" valor={resultado.ignorados} />
+            {resultado.classificadasPorRegras > 0 && (
+              <Contador label="classificados por regras" valor={resultado.classificadasPorRegras} />
+            )}
           </div>
 
           {resultado.avisos.length > 0 && (

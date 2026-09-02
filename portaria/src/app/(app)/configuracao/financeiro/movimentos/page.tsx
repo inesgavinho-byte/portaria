@@ -7,10 +7,12 @@ import {
   estadoAtribuicao,
   resumirTriagem,
   sugerirFornecedores,
+  type AliasFornecedor,
   type EstadoAtribuicao,
   type FornecedorCandidato,
   type MovimentoAtribuivel,
 } from "@/lib/financeiro/atribuicao-movimentos";
+import { normalizarPadrao } from "@/lib/financeiro/regras-classificacao";
 
 export const metadata = { title: "Atribuição de movimentos — Portaria" };
 
@@ -27,6 +29,16 @@ const euro = (cents: number) =>
 const data = (valor: string) =>
   new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(valor));
 
+/**
+ * Padrão pré-preenchido do link «criar regra»: a contraparte extraída, se
+ * existir; senão os primeiros ~30 caracteres normalizados da descrição. Já
+ * sai normalizado — é exactamente a forma em que a regra é guardada.
+ */
+function padraoDeMovimento(movimento: MovimentoAtribuivel): string {
+  if (movimento.contraparte?.trim()) return normalizarPadrao(movimento.contraparte);
+  return normalizarPadrao(movimento.descricao).slice(0, 30).trim();
+}
+
 export default async function AtribuicaoMovimentosPage({
   searchParams,
 }: {
@@ -36,7 +48,7 @@ export default async function AtribuicaoMovimentosPage({
   if (!ctx) redirect("/inicio");
 
   const supabase = await createClient();
-  const [{ data: movimentosData }, { data: fornecedoresData }] = await Promise.all([
+  const [{ data: movimentosData }, { data: fornecedoresData }, { data: aliasesData }] = await Promise.all([
     supabase
       .from("movimentos_bancarios")
       .select(
@@ -49,10 +61,18 @@ export default async function AtribuicaoMovimentosPage({
       .select("id,nome,ativo")
       .eq("tenant_id", ctx.tenant.id)
       .order("nome", { ascending: true }),
+    supabase
+      .from("fornecedores_aliases")
+      .select("fornecedor_id,alias")
+      .eq("tenant_id", ctx.tenant.id),
   ]);
 
   const movimentos = (movimentosData ?? []) as MovimentoAtribuivel[];
   const fornecedores = (fornecedoresData ?? []) as FornecedorCandidato[];
+  const aliases: AliasFornecedor[] = (aliasesData ?? []).map((entrada) => ({
+    fornecedorId: entrada.fornecedor_id,
+    alias: entrada.alias,
+  }));
   const resumo = resumirTriagem(movimentos);
 
   const vista = VISTAS.some((v) => v.valor === filtros.estado)
@@ -74,12 +94,26 @@ export default async function AtribuicaoMovimentosPage({
         <p className="mb-1 font-body text-xs font-semibold uppercase tracking-[0.12em] text-britishGreen">Financeiro</p>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-title text-h1 text-ink">Atribuição de movimentos</h1>
-          <Link
-            href="/configuracao/financeiro/movimentos/importar"
-            className="rounded-lg border border-britishGreen/15 px-3 py-1.5 font-body text-xs font-semibold text-oliveGray transition-colors hover:text-britishGreen"
-          >
-            Importar extrato
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/configuracao/financeiro/movimentos/importar"
+              className="rounded-lg border border-britishGreen/15 px-3 py-1.5 font-body text-xs font-semibold text-oliveGray transition-colors hover:text-britishGreen"
+            >
+              Importar extrato
+            </Link>
+            <Link
+              href="/configuracao/financeiro/movimentos/recebimentos"
+              className="rounded-lg border border-britishGreen/15 px-3 py-1.5 font-body text-xs font-semibold text-oliveGray transition-colors hover:text-britishGreen"
+            >
+              Recebimentos
+            </Link>
+            <Link
+              href="/configuracao/financeiro/movimentos/regras"
+              className="rounded-lg border border-britishGreen/15 px-3 py-1.5 font-body text-xs font-semibold text-oliveGray transition-colors hover:text-britishGreen"
+            >
+              Regras
+            </Link>
+          </div>
         </div>
         <p className="mt-2 max-w-3xl font-body text-sm leading-6 text-oliveGray">
           A quem pertence cada movimento bancário. Esta decisão alimenta as saídas confirmadas na ficha de cada
@@ -147,6 +181,14 @@ export default async function AtribuicaoMovimentosPage({
                   {movimento.contraparte && (
                     <p className="mt-0.5 font-body text-xs text-oliveGray">Contraparte: {movimento.contraparte}</p>
                   )}
+                  {estadoAtribuicao(movimento) === "pendente" && (
+                    <Link
+                      href={`/configuracao/financeiro/movimentos/regras?padrao=${encodeURIComponent(padraoDeMovimento(movimento))}`}
+                      className="mt-1 inline-block font-body text-[0.68rem] font-semibold text-britishGreen/80 transition-colors hover:text-britishGreen"
+                    >
+                      criar regra
+                    </Link>
+                  )}
                 </div>
                 <p className="font-body text-base font-semibold tabular-nums text-ink">{euro(movimento.valor_cents)}</p>
               </div>
@@ -158,7 +200,9 @@ export default async function AtribuicaoMovimentosPage({
                 fornecedorNome={movimento.fornecedor_id ? nomePorFornecedor.get(movimento.fornecedor_id) ?? null : null}
                 fornecedores={fornecedores}
                 sugestoes={
-                  estadoAtribuicao(movimento) === "pendente" ? sugerirFornecedores(movimento, fornecedores) : []
+                  estadoAtribuicao(movimento) === "pendente"
+                    ? sugerirFornecedores(movimento, fornecedores, 3, aliases)
+                    : []
                 }
               />
             </li>
