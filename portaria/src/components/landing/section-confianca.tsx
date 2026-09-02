@@ -2,6 +2,14 @@ import { Cloud, Eye, Lock, Scale } from "lucide-react";
 import { Reveal } from "./reveal";
 import { SectionIntro } from "./section-intro";
 
+// Auditoria beta-europa §6.3: afirmações públicas só com o demonstrável.
+// Nada aqui pode prometer o que não está verificado no repositório:
+//   • Infraestrutura: só o alojamento Supabase eu-west-1 — NÃO afirmar que
+//     todo o pipeline (IA, email) está na UE, nem inventar backups.
+//   • Privacidade: o isolamento RLS entre condomínios é testado em CI
+//     (.github/workflows/ci.yml, tests/security).
+//   • Conformidade: os textos legais são estáticos (src/lib/ai/legislacao.ts)
+//     — citam a fonte; NÃO afirmar "sempre atualizada".
 const PONTOS = [
   {
     icon: Lock,
@@ -11,17 +19,17 @@ const PONTOS = [
   {
     icon: Cloud,
     titulo: "Infraestrutura",
-    texto: "Backups diários. Infraestrutura europeia.",
+    texto: "Dados alojados na Europa (Supabase, região eu-west-1).",
   },
   {
     icon: Eye,
     titulo: "Privacidade",
-    texto: "Só quem tem acesso, acessa.",
+    texto: "Isolamento entre condomínios por RLS, testado em CI.",
   },
   {
     icon: Scale,
     titulo: "Conformidade",
-    texto: "Legislação portuguesa, sempre atualizada.",
+    texto: "Legislação portuguesa com as fontes citadas.",
   },
 ];
 

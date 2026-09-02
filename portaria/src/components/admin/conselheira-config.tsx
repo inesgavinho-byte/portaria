@@ -9,11 +9,11 @@ import {
 } from "@/lib/actions/conhecimento";
 
 export function ConselheiraConfig({
-  openai,
+  iaConfigurada,
   legislacao,
   regulamento,
 }: {
-  openai: boolean;
+  iaConfigurada: boolean;
   legislacao: number;
   regulamento: number;
 }) {
@@ -28,11 +28,13 @@ export function ConselheiraConfig({
 
   return (
     <div className="space-y-10 max-w-2xl">
-      {!openai && (
+      {!iaConfigurada && (
         <div className="border-l-4 border-alert bg-alert/5 px-4 py-3">
           <p className="font-body text-sm text-alert">
-            Falta configurar a variável <code>OPENAI_API_KEY</code> no ambiente.
-            A Conselheira fica indisponível até isso estar feito.
+            A IA está indisponível: falta configurar o servidor local
+            (<code>MLX_EMBEDDINGS_URL</code>) ou, em alternativa, a variável{" "}
+            <code>OPENAI_API_KEY</code>. A Conselheira fica indisponível até
+            isso estar feito.
           </p>
         </div>
       )}
@@ -55,7 +57,7 @@ export function ConselheiraConfig({
         <form action={semAction}>
           <button
             type="submit"
-            disabled={semPending || !openai}
+            disabled={semPending || !iaConfigurada}
             className="px-6 py-3 border border-warmBeige/50 font-body text-xs tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors disabled:opacity-50"
           >
             {semPending
@@ -97,7 +99,7 @@ export function ConselheiraConfig({
           <div>
             <button
               type="submit"
-              disabled={regPending || !openai}
+              disabled={regPending || !iaConfigurada}
               className="px-6 py-3 bg-ink text-paper font-body text-xs tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50"
             >
               {regPending ? "A analisar o regulamento…" : "Carregar regulamento"}

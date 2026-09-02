@@ -16,8 +16,16 @@ export async function PublicFooter() {
               <p className="font-body text-sm text-oliveGray">{tenant.morada}</p>
             )}
           </div>
-          <div className="md:text-right font-body text-xs text-oliveGray/70">
-            © {year} {tenant?.nome ?? "Portaria"}. Plataforma desenvolvida em portaria.
+          <div className="md:text-right font-body text-xs text-oliveGray/70 space-x-4">
+            <a href="/privacidade" className="hover:text-oliveGray transition-colors">
+              Privacidade
+            </a>
+            <a href="/termos" className="hover:text-oliveGray transition-colors">
+              Termos
+            </a>
+            <span>
+              © {year} {tenant?.nome ?? "Portaria"}. Plataforma desenvolvida em portaria.
+            </span>
           </div>
         </div>
       </div>

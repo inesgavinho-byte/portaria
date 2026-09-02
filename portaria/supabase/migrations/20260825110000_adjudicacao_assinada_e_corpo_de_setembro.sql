@@ -1,0 +1,65 @@
+-- A folha de adjudicação antecede em três meses o corpo que aparenta adjudicar.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   adjudicacao_assinada_03_06_2025_e_corpo_de_setembro
+--
+-- ====================================================================
+-- CORRECÇÃO
+-- ====================================================================
+-- O registo anterior afirmava que a empreitada nunca teve contrato assinado.
+-- ESTÁ ERRADO. Existe exemplar assinado e a administração em funções tem
+-- cópia. O registo original do processo, que dava a adjudicação como assinada
+-- em 03-06-2025, estava certo.
+--
+-- ====================================================================
+-- O QUE O EXEMPLAR ASSINADO MOSTRA
+-- ====================================================================
+-- Tem OITO páginas. Os exemplares até agora no processo têm sete e não contêm
+-- a oitava, que é uma folha autónoma de Adjudicação:
+--
+--   "Adjudicação. Agualva-Cacém, 03 de Junho de 2025.
+--    O Empreiteiro, [assinatura manuscrita].  A Administração, ___"
+--
+-- O corpo a que essa folha está aposta é o do ficheiro c9936e04:
+--   - prazo de 45 dias (as versões anteriores: 2 meses)
+--   - "acresce IVA, a combinar" (a versão aceite em assembleia: "à taxa legal
+--     em vigor")
+--   - "duas demãos de argamassa de impermeabilização Hidrostop flex" nas
+--     floreiras, e o material M004 na ficha técnica
+--   - pág. 1: "com data de início a 01/06/2025", enquanto a pág. 5 diz
+--     "a data para início dos trabalhos será no dia 1 de setembro de 2025"
+--
+-- Esse corpo foi entregue ao condomínio em 04-09-2025, como "orçamento
+-- retificado", em resposta ao pedido de esclarecimentos dos condóminos.
+--
+-- E, decisivamente: em 11-06-2025 — OITO DIAS depois da data que a folha de
+-- adjudicação ostenta — a empreiteira remeteu uma versão do mesmo orçamento
+-- (b28f4a71) que NÃO contém Hidrostop Flex nem o material M004, listando
+-- apenas M001 a M003.
+--
+-- O que foi assinado a 3 de Junho não pode ser o texto entregue a 4 de
+-- Setembro.
+--
+-- ====================================================================
+-- TRÊS COROLÁRIOS
+-- ====================================================================
+-- 1. A folha de adjudicação NÃO IDENTIFICA qual das três versões adjudica. É
+--    autónoma, sem menção de valor, âmbito ou fachada — apenas a palavra
+--    "Adjudicação", local, data e espaços de assinatura.
+--
+-- 2. O exemplar assinado da proposta que a empreiteira se obrigou a devolver,
+--    e de que fez depender a eficácia da adjudicação, NUNCA foi entregue ao
+--    condomínio — consignado por escrito em 25 e 26-09-2025, com a obra em
+--    curso e 22.000,00 EUR pagos.
+--
+-- 3. O âmbito contratual foi sendo definido POR EMAIL sobre uma base
+--    documental instável: três ficheiros sob a mesma referência 010125,
+--    divergentes em valor global, cláusula de IVA, prazo e materiais.
+--
+-- ====================================================================
+-- POR VERIFICAR NO EXEMPLAR FÍSICO
+-- ====================================================================
+-- Se a folha de adjudicação está subscrita apenas pela empreiteira ou também
+-- pela administração. E como se concilia a existência deste exemplar com a
+-- declaração escrita da administração, de 26-09-2025, de que não tinha
+-- qualquer exemplar com assinatura.

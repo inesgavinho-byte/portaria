@@ -38,12 +38,15 @@ export type Fixtures = {
   cleanup: () => Promise<void>;
 };
 
-const uuid = (n: number) =>
-  `00000000-0000-4000-8000-${n.toString().padStart(12, "0")}`;
+/**
+ * UUID aleatório por chamada: o vitest corre ficheiros de teste em paralelo e
+ * duas fixtures com ids fixos colidem (unique violation no tenants.id).
+ */
+const uid = () => crypto.randomUUID();
 
 export async function seed(): Promise<Fixtures> {
   const svc = serviceClient();
-  const stamp = Date.now();
+  const stamp = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const mail = (r: string) => `sec+${r}-${stamp}@test.local`;
 
   const [adminA, condoA, inquiA, comissaoA, adminB, condoB] = await Promise.all([
@@ -55,8 +58,8 @@ export async function seed(): Promise<Fixtures> {
     createConfirmedUser(mail("condoB")),
   ]);
 
-  const tenantA = uuid(1);
-  const tenantB = uuid(2);
+  const tenantA = uid();
+  const tenantB = uid();
 
   await svc.from("tenants").insert([
     { id: tenantA, slug: `ta-${stamp}`, nome: "Tenant A" },
@@ -73,8 +76,8 @@ export async function seed(): Promise<Fixtures> {
   ]);
 
   // Espaços (um por tenant), 24/7 para as reservas passarem o trigger.
-  const espacoA = uuid(10);
-  const espacoB = uuid(11);
+  const espacoA = uid();
+  const espacoB = uid();
   const horario = {
     abertura_seg: "00:00", fecho_seg: "23:59", abertura_ter: "00:00", fecho_ter: "23:59",
     abertura_qua: "00:00", fecho_qua: "23:59", abertura_qui: "00:00", fecho_qui: "23:59",
@@ -87,10 +90,10 @@ export async function seed(): Promise<Fixtures> {
   ]);
 
   // Votações (A): uma aberta com condoA como participante, uma fechada.
-  const votacaoAberta = uuid(20);
-  const votacaoFechada = uuid(21);
-  const opcaoAberta = uuid(22);
-  const opcaoFechada = uuid(23);
+  const votacaoAberta = uid();
+  const votacaoFechada = uid();
+  const opcaoAberta = uid();
+  const opcaoFechada = uid();
   await svc.from("votacoes").insert([
     { id: votacaoAberta, tenant_id: tenantA, titulo: "Aberta", estado: "aberta", criado_por: adminA.id },
     { id: votacaoFechada, tenant_id: tenantA, titulo: "Fechada", estado: "encerrada", criado_por: adminA.id },
@@ -105,15 +108,15 @@ export async function seed(): Promise<Fixtures> {
   ]);
 
   // Documentos (A): uma conta (sensível) e um manual (não sensível).
-  const docContaA = uuid(30);
-  const docManualA = uuid(31);
+  const docContaA = uid();
+  const docManualA = uid();
   await svc.from("documentos").insert([
     { id: docContaA, tenant_id: tenantA, titulo: "Contas 2025", categoria: "conta", ficheiro_path: `${tenantA}/${docContaA}/contas.pdf`, upload_por: adminA.id },
     { id: docManualA, tenant_id: tenantA, titulo: "Manual", categoria: "manual", ficheiro_path: `${tenantA}/${docManualA}/manual.pdf`, upload_por: adminA.id },
   ]);
 
   // Ocorrência privada (A) criada pelo condoA.
-  const ocorrenciaPrivadaA = uuid(40);
+  const ocorrenciaPrivadaA = uid();
   await svc.from("ocorrencias").insert([
     { id: ocorrenciaPrivadaA, tenant_id: tenantA, titulo: "Barulho do vizinho", descricao: "Detalhe privado sensível", categoria: "outro", criado_por: condoA.id },
   ]);

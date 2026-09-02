@@ -1,15 +1,23 @@
 "use server";
 
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { extrairTextoPdfLocal } from "@/lib/ai/pdf-texto";
+import { chatLocal, mlxChatConfigurado } from "@/lib/ai/local";
 
 /**
- * Extracção automática de dados de um contrato em PDF, via OpenAI (gpt-4o).
+ * Extracção automática de dados de um contrato em PDF — processamento
+ * LOCAL (decisão L-44, docs/legal/decisao-ia-l44.md): o texto é extraído
+ * do PDF com unpdf (sem LLM) e enviado ao chat MLX da infraestrutura
+ * própria (Qwen3-8B-4bit). Nenhum dado sai da máquina — o contrato nunca
+ * mais é enviado a provedores externos (era o único caminho gpt-4o com
+ * PDF integral).
  *
- * É um auxiliar de preenchimento: nunca é bloqueante. Se a chave não
- * estiver configurada, o PDF não for legível ou a API falhar, devolve um
- * estado que deixa o formulário como está — o admin preenche à mão.
+ * É um auxiliar de preenchimento: nunca é bloqueante. Se o chat local não
+ * estiver configurado/indisponível, o PDF não for legível ou a resposta
+ * não for JSON válido, devolve um estado que deixa o formulário como
+ * está — o admin preenche à mão.
  *
- * Requer a variável de ambiente OPENAI_API_KEY (definida na Netlify).
+ * Requer a variável de ambiente MLX_CHAT_URL (ver scripts/mlx-local/).
  */
 
 export type DadosContratoExtraidos = {
@@ -32,42 +40,20 @@ export type ExtraccaoState = {
 const TAMANHO_MAX_MB = 15;
 const DATA_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+/**
+ * Teto de contrato enviado ao modelo: contratos de condomínio cabem com
+ * folga; evita ultrapassar a janela de contexto do Qwen3-8B.
+ */
+const CONTRATO_MAX_CARACTERES = 48_000;
+
 const PROMPT =
   "Analisa este contrato e extrai as seguintes informações em JSON: " +
   "titulo, fornecedor, referencia, data_inicio, data_fim, " +
   "renovacao_automatica (boolean), valor, notas. " +
   "Se não encontrares um campo, devolve null. " +
   "As datas devem estar no formato AAAA-MM-DD. " +
-  "O valor deve ser um número (sem símbolo de moeda nem separador de milhares).";
-
-const JSON_SCHEMA = {
-  name: "dados_contrato",
-  strict: true,
-  schema: {
-    type: "object",
-    additionalProperties: false,
-    properties: {
-      titulo: { type: ["string", "null"] },
-      fornecedor: { type: ["string", "null"] },
-      referencia: { type: ["string", "null"] },
-      data_inicio: { type: ["string", "null"] },
-      data_fim: { type: ["string", "null"] },
-      renovacao_automatica: { type: ["boolean", "null"] },
-      valor: { type: ["number", "null"] },
-      notas: { type: ["string", "null"] },
-    },
-    required: [
-      "titulo",
-      "fornecedor",
-      "referencia",
-      "data_inicio",
-      "data_fim",
-      "renovacao_automatica",
-      "valor",
-      "notas",
-    ],
-  },
-};
+  "O valor deve ser um número (sem símbolo de moeda nem separador de milhares). " +
+  "Responde APENAS com o JSON, sem markdown nem explicações.";
 
 function normalizarData(v: unknown): string | null {
   return typeof v === "string" && DATA_RE.test(v) ? v : null;
@@ -79,14 +65,31 @@ function texto(v: unknown): string | null {
   return t.length > 0 ? t.slice(0, 2000) : null;
 }
 
+/** Aceita JSON puro ou cercado de markdown (```json … ```) do modelo. */
+function extrairJson(conteudo: string): Record<string, unknown> | null {
+  let t = conteudo.trim();
+  const fence = t.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (fence) t = fence[1].trim();
+  const inicio = t.indexOf("{");
+  const fim = t.lastIndexOf("}");
+  if (inicio === -1 || fim <= inicio) return null;
+  try {
+    const parsed = JSON.parse(t.slice(inicio, fim + 1));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function extrairDadosContrato(
   formData: FormData
 ): Promise<ExtraccaoState> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões para esta operação." };
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return { indisponivel: true };
+  if (!mlxChatConfigurado()) return { indisponivel: true };
 
   const file = formData.get("ficheiro");
   if (!(file instanceof File) || file.size === 0) {
@@ -99,61 +102,47 @@ export async function extrairDadosContrato(
     return { error: `PDF demasiado grande (máx. ${TAMANHO_MAX_MB} MB).` };
   }
 
-  let conteudo: string;
-  try {
-    const b64 = Buffer.from(await file.arrayBuffer()).toString("base64");
-
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        temperature: 0,
-        messages: [
-          {
-            role: "system",
-            content:
-              "És um assistente que extrai dados de contratos de condomínio para uma plataforma de gestão. Responde apenas com o JSON pedido.",
-          },
-          {
-            role: "user",
-            content: [
-              { type: "text", text: PROMPT },
-              {
-                type: "file",
-                file: {
-                  filename: "contrato.pdf",
-                  file_data: `data:application/pdf;base64,${b64}`,
-                },
-              },
-            ],
-          },
-        ],
-        response_format: { type: "json_schema", json_schema: JSON_SCHEMA },
-      }),
-    });
-
-    if (!res.ok) {
-      const corpo = await res.text().catch(() => "");
-      console.error("OpenAI extracção falhou:", res.status, corpo.slice(0, 500));
-      return { error: "Não foi possível analisar o contrato. Preencha à mão." };
-    }
-
-    const json = await res.json();
-    conteudo = json?.choices?.[0]?.message?.content ?? "";
-  } catch (err) {
-    console.error("Erro a contactar a OpenAI:", err);
-    return { error: "Não foi possível analisar o contrato. Preencha à mão." };
+  // 1) Texto do PDF, extraído localmente (unpdf). Estados explícitos,
+  //    nunca lançar.
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const extracao = await extrairTextoPdfLocal(bytes);
+  if (extracao.estado === "falha") {
+    return { error: "Não foi possível ler o PDF do contrato. Preencha à mão." };
+  }
+  if (extracao.estado === "sem_texto") {
+    return {
+      error:
+        "O PDF do contrato não tem texto extraível (digitalizado?). Preencha à mão.",
+    };
   }
 
-  let bruto: Record<string, unknown>;
-  try {
-    bruto = JSON.parse(conteudo);
-  } catch {
-    console.error("Resposta da OpenAI não é JSON:", conteudo.slice(0, 300));
+  // 2) Enviar o TEXTO ao chat local.
+  const res = await chatLocal(
+    [
+      {
+        role: "system",
+        content:
+          "És um assistente que extrai dados de contratos de condomínio para uma plataforma de gestão. Responde apenas com o JSON pedido.",
+      },
+      {
+        role: "user",
+        content: `${PROMPT}\n\nCONTRATO:\n${extracao.texto.slice(0, CONTRATO_MAX_CARACTERES)}`,
+      },
+    ],
+    { temperature: 0 }
+  );
+
+  if (!res?.content) {
+    console.error("[extrair-contrato] chat local indisponível.");
+    return { indisponivel: true };
+  }
+
+  const bruto = extrairJson(res.content);
+  if (!bruto) {
+    console.error(
+      "[extrair-contrato] resposta do modelo não é JSON:",
+      res.content.slice(0, 300)
+    );
     return { error: "Resposta inesperada da análise. Preencha à mão." };
   }
 

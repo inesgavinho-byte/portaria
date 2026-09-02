@@ -8,8 +8,16 @@
 
 -- ----------------------------------------------------------------------
 -- 0. Extensão pgvector (ignora se já existir)
+-- Explicitamente em `extensions`, onde produção a tem e onde as funções
+-- posteriores (20260826030000) a referenciam como extensions.vector.
 -- ----------------------------------------------------------------------
-create extension if not exists vector;
+create extension if not exists vector with schema extensions;
+
+-- O operador de distância coseno (<=>) e a classe de operadores
+-- vector_cosine_ops vivem no schema da extensão; sem `extensions` no
+-- search_path, a criação do índice HNSW e das funções que usam <=> falha
+-- numa reconstrução limpa (produção tem extensions no search_path do papel).
+set search_path = public, extensions;
 
 -- ----------------------------------------------------------------------
 -- 1. CONHECIMENTO_EMBEDDINGS — chunks de texto com embeddings vetoriais
@@ -150,7 +158,7 @@ returns table (
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select
     e.id,
@@ -178,7 +186,7 @@ returns table (origem text, count bigint)
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select e.origem, count(*)::bigint
   from public.conhecimento_embeddings e

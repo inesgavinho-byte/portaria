@@ -43,13 +43,39 @@
   }
 }
 
+/*
+ * Impressão: comportamento global da aplicação.
+ *
+ * Aqui fica apenas o que vale para QUALQUER página impressa — retirar o cromo
+ * da interface e assentar o documento em branco sobre preto. As regras de
+ * composição de um documento concreto pertencem ao documento: as do relatório
+ * do fornecedor estão em `src/styles/relatorio-print.css`.
+ */
 @media print {
-  @page { size: A4; margin: 16mm; }
-  .no-print, nav, aside, header + div { display: none !important; }
-  body { background: #fff !important; color: #17201c !important; }
-  .print-report { max-width: none !important; padding: 0 !important; }
-  .print-report section, .print-report tr, .print-report li { break-inside: avoid; }
-  .print-report a { color: inherit !important; text-decoration: none !important; }
+  /*
+   * `.no-print` marca controlos; `[data-chrome="app"]` marca o invólucro da
+   * aplicação — sidebar, barra de pesquisa, conselheira.
+   *
+   * A regra anterior era `nav, aside, header + div`, que apagava por forma e
+   * não por intenção: acertava na sidebar e também em conteúdo dentro das
+   * próprias páginas. Marcar explicitamente custa uma linha por elemento e
+   * deixa de haver conteúdo a desaparecer por acidente.
+   */
+  .no-print,
+  [data-chrome="app"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #141a17 !important;
+  }
+
+  /* O fundo da aplicação é um verde muito claro que no papel sai cinzento. */
+  body * {
+    box-shadow: none !important;
+  }
 }
 
 @layer components {

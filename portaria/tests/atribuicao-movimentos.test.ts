@@ -147,4 +147,34 @@ describe("sugestões de fornecedor", () => {
     const sugestoes = sugerirFornecedores(mov({ id: "1", contraparte: "SU Eletricidade" }), FORNECEDORES);
     expect(sugestoes[0].motivo.length).toBeGreaterThan(0);
   });
+
+  it("eleva a exacta uma contraparte que é alias confirmado anteriormente", () => {
+    // Variante de nome que, sozinha, não chegava a sugestão nenhuma ("verticai"
+    // ≠ "verticais", e só "pinturas" é termo comum). Com o alias confirmado por
+    // uma pessoa na triagem manual, a sugestão nasce exacta — é memória, não
+    // adivinhacao.
+    const sugestoes = sugerirFornecedores(
+      mov({ id: "1", contraparte: "PINTURAS VERTICAI LDA" }),
+      FORNECEDORES,
+      3,
+      [{ fornecedorId: "f-pinturas", alias: "pinturas verticai lda" }],
+    );
+    expect(sugestoes).toHaveLength(1);
+    expect(sugestoes[0].fornecedor.id).toBe("f-pinturas");
+    expect(sugestoes[0].confianca).toBe("exacta");
+    expect(sugestoes[0].motivo).toContain("Alias confirmado");
+  });
+
+  it("um alias com texto diferente da contraparte não contamina a sugestão", () => {
+    // O alias pertence ao par (fornecedor, texto): só "pinturas verticai lda"
+    // registado COMO f-pinturas produz exacta. Outro texto, mesmo do mesmo
+    // fornecedor, não conta.
+    const sugestoes = sugerirFornecedores(
+      mov({ id: "1", contraparte: "PINTURAS VERTICAI LDA" }),
+      FORNECEDORES,
+      3,
+      [{ fornecedorId: "f-pinturas", alias: "pinturas verticais unipessoal" }],
+    );
+    expect(sugestoes).toEqual([]);
+  });
 });

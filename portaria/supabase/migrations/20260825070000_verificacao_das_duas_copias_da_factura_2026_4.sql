@@ -1,0 +1,39 @@
+-- Verificação de identidade entre as duas cópias da Factura 2026/4.
+--
+-- Aplicada no projecto Supabase por actualização directa da fonte
+-- "Factura 2026/4 — documento original" (checksum 9dad4d55).
+--
+-- A Factura 2026/4 existe no processo em dois ficheiros distintos:
+--
+--   MD5 9dad4d55   PDF nativo, com camada de texto.
+--                  Enviado pelo empreiteiro a 26-05-2026, 21:44.
+--   MD5 dd33f5b9   Digitalização, sem camada de texto, 248K.
+--                  Anexada ao email da administração de 09-06-2026, 18:27,
+--                  "para melhor identificação do assunto".
+--
+-- Confrontados campo a campo:
+--
+--   ATCUD                     J62NRRCP-4
+--   Data de emissão           2026-05-26
+--   Data de vencimento        2026-05-26
+--   NIF do emitente           515635952
+--   NIF do adquirente         900228288
+--   Quantidade                1,00
+--   Preço                     6.000,00
+--   Desconto                  0,00
+--   Taxa de IVA               6,00 %
+--   Subtotal                  6.000,00 EUR
+--   IVA (incidência 6.000,00)   360,00 EUR
+--   Total                     6.360,00 EUR
+--   Identificador de assinatura  LBpM
+--   Programa certificado      n.º 1137/AT
+--
+-- Sem divergência. É o mesmo documento fiscal, não uma reemissão.
+-- (A Factura 2026/7 exibe identificador distinto, AnHd, como esperado.)
+--
+-- PORQUE SE REGISTA ISTO
+-- Neste processo circularam três ficheiros distintos sob a mesma referência
+-- 010125 — MD5 66032d3a, b28f4a71 e c9936e04 — com valores, prazos, cláusula
+-- de IVA e lista de materiais diferentes entre si. Depois disso, a identidade
+-- entre duas cópias que ostentam a mesma referência não se presume: verifica-se
+-- e fica registada a verificação.

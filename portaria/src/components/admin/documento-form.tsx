@@ -133,6 +133,80 @@ export function DocumentoForm({ documento }: DocumentoFormProps) {
         </div>
       </div>
 
+      {/* Metadados do documento em si, distintos dos do upload. A data de um
+          email não é a data em que foi arquivado, e é a primeira que importa ao
+          dossiê. Em edição podem ser corrigidos — a fonte documental, quando
+          existe, acompanha. */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <div>
+          <label
+            htmlFor="data_documento"
+            className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
+          >
+            Data do documento{" "}
+            <span className="normal-case tracking-normal text-oliveGray/60">(opcional)</span>
+          </label>
+          <input
+            id="data_documento"
+            name="data_documento"
+            type="date"
+            defaultValue={documento?.data_documento ?? ""}
+            className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
+          />
+          {state.fieldErrors?.data_documento && (
+            <p className="mt-2 text-sm text-alert font-body">
+              {state.fieldErrors.data_documento}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="contraparte"
+            className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
+          >
+            Emitente / contraparte{" "}
+            <span className="normal-case tracking-normal text-oliveGray/60">(opcional)</span>
+          </label>
+          <input
+            id="contraparte"
+            name="contraparte"
+            type="text"
+            maxLength={200}
+            defaultValue={documento?.contraparte ?? ""}
+            className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
+          />
+          {state.fieldErrors?.contraparte && (
+            <p className="mt-2 text-sm text-alert font-body">
+              {state.fieldErrors.contraparte}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="n_mensagens"
+            className="block font-body text-xs tracking-widest uppercase text-oliveGray mb-2"
+          >
+            N.º de mensagens{" "}
+            <span className="normal-case tracking-normal text-oliveGray/60">(se fio)</span>
+          </label>
+          <input
+            id="n_mensagens"
+            name="n_mensagens"
+            type="number"
+            min={1}
+            defaultValue={documento?.n_mensagens ?? ""}
+            className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
+          />
+          {state.fieldErrors?.n_mensagens && (
+            <p className="mt-2 text-sm text-alert font-body">
+              {state.fieldErrors.n_mensagens}
+            </p>
+          )}
+        </div>
+      </div>
+
       <div>
         <label
           htmlFor="descricao"

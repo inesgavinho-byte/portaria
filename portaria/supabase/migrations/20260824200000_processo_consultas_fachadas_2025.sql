@@ -21,7 +21,7 @@
 INSERT INTO public.ia_documental_fontes
   (tenant_id, titulo, referencia, jurisdicao, ativa, conteudo_resumo, conteudo_markdown, checksum, tamanho_bytes)
 SELECT t.id, v.titulo, v.referencia, 'PT', true, v.resumo, v.markdown, v.checksum, v.bytes
-FROM (SELECT DISTINCT tenant_id AS id FROM public.contratos c
+FROM (SELECT DISTINCT c.tenant_id AS id FROM public.contratos c
       JOIN public.fornecedores f ON f.id = c.fornecedor_id
       WHERE f.nome = 'Pinturas Verticais') t,
 (VALUES

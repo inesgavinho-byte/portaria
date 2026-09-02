@@ -86,7 +86,11 @@ function cenarioPinturasVerticais(): SupplierTimelineInput {
       memoria({ id: "e-adj", data_evento: "2026-05-26T00:00:00Z", tipo: "adjudicacao", titulo: "Adjudicação da empena direita" }),
       memoria({ id: "e-suspensao", data_evento: "2026-05-27T00:00:00Z", tipo: "decisao", titulo: "Pagamento suspenso", despesa_id: despesa4, efeito: "suspensao" }),
       memoria({ id: "e-exec-0906", data_evento: "2026-06-09T00:00:00Z", tipo: "execucao", titulo: "Metade dos trabalhos ultrapassada" }),
-      memoria({ id: "e-pag-banco", data_evento: "2026-06-11T00:00:00Z", tipo: "pagamento", titulo: "Pagamento bancário de 6.360 EUR imputado à Factura 2026/4", natureza: "inferencia", valor_cents: 636000, movimento_id: movimento6360, despesa_id: despesa4, efeito: "confirmacao_pagamento" }),
+      // O débito é facto bancário; a factura que liquidou não está identificada.
+      // A 09-06 estavam por pagar a 2026/4 e a 2026/7, ambas de 6.360, e nenhum
+      // documento diz qual foi paga: `despesa_id` fica nulo e a natureza é
+      // pendente. Ver 20260825120000_desimputar_pagamento_11_06.sql.
+      memoria({ id: "e-pag-banco", data_evento: "2026-06-11T00:00:00Z", tipo: "pagamento", titulo: "Pagamento bancário de 6.360 EUR — factura exacta por identificar", natureza: "pendente", valor_cents: 636000, movimento_id: movimento6360, despesa_id: null, efeito: "confirmacao_pagamento" }),
       memoria({ id: "e-ft8", data_evento: "2026-06-15T00:00:00Z", tipo: "fatura", titulo: "Emissão e envio da Factura 2026/8", natureza: "inferencia", valor_cents: 318000, despesa_id: despesa8, efeito: "emissao" }),
       memoria({ id: "e-retencao", data_evento: "2026-07-07T00:00:00Z", tipo: "decisao", titulo: "Retenção do pagamento final", despesa_id: despesa8, efeito: "retencao" }),
       memoria({ id: "e-reconciliacao", data_evento: "2026-08-23T00:00:00Z", tipo: "decisao", titulo: "Reconciliação financeira", natureza: "pendente" }),
@@ -126,6 +130,47 @@ describe("resumo financeiro do fornecedor", () => {
     const entrada = cenarioPinturasVerticais();
     expect(entrada.movimentos.every((m) => m.despesa_id === null)).toBe(true);
     expect(resumirFinanceiroFornecedor(entrada).saidasConfirmadasCents).toBe(636000);
+  });
+
+  it("conta a saída confirmada sem a distribuir por nenhuma despesa", () => {
+    const entrada = cenarioPinturasVerticais();
+    const resumo = resumirFinanceiroFornecedor(entrada);
+
+    // Atribuído ao fornecedor, não reconciliado com factura: é a posição
+    // canónica do débito de 11-06-2026.
+    const debito = entrada.movimentos.find((m) => m.id === "m-11-06");
+    expect(debito?.fornecedor_id).toBe(FORNECEDOR);
+    expect(debito?.despesa_id).toBeNull();
+    expect(debito?.confirmado).toBe(true);
+    expect(debito?.estado_reconciliacao).toBe("parcial");
+
+    // Nenhuma factura recebe a imputação, nem por movimento nem por
+    // acontecimento de memória.
+    expect(entrada.movimentos.some((m) => m.despesa_id !== null)).toBe(false);
+    const imputacoes = entrada.memoria.filter(
+      (e) => e.efeito === "confirmacao_pagamento" && e.despesa_id !== null,
+    );
+    expect(imputacoes).toEqual([]);
+
+    // E o valor entra inteiro nas saídas confirmadas.
+    expect(resumo.saidasConfirmadasCents).toBe(636000);
+  });
+
+  it("apura os mesmos KPIs com ou sem imputação do pagamento a uma factura", () => {
+    // A garantia central da correcção: retirar a imputação não move nenhum
+    // número. Se movesse, o apuramento estaria a depender de uma inferência.
+    const semImputacao = resumirFinanceiroFornecedor(cenarioPinturasVerticais());
+
+    const comImputacao = cenarioPinturasVerticais();
+    comImputacao.movimentos = comImputacao.movimentos.map((m) =>
+      m.id === "m-11-06" ? { ...m, despesa_id: "d-2026-4", estado_reconciliacao: "reconciliado" } : m,
+    );
+
+    expect(resumirFinanceiroFornecedor(comImputacao)).toEqual(semImputacao);
+    expect(semImputacao.despesasRegistadasCents).toBe(1590000); // €15.900
+    expect(semImputacao.saidasConfirmadasCents).toBe(636000); //   €6.360
+    expect(semImputacao.emAbertoCents).toBe(954000); //            €9.540
+    expect(semImputacao.condicionadoCents).toBe(318000); //        €3.180
   });
 
   it("desconta entradas confirmadas do pago líquido em vez de as somar", () => {
@@ -197,15 +242,17 @@ describe("cronologia unificada do fornecedor", () => {
     expect(eventos.length).toBeGreaterThan(20);
   });
 
-  it("mostra o pagamento de 11/06 com a imputação classificada como inferência", () => {
+  it("mostra o pagamento de 11/06 confirmado no banco e sem factura identificada", () => {
     const eventos = construirTimelineFornecedor(cenarioPinturasVerticais());
     const pagamento = eventos.find((evento) => evento.date.startsWith("2026-06-11"));
     expect(pagamento).toBeDefined();
     expect(pagamento?.amountCents).toBe(636000);
     expect(pagamento?.confirmation).toBe("banco");
-    // O débito é facto bancário; a imputação a uma factura concreta não é
-    // promovida a facto documental.
-    expect(pagamento?.nature).toBe("inferencia");
+    // O débito é facto bancário provado pelo extrato. Qual das duas facturas de
+    // igual valor liquidou não está em documento nenhum, e a imputação legal
+    // pela obrigação mais antiga está disputada pela interpelação de
+    // 31-07-2026 — logo é PENDENTE, não uma inferência sustentada.
+    expect(pagamento?.nature).toBe("pendente");
   });
 
   it("não deixa o evento de pagamento absorver a factura que imputa", () => {

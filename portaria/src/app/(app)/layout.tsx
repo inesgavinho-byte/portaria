@@ -129,20 +129,40 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const vista: Vista = isAdmin && raw && vistas.includes(raw) ? raw : vistas[0];
   const grupos = vista === "admin" ? GRUPOS_ADMIN : vista === "inquilino" ? GRUPOS_INQUILINO : GRUPOS_CONDOMINO;
 
+  // `data-chrome="app"` marca o invólucro da aplicação para a impressão o
+  // retirar. Sem estas marcas a sidebar, a barra de pesquisa e a conselheira
+  // saíam no papel: a regra global que antes as escondia apagava elementos pela
+  // forma (`nav, aside, header + div`) e levava conteúdo das páginas com ela,
+  // pelo que foi substituída por marcação explícita.
   return (
     <div className="min-h-screen lg:flex">
-      <AppNav tenantNome={ctx.tenant.nome} userEmail={ctx.user.email ?? ""} fracao={ctx.membership.fracao} grupos={grupos} vista={vista} vistas={vistas} />
+      <div data-chrome="app" className="contents">
+        <AppNav tenantNome={ctx.tenant.nome} userEmail={ctx.user.email ?? ""} fracao={ctx.membership.fracao} grupos={grupos} vista={vista} vistas={vistas} />
+      </div>
       <div className="min-w-0 flex-1">
         {vista === "admin" && (
-          <div className="sticky top-0 z-30 border-b border-white/60 bg-[#edf3f0]/75 px-5 py-3 backdrop-blur-xl md:px-8 lg:px-10 xl:px-12">
+          <div data-chrome="app" className="sticky top-0 z-30 border-b border-white/60 bg-[#edf3f0]/75 px-5 py-3 backdrop-blur-xl md:px-8 lg:px-10 xl:px-12">
             <PesquisaGlobal />
           </div>
         )}
-        <main className="px-5 py-8 md:px-8 lg:px-10 xl:px-12">
-          <div className="mx-auto w-full max-w-6xl">{children}</div>
+        <main className="px-5 py-8 md:px-8 lg:px-10 xl:px-12 print:p-0">
+          {/*
+            O invólucro limita as páginas a 72rem (1152px). Um relatório
+            editorial precisa de mais do que isso num monitor grande, e o
+            `max-w` do próprio relatório nunca chegava a ser o limite efectivo
+            porque este era menor. Em vez de duplicar o layout para uma rota,
+            o invólucro cede quando o filho se declara documento largo.
+          */}
+          <div className="mx-auto w-full max-w-6xl has-[[data-documento='largo']]:max-w-[1400px] print:max-w-none">
+            {children}
+          </div>
         </main>
       </div>
-      {vista === "admin" && <Conselheira />}
+      {vista === "admin" && (
+        <div data-chrome="app" className="contents">
+          <Conselheira />
+        </div>
+      )}
     </div>
   );
 }

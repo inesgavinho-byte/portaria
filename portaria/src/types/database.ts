@@ -122,6 +122,7 @@ export type Convite = {
   criado_em: string;
   expira_em: string;
   aceite_em: string | null;
+  recusado_em: string | null;
 };
 
 export type Ocorrencia = {
@@ -219,6 +220,8 @@ export type ContratoMemoriaFonte = {
   titulo: string;
   referencia: string | null;
   url: string | null;
+  /** Ficheiro arquivado de que esta fonte é a leitura, quando existe. */
+  documento_id: string | null;
 };
 
 export type ContratoMemoriaEvidencia = {
@@ -231,6 +234,61 @@ export type ContratoMemoriaEvidencia = {
 
 /** Efeito de um acontecimento de memória sobre o objecto financeiro ligado. */
 export type ContratoMemoriaEfeito = "emissao" | "confirmacao_pagamento" | "retencao" | "suspensao";
+
+/* ------------------------------------------------------- posições de imputação */
+
+/**
+ * Quem sustenta uma posição sobre a imputação de um pagamento.
+ *
+ * `terceiro` cobre acompanhamento técnico, perito ou mandatário de outra parte
+ * — quem não é o condomínio nem a contraparte do contrato.
+ */
+export type PosicaoParte = "condominio" | "contraparte" | "terceiro";
+
+/** O que sustenta. `reserva` é declarar expressamente que não se toma posição. */
+export type PosicaoTipo = "imputa" | "nao_imputa" | "reserva";
+
+/**
+ * Em que pé está. Uma posição retirada ou superada não se apaga: o processo
+ * precisa de saber que existiu e quando deixou de ser sustentada.
+ */
+export type PosicaoEstado = "sustentada" | "aceite" | "retirada" | "superada";
+
+/**
+ * Posição de uma parte sobre a imputação de um movimento bancário a uma
+ * despesa.
+ *
+ * Nunca substitui `movimentos_bancarios.despesa_id`, que continua a significar
+ * uma só coisa: a factura que o processo demonstra ter sido liquidada por
+ * aquele movimento. Uma posição vive ao lado dessa ligação, não dentro dela, e
+ * nenhum apuramento financeiro a lê.
+ */
+export type PosicaoImputacao = {
+  id: string;
+  tenant_id: string;
+  movimento_id: string;
+  /** Factura candidata. Nula apenas quando a posição é de reserva. */
+  despesa_id: string | null;
+  parte: PosicaoParte;
+  /** Quem em concreto, quando importa: "Rui Machado da Silva, mandatário". */
+  parte_descricao: string | null;
+  tipo: PosicaoTipo;
+  fundamento: string;
+  estado: PosicaoEstado;
+  /** Quando a parte a assumiu, não quando foi registada. */
+  data_posicao: string;
+  observacoes: string | null;
+  criado_em: string;
+  atualizado_em: string;
+  imputacoes_posicoes_evidencias?: PosicaoImputacaoEvidencia[];
+};
+
+export type PosicaoImputacaoEvidencia = {
+  id: string;
+  localizador: string | null;
+  citacao: string;
+  ia_documental_fontes: ContratoMemoriaFonte[];
+};
 
 export type ContratoMemoriaEvento = {
   id: string;
@@ -333,12 +391,38 @@ export type AssembleiaPonto = {
   criado_em: string;
 };
 
+/**
+ * Categorias do arquivo documental.
+ *
+ * As sete últimas foram acrescentadas porque um processo de empreitada vive de
+ * comunicações, orçamentos e comprovativos, e classificá-los como "outro"
+ * torna o arquivo inútil no momento em que é preciso citá-los.
+ */
+export type DocumentoCategoria =
+  | "ata"
+  | "conta"
+  | "contrato"
+  | "regulamento"
+  | "manual"
+  | "apolice"
+  | "circular"
+  | "outro"
+  | "obra"
+  | "seguro"
+  | "comunicacao"
+  | "orcamento"
+  | "factura"
+  | "comprovativo"
+  | "ficha_tecnica"
+  | "parecer"
+  | "interpelacao";
+
 export type Documento = {
   id: string;
   tenant_id: string;
   titulo: string;
   descricao: string | null;
-  categoria: "ata" | "conta" | "contrato" | "regulamento" | "manual" | "apolice" | "circular" | "outro";
+  categoria: DocumentoCategoria;
   ano: number | null;
   ficheiro_path: string;
   ficheiro_tamanho: number | null;
@@ -349,6 +433,14 @@ export type Documento = {
   fornecedor_id: string | null;
   contrato_id: string | null;
   blueprint_id: string | null;
+  /** Data do documento em si — do email, da factura, do parecer. */
+  data_documento: string | null;
+  /** Remetente, destinatário ou emitente, conforme a natureza. */
+  contraparte: string | null;
+  /** Número de mensagens, quando o documento é um fio de correspondência. */
+  n_mensagens: number | null;
+  /** Resumo criptográfico. Distingue cópias de versões sob a mesma referência. */
+  checksum: string | null;
 };
 
 /** Documento confidencial, visível apenas a administradores do tenant. */

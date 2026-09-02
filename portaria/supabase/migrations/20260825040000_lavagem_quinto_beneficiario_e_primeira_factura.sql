@@ -1,0 +1,100 @@
+-- Lavagem da frente, quinto beneficiário terceiro, retenção de 1.700 EUR e a
+-- primeira factura do processo.
+--
+-- Aplicada no projecto Supabase sob o nome:
+--   lavagem_frente_quinto_beneficiario_e_primeira_factura
+--
+-- Quatro fontes novas (MD5 d1d7ecde, 1fb515d7, 885eed81, 9dad4d55), sete
+-- eventos e duas correcções.
+--
+-- ====================================================================
+-- DUAS CORRECÇÕES A REGISTOS ANTERIORES
+-- ====================================================================
+--
+-- 1. "Redução de 1.700 EUR na frente e na lateral entre Abril e Maio de 2026"
+--    juntava dois fenómenos distintos. Passa a "Retenção de 1.700 EUR na
+--    frente desaparece e a lateral é reorçamentada".
+--
+--    Na LATERAL não houve redução: houve reorçamentação. O 010125-ADIT, de
+--    25-05-2026, fixa-a em 15.000,00 EUR + IVA 6%.
+--
+--    Na FRENTE os 1.700,00 EUR não eram saldo por negociar. Eram uma RETENÇÃO
+--    que a administração constituiu por escrito em 24-02-2026:
+--      "solicito ao Dr. Carlos Reis que proceda ao pagamento dos 3.000,00€,
+--       ficando cativos os 1.700,00€ referente à conclusão dos trabalhos na
+--       fachada da frente."
+--    Entre Abril e Maio de 2026 essa retenção desaparece do mapa sem que
+--    conste documento que ateste a conclusão dos trabalhos, acordo de perdão,
+--    compensação ou deliberação. À data em que desaparece estavam por
+--    resolver as infiltrações do 3.º e do 5.º Dt.º.
+--
+-- 2. "Pagamento de 3.000 EUR comunicado no mesmo acto em que se reporta a
+--    falha" dizia "sem retenção nem reserva documentada". Errado. Houve
+--    reserva, escrita e fundamentada. O que falta explicar não é a sua
+--    ausência, é o seu desaparecimento.
+--
+-- ====================================================================
+-- FACTOS NOVOS
+-- ====================================================================
+--
+-- LAVAGEM DA FRENTE — 2.000,00 EUR, 29/30-10-2025
+--   Pedida "conforme acordado". Questionada, Miguel Vassalo explica:
+--     "Está relacionado com o inicio da pintura no edifício America e a
+--      empresa pediu para lavar os dois edifícios de forma a um edificio não
+--      sujar o outro."
+--   A lavagem geral de alta pressão é a fase 2 do orçamento e está incluída
+--   no preço de cada fachada. E o motivo declarado é a obra de um edifício
+--   terceiro, sem repartição de custo. Não há factura.
+--
+-- QUINTO BENEFICIÁRIO TERCEIRO — 23-02-2026
+--   Pedro Henrique Barbosa Silva, 3.000,00 EUR. A lista completa:
+--     Robert Gian / Guan Júlio          12.000,00 + 10.000,00 EUR
+--     Danilo Lopes Bandeca              indicado e retirado "por lapso"
+--     Wagner Ottoni Nascimento           4.000,00 EUR
+--     Gustavo José Matias da Silva       6.000,00 EUR
+--     Pedro Henrique Barbosa Silva       3.000,00 EUR
+--
+--   E, pela única vez no processo, a fórmula "Conforme acordado" é
+--   confrontada — e desmentida por quem a teria dado:
+--     "O empreiteiro falou comigo, mas não combinei nenhum pagamento."
+--                                              Miguel Vassalo, 23-02-2026
+--
+-- PRIMEIRA CONTA DA PRÓPRIA SOCIEDADE — 25-05-2026, 19:13
+--   Comprovativo Novo Banco em nome de REINALDO FERREIRA TRABALHOS VERTICAIS
+--   UNIPESSOAL LDA. Primeira vez em todo o processo que o beneficiário é a
+--   adjudicatária. Os 45.000,00 EUR anteriores foram para cinco pessoas.
+--
+-- PRIMEIRA FACTURA — 2026/4, ATCUD J62NRRCP-4, 26-05-2026
+--   Base 6.000,00 | IVA 6,00% sobre a totalidade 360,00 | Total 6.360,00 EUR
+--   NIF do adquirente 900228288.
+--
+--   Desmente a fórmula que o próprio emitente anunciara em 04-09-2025: não há
+--   repartição 6%/23%, há 6% sobre o valor integral.
+--
+--   E fecha a aritmética da lateral:
+--     6.000,00 = 40% de 15.000,00
+--     6.360,00 + 6.360,00 + 3.180,00 = 15.900,00 = 15.000,00 x 1,06
+--   A fachada lateral está integralmente facturada. As fachadas tardoz e da
+--   frente, 45.000,00 EUR pagos, não têm uma única factura no processo.
+--
+--   Mas a descrição é apenas "Pintura do prédio", sem fachada, fase ou
+--   tranche. A imputação à lateral resulta do contexto e da aritmética, não
+--   do documento.
+--
+-- SEQUÊNCIA DA ADJUDICAÇÃO DA EMPENA DIREITA — 26-05-2026
+--   21:44  o empreiteiro envia a factura
+--   22:38  o Eng. Jaime Correia comunica a adjudicação, anexando "a fatura já
+--          emitida", e instrui a administração a pagar
+--   A factura precede o acto que lhe dá causa em 54 minutos, e quem comunica
+--   a adjudicação é o acompanhamento técnico, cujo mandato documentado, de
+--   08-09-2025, era de "controle verificação".
+--
+-- QUARTA REDACÇÃO DA CLÁUSULA DE IVA
+--   66032d3a  Jan/2025, aceite em assembleia  "acresce IVA à taxa legal em vigor"
+--   b28f4a71  11-06-2025                      "acresce IVA, a combinar"
+--   c9936e04  04-09-2025, o 010125-R          "acresce IVA, a combinar"
+--   8818a8c6  25-05-2026, o 010125-ADIT       "acresce IVA, à taxa legal de 6%"
+--
+--   A taxa nunca mudou — resulta da lei. Mudou a disposição do emitente para
+--   a escrever. O período em que a cláusula esteve "combinável" é exactamente
+--   o período em que se pagaram 45.000,00 EUR sem factura e sem IVA.

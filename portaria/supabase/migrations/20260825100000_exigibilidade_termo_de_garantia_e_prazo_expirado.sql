@@ -1,0 +1,92 @@
+-- Exigibilidade da tranche de conclusão, termo de garantia em falta e prazo da
+-- interpelação expirado.
+--
+-- Aplicadas no projecto Supabase sob os nomes:
+--   exigibilidade_da_tranche_de_conclusao_e_termo_de_garantia
+--   interpelacao_sem_resposta_prazo_expirado
+--
+-- ====================================================================
+-- CORRECÇÃO DE FUNDAMENTO
+-- ====================================================================
+-- Uma redacção anterior ancorava a retenção da tranche final na deliberação
+-- da AGE de 07-07-2026. Estava errada quanto ao fundamento.
+--
+-- A retenção não é discricionária nem decorre de deliberação. Decorre da
+-- obrigação: a prestação não se venceu.
+--
+-- O orçamento 010125-ADIT, proposto pela própria empreiteira, estipula:
+--
+--   "Pagamento: 40% na adjudicação da obra, 40% a meio da obra,
+--    20% NA CONCLUSÃO DOS TRABALHOS."
+--
+--   "Damos garantia por um período de 5 anos aos trabalhos executados.
+--    APÓS A CONCLUSÃO DA OBRA SERÁ EMITIDO UM TERMO DE GARANTIA."
+--
+--   "A adjudicação só será considerada após a entrega do duplicado da
+--    proposta devidamente assinada."
+--
+-- O termo de garantia é, no desenho do próprio proponente, o marco documental
+-- da conclusão. Não existe. Não há termo de garantia, auto de recepção,
+-- vistoria nem parecer que ateste a conclusão — apesar de o acompanhamento
+-- técnico estar em cópia em toda a correspondência do período.
+--
+-- A obra não foi entregue e a garantia não foi prestada. A deliberação da AGE
+-- confirma a posição do condomínio; não a funda. O fundamento está no
+-- contrato.
+--
+-- ====================================================================
+-- CORRECÇÃO DE FACTO: o prazo do ADIT é de 30 dias
+-- ====================================================================
+-- Uma citação anterior atribuiu ao ADIT o prazo de 45 dias, que é o do
+-- orçamento 010125-R. O ADIT diz 30 dias. Citação e evento corrigidos.
+--
+-- ====================================================================
+-- PENDÊNCIA NOVA: termo de garantia nunca emitido
+-- ====================================================================
+-- A cláusula do termo de garantia consta de TODAS as versões da proposta —
+-- 010125 de Janeiro/2025, a reenviada em Junho/2025, o 010125-R e o ADIT.
+--
+-- Não consta do processo um único termo de garantia:
+--   fachada tardoz   dada como liquidada em 30.000,00 EUR — sem termo
+--   fachada frente   dada como liquidada em 15.000,00 EUR — sem termo
+--   fachada lateral  tranche de conclusão reclamada judicialmente — sem termo
+--
+-- Duplo efeito. Nas fachadas já pagas, o condomínio pagou a totalidade sem
+-- receber o título que formaliza a garantia de cinco anos — relevante para as
+-- anomalias por sanar. Na lateral, a ausência do termo é o indício documental
+-- de que a conclusão que a factura pressupõe não ocorreu.
+--
+-- ====================================================================
+-- PRAZO EXPIRADO — datas fixadas
+-- ====================================================================
+-- Aplicada também sob o nome:
+--   data_do_aviso_de_recepcao_e_contagem_do_prazo
+--
+--   31-07-2026  sexta-feira   data da carta
+--   04-08-2026  terça-feira   AVISO DE RECEPÇÃO ASSINADO — é esta que conta
+--   14-08-2026  sexta-feira   termo dos 10 dias (dia útil, sem transferência)
+--   15-08-2026  sábado        abre-se a janela para a acção anunciada
+--   24-08-2026  segunda-feira 20 dias sobre a recepção, 10 sobre o termo
+--
+-- Não consta resposta. A carta declarara que, findo o prazo e no silêncio da
+-- administração, "sem mais avisos", recorreria imediatamente à via judicial.
+--
+-- O silêncio não faz precludir os fundamentos do condomínio, que podem ser
+-- invocados em juízo, mas priva-o do registo extrajudicial de os ter invocado
+-- em tempo.
+--
+-- A data do AR releva para três coisas e NÃO releva para uma quarta:
+--   1. delimita a janela em que uma acção pode ter sido instaurada — aberta
+--      desde 15-08-2026. Verificar junto do tribunal competente é urgente.
+--   2. fixa o momento da interpelação para efeitos de mora quanto ao que seja
+--      exigível. Questão distinta: as facturas indicam data de vencimento
+--      coincidente com a de emissão, o que suscita saber se há termo
+--      convencionado ou se a mora só se constitui por interpelação.
+--   3. fixa o momento a partir do qual o silêncio é oponível ao condomínio na
+--      apreciação da conduta das partes.
+--   4. NÃO altera o mérito. A não exigibilidade da tranche de conclusão
+--      decorre de a obra não estar concluída nem garantida, e isso é
+--      indiferente ao decurso do prazo.
+--
+-- A caracterização jurídica de cada ponto deve ser confirmada por advogado do
+-- condomínio.

@@ -4,7 +4,14 @@
  * devolve null e quem chama decide o fallback.
  *
  * NUNCA importar em código com "use client".
+ *
+ * L-44 (processamento local): quando `MLX_CHAT_URL` está definido,
+ * deepseekChat delega no cliente MLX (src/lib/ai/local.ts) e a DeepSeek
+ * DEIXA DE SER CHAMADA — o pipeline China (auditoria 6.2 / L-44) fica
+ * desligado. Sem a variável, mantém-se o comportamento legado.
  */
+
+import { chatLocal, mlxChatConfigurado } from "@/lib/ai/local";
 
 const BASE = "https://api.deepseek.com/v1";
 
@@ -17,7 +24,7 @@ function getModel(): string {
 }
 
 export function deepseekConfigurado(): boolean {
-  return Boolean(getKey());
+  return mlxChatConfigurado() || Boolean(getKey());
 }
 
 export type DeepSeekMessage = {
@@ -37,6 +44,11 @@ export async function deepseekChat(
   messages: DeepSeekMessage[],
   opts?: { temperature?: number; maxTokens?: number }
 ): Promise<DeepSeekResponse | null> {
+  // L-44: chat local em primeiro lugar — a DeepSeek não é contactada.
+  if (mlxChatConfigurado()) {
+    return chatLocal(messages, opts);
+  }
+
   const key = getKey();
   if (!key) {
     console.warn("[deepseek] DEEPSEEK_API_KEY não configurada.");

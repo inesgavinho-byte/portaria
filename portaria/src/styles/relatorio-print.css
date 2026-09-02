@@ -1,0 +1,172 @@
+/*
+ * Regras de impressão do relatório do fornecedor.
+ *
+ * Vive fora de `globals.css` por uma razão de fronteira: o `globals.css` define
+ * a interface da aplicação, este ficheiro define o comportamento de UM
+ * documento em papel. Eram ~80 linhas misturadas com estilos de ecrã, o que
+ * tornava difícil perceber, ao alterar um, se se estava a estragar o outro.
+ *
+ * Tudo aqui está debaixo de `@media print` e limitado a `.relatorio` — nada
+ * neste ficheiro afecta o ecrã, e nada afecta outra página que seja impressa.
+ *
+ * A estrutura HTML é a mesma em ecrã e em papel. Este ficheiro não esconde nem
+ * reordena conteúdo: só reajusta tipografia, larguras e quebras de página.
+ */
+
+@media print {
+  @page {
+    size: A4;
+    /* Margens de documento, não de captura de browser. A inferior é maior para
+       o rodapé não encostar ao corte. */
+    margin: 18mm 16mm 20mm;
+  }
+
+  /* ---------------------------------------------------------------- corpo */
+
+  .relatorio {
+    /* O contentor do ecrã é largo e centrado; no papel a largura é a da folha. */
+    max-width: none;
+    padding: 0;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: #141a17;
+    /* Nunca uma linha só de um parágrafo isolada no topo ou no fundo. */
+    orphans: 3;
+    widows: 3;
+  }
+
+  .relatorio :is(h1, h2, h3) {
+    /* Um título nunca fica sozinho no fim de uma página. */
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  .relatorio h1 {
+    font-size: 19pt;
+    line-height: 1.15;
+  }
+  .relatorio h2 {
+    font-size: 12pt;
+  }
+  .relatorio h3 {
+    font-size: 10pt;
+  }
+
+  /* ------------------------------------------------------------- secções */
+
+  /*
+   * `break-inside: avoid` pertence aos itens, nunca às secções. Numa secção com
+   * 104 acontecimentos, evitar o corte empurraria o bloco inteiro para a página
+   * seguinte e deixaria meia folha em branco — que é o defeito que o pedido
+   * pede expressamente para não introduzir.
+   */
+  .relatorio section {
+    break-inside: auto;
+  }
+
+  .relatorio [data-bloco] {
+    /* Unidade mínima de leitura: uma linha de tabela, um acontecimento curto,
+       um bloco de conflito, uma entrada de fonte. Estes sim, inteiros. */
+    break-inside: avoid;
+  }
+
+  /* O resumo executivo é a peça que perde mais em ser cortada, e é curto o
+     suficiente para caber sempre. */
+  .relatorio [data-bloco="resumo"],
+  .relatorio [data-bloco="reconciliacao"] {
+    break-inside: avoid;
+  }
+
+  /* Um ano da cronologia começa em página nova apenas se o cabeçalho do ano
+     ficasse órfão; não se força página nova por ano, que geraria brancos. */
+  .relatorio [data-ano] > :first-child {
+    break-after: avoid;
+  }
+
+  /* ------------------------------------------------------------- tabelas */
+
+  /*
+   * No ecrã a tabela tem largura mínima e um contentor com scroll horizontal.
+   * No papel não existe scroll: uma tabela que não caiba é uma tabela cortada,
+   * pelo que a largura mínima e o overflow têm de desaparecer.
+   */
+  .relatorio [data-tabela] {
+    overflow: visible;
+  }
+  .relatorio table {
+    width: 100%;
+    min-width: 0;
+    font-size: 8pt;
+    table-layout: fixed;
+  }
+  .relatorio thead {
+    /* Repete o cabeçalho em cada página que a tabela ocupe. */
+    display: table-header-group;
+  }
+  .relatorio tfoot {
+    display: table-footer-group;
+  }
+  .relatorio tr {
+    break-inside: avoid;
+  }
+  .relatorio :is(td, th) {
+    padding: 1.4mm 1.6mm;
+    /* Descrições longas quebram dentro da célula em vez de esticarem a coluna. */
+    overflow-wrap: anywhere;
+  }
+  .relatorio [data-numerico] {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --------------------------------------------------------------- links */
+
+  /* Um link impresso é texto: o sublinhado e a cor só distraem. O destino
+     interessa apenas nas fontes, onde o URL é escrito por extenso. */
+  .relatorio a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .relatorio [data-url]::after {
+    content: " (" attr(data-url) ")";
+    font-size: 7pt;
+    overflow-wrap: anywhere;
+  }
+
+  /* ----------------------------------------------------------- natureza */
+
+  /*
+   * Em escala de cinzas, `britishGreenSoft`, `softCream` e `warmBeige/15`
+   * colapsam todos para o mesmo cinza claro: a distinção facto / inferência /
+   * conflito / pendente desaparecia. No papel a marca é textual e o contorno
+   * carrega o peso, não o preenchimento.
+   */
+  .relatorio [data-natureza] {
+    border: 0.4pt solid currentColor;
+    background: transparent;
+    padding: 0.3mm 1mm;
+    font-size: 6.5pt;
+    letter-spacing: 0.08em;
+  }
+  .relatorio [data-natureza="conflito"] {
+    border-width: 0.9pt;
+    font-weight: 700;
+  }
+
+  /* As cores que carregam significado — a barra de conflito, o realce de
+     retenção — imprimem-se como estão. As decorativas achatam. */
+  .relatorio [data-realce] {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* --------------------------------------------------------------- rodapé */
+
+  .relatorio [data-rodape] {
+    break-inside: avoid;
+    border-top: 0.4pt solid #141a17;
+    font-size: 7.5pt;
+    line-height: 1.4;
+  }
+}

@@ -1,2 +1,39 @@
 .next/
 node_modules/
+
+# graphify — artefactos do grafo de conhecimento
+#
+# O grafo em si (.graphify/graph.json, GRAPH_REPORT.md) é committável e é o que
+# dá valor a quem clona: permite consultar o repositório sem o reprocessar.
+#
+# Estes quatro são estado local por checkout — ramo actual, worktree, marca de
+# desactualização e cache. Committá-los cria conflitos a cada troca de ramo, e
+# a própria ferramenta pede que fiquem de fora.
+**/.graphify/branch.json
+**/.graphify/worktree.json
+**/.graphify/needs_update
+**/.graphify/cache/
+
+# Enriquecimento por LLM, não usado nesta fase.
+#
+# O grafo é code-only: a estrutura (nós, arestas, comunidades) é extraída
+# localmente por tree-sitter e é ela que poupa tokens. As descrições por nó e
+# os rótulos de comunidade são prosa gerada por modelo — custo agora, para
+# ganho marginal na consulta. Ficam de fora até haver decisão em contrário.
+#
+# label-instructions/ contém ainda um caminho absoluto da máquina de build, o
+# que o `graphify portable-check` sinaliza e correctamente reprova.
+**/.graphify/description-instructions/
+**/.graphify/label-instructions/
+**/.graphify/.graphify_describe_pending
+**/.graphify/.graphify_detect.json
+**/.graphify/.graphify_labels.json
+
+# Índice de pertença a comunidades, 58 KB regenerados pelo `cluster-only`. Cada
+# nó já traz o seu `community` em graph.json: é duplicação pura.
+**/.graphify/.graphify_analysis.json
+
+# O studio é uma visualização para browser: 4,1 MB de HTML que nenhum agente lê
+# e que não poupa um único token. Reconstrói-se de graph.json em segundos com
+# `graphify cluster-only .` quando alguém o quiser abrir.
+**/.graphify/studio/

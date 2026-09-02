@@ -5,9 +5,10 @@ import { NovaPasswordForm } from "@/components/app/nova-password-form";
 
 /**
  * Aceitação de convite: o convidado chega aqui autenticado (via
- * /auth/confirm), define a palavra-passe e o rpc aceitar_convites()
- * cria o membership. Vive fora do grupo (app) porque, neste momento,
- * o utilizador ainda não é membro de nenhum tenant.
+ * /auth/confirm) e define a palavra-passe. S11: os convites já não são
+ * aceites aqui — no passo seguinte (/convite/pendentes) aceita ou recusa
+ * cada convite explicitamente. Vive fora do grupo (app) porque, neste
+ * momento, o utilizador ainda não é membro de nenhum tenant.
  */
 export default async function ConvitePage() {
   const supabase = await createClient();
@@ -31,7 +32,7 @@ export default async function ConvitePage() {
             palavra-passe para concluir o registo.
           </p>
         </div>
-        <NovaPasswordForm aceitarConvites />
+        <NovaPasswordForm />
       </div>
     </div>
   );
