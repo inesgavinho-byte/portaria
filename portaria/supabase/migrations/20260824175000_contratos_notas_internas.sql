@@ -20,6 +20,11 @@
 alter table public.contratos
   add column if not exists notas_internas text;
 
+-- A 180000 também faz SET atualizado_em = now() sobre contratos; em produção
+-- a coluna existe por fora da cadeia versionada, como a anterior.
+alter table public.contratos
+  add column if not exists atualizado_em timestamptz;
+
 -- Nota: o runner de migrações parte statements de forma ingênua — evitar
 -- concatenação de literais (||) e strings multi-linha nos comentários SQL.
 comment on column public.contratos.notas_internas is 'Notas internas do contrato: constatações e reconciliações registadas pela administração (append-only por convenção).';
