@@ -84,8 +84,13 @@ export function resumirTriagem(movimentos: MovimentoAtribuivel[]): ResumoTriagem
   return resumo;
 }
 
-/** minúsculas, sem acentos, sem pontuação, espaços colapsados. */
-function normalizar(valor: string): string {
+/**
+ * minúsculas, sem acentos, sem pontuação, espaços colapsados.
+ * É a normalização canónica deste domínio: regras de classificação e aliases
+ * de contraparte guardam texto exactamente nesta forma, por isso é exportada
+ * em vez de duplicada.
+ */
+export function normalizar(valor: string): string {
   return valor
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -105,21 +110,39 @@ const PALAVRAS_VAZIAS = new Set([
   "sociedade", "empresa", "condominio", "cond", "recebida", "para", "por",
 ]);
 
-function tokensSignificativos(valor: string): string[] {
+/**
+ * Tokens que distinguem um nome de outro. Exportada para os módulos vizinhos
+ * (sugestões de fracção nos recebimentos) reutilizarem a mesma noção de
+ * "termo significativo" — PALAVRAS_VAZIAS continua privada porque só faz
+ * sentido através desta função.
+ */
+export function tokensSignificativos(valor: string): string[] {
   return normalizar(valor)
     .split(" ")
     .filter((token) => token.length >= 3 && !PALAVRAS_VAZIAS.has(token));
 }
 
 /**
+ * Alias de contraparte confirmado por uma pessoa: a memória das variantes de
+ * nome já validadas na triagem manual. O alias nunca escreve nada sozinho —
+ * só eleva a sugestão a "exacta".
+ */
+export type AliasFornecedor = { fornecedorId: string; alias: string };
+
+/**
  * Propõe fornecedores para um movimento por triar, do mais forte para o mais
  * fraco. Devolve lista vazia quando nada é suficientemente parecido — não
  * adivinhar é uma resposta válida.
+ *
+ * `aliases` (opcional, retrocompatível): variantes de contraparte já
+ * confirmadas por humanos; um alias igual à contraparte normalizada do
+ * movimento vale uma sugestão "exacta" — não é adivinhamento, é memória.
  */
 export function sugerirFornecedores(
   movimento: MovimentoAtribuivel,
   fornecedores: FornecedorCandidato[],
   limite = 3,
+  aliases: AliasFornecedor[] = [],
 ): SugestaoFornecedor[] {
   const textos = [movimento.contraparte, movimento.descricao].filter(
     (texto): texto is string => Boolean(texto && texto.trim()),
@@ -130,6 +153,16 @@ export function sugerirFornecedores(
   const textoCompleto = normalizar(textos.join(" "));
   const tokensMovimento = new Set(textos.flatMap(tokensSignificativos));
 
+  // Índice dos aliases por fornecedor: um alias que coincide com a contraparte
+  // do movimento é a pista mais forte que existe — alguém já confirmou esta
+  // variante de nome para este fornecedor.
+  const aliasesPorFornecedor = new Map<string, string[]>();
+  for (const entrada of aliases) {
+    const lista = aliasesPorFornecedor.get(entrada.fornecedorId) ?? [];
+    lista.push(normalizar(entrada.alias));
+    aliasesPorFornecedor.set(entrada.fornecedorId, lista);
+  }
+
   const sugestoes: SugestaoFornecedor[] = [];
   for (const fornecedor of fornecedores) {
     const nomeNormalizado = normalizar(fornecedor.nome);
@@ -137,6 +170,12 @@ export function sugerirFornecedores(
 
     if (contraparteNormalizada && contraparteNormalizada === nomeNormalizado) {
       sugestoes.push({ fornecedor, confianca: "exacta", motivo: "A contraparte é exactamente o nome do fornecedor." });
+      continue;
+    }
+    if (
+      contraparteTemAlias(aliasesPorFornecedor.get(fornecedor.id) ?? [], contraparteNormalizada)
+    ) {
+      sugestoes.push({ fornecedor, confianca: "exacta", motivo: "Alias confirmado anteriormente." });
       continue;
     }
     if (textoCompleto.includes(nomeNormalizado)) {
@@ -162,4 +201,10 @@ export function sugerirFornecedores(
   return sugestoes
     .sort((a, b) => ordem[a.confianca] - ordem[b.confianca] || a.fornecedor.nome.localeCompare(b.fornecedor.nome, "pt-PT"))
     .slice(0, limite);
+}
+
+/** A contraparte normalizada coincide com algum alias conhecido do fornecedor. */
+function contraparteTemAlias(aliasesNormalizados: string[], contraparteNormalizada: string): boolean {
+  if (!contraparteNormalizada) return false;
+  return aliasesNormalizados.some((alias) => alias && alias === contraparteNormalizada);
 }

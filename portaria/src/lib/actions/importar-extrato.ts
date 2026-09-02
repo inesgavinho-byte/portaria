@@ -11,6 +11,7 @@ import {
   validarCadeiaSaldos,
   type LinhaExtrato,
 } from "@/lib/financeiro/extrato-bcp";
+import { aplicarRegrasAMovimentos } from "@/lib/financeiro/regras-classificacao";
 
 const TAMANHO_MAXIMO_BYTES = 25 * 1024 * 1024;
 // A consulta de duplicados vai em chunks para não estourar o tamanho máximo
@@ -27,6 +28,8 @@ export type ImportarExtratoEstado =
       importados: number;
       duplicados: number;
       ignorados: number;
+      /** Movimentos atribuídos automaticamente por regras de triagem. */
+      classificadasPorRegras: number;
       avisos: string[];
       saldoInicial: string;
       saldoFinal: string;
@@ -168,35 +171,108 @@ export async function importarExtratoBcp(formData: FormData): Promise<ImportarEx
   });
 
   let importados = 0;
+  // Movimentos acabados de inserir (com os dados que as regras precisam):
+  // o insert devolve-os para a aplicação de regras ser feita EM MEMÓRIA e
+  // só a seguir, com os ids reais, escrever as atribuições.
+  const inseridos: {
+    id: string;
+    descricao: string;
+    contraparte: string | null;
+    fornecedor_id: string | null;
+    fornecedor_nao_aplicavel: boolean;
+  }[] = [];
   for (const chunk of emChunks(novos, TAMANHO_CHUNK_INSERCAO)) {
-    const { error } = await supabase.from("movimentos_bancarios").insert(
-      chunk.map(({ linha, referencia }) => ({
-        tenant_id: ctx.tenant.id,
-        data_movimento: linha.dataLancamento,
-        data_valor: linha.dataValor,
-        tipo: linha.montanteCents > 0 ? "credito" : "debito",
-        valor_cents: Math.abs(linha.montanteCents),
-        descricao: linha.descricao,
-        contraparte: extrairContraparte(linha.descricao),
-        origem: "extrato_bancario",
-        referencia_externa: referencia,
-        // O extrato é a prova bancária primária: o que lá está, saiu ou entrou
-        // de facto, e é isso que o mapa anual precisa para contar saídas
-        // realizadas. O que continua pendente é a triagem de fornecedor —
-        // `estado_reconciliacao` fica no default (`nao_reconciliado`).
-        confirmado: true,
-        criado_por: ctx.user.id,
-        fonte_referencia: ficheiro.name,
-      })),
-    );
-    if (error) {
+    const { data, error } = await supabase
+      .from("movimentos_bancarios")
+      .insert(
+        chunk.map(({ linha, referencia }) => ({
+          tenant_id: ctx.tenant.id,
+          data_movimento: linha.dataLancamento,
+          data_valor: linha.dataValor,
+          tipo: linha.montanteCents > 0 ? "credito" : "debito",
+          valor_cents: Math.abs(linha.montanteCents),
+          descricao: linha.descricao,
+          contraparte: extrairContraparte(linha.descricao),
+          origem: "extrato_bancario",
+          referencia_externa: referencia,
+          // O extrato é a prova bancária primária: o que lá está, saiu ou entrou
+          // de facto, e é isso que o mapa anual precisa para contar saídas
+          // realizadas. O que continua pendente é a triagem de fornecedor —
+          // `estado_reconciliacao` fica no default (`nao_reconciliado`).
+          confirmado: true,
+          criado_por: ctx.user.id,
+          fonte_referencia: ficheiro.name,
+        })),
+      )
+      .select("id,descricao,contraparte,fornecedor_id,fornecedor_nao_aplicavel");
+    if (error || !data) {
       console.error("Erro ao inserir movimentos do extrato BCP:", error);
       return {
         estado: "erro",
         erro: "Erro ao gravar os movimentos na base de dados. A importação foi interrompida — volta a tentar: é idempotente e não duplica o que já foi gravado.",
       };
     }
+    inseridos.push(...data);
     importados += chunk.length;
+  }
+
+  // Fecho do ciclo: as regras criadas por uma pessoa aplicam-se sozinhas aos
+  // movimentos ACABADOS DE INSERIR. Sem regras, o custo é um select vazio.
+  // A proveniência fica em `fornecedor_origem = 'regra'` — visível e
+  // reversível com um clique na triagem.
+  let classificadasPorRegras = 0;
+  if (inseridos.length > 0) {
+    const { data: regrasData, error: regrasError } = await supabase
+      .from("regras_classificacao_movimentos")
+      .select("id,padrao,fornecedor_id,sem_fornecedor")
+      .eq("tenant_id", ctx.tenant.id)
+      .order("criado_em", { ascending: true });
+    if (regrasError) {
+      // A importação já gravou: um erro aqui é AVISO, não falha — a triagem
+      // manual continua disponível para o que as regras não apanhem.
+      console.error("Erro ao carregar regras de classificação:", regrasError);
+      avisos.push("As regras de triagem não puderam ser aplicadas (erro ao carregá-las) — classifica em Por triar.");
+    } else if (regrasData && regrasData.length > 0) {
+      const regras = regrasData.map((regra) => ({
+        id: regra.id,
+        padrao: regra.padrao,
+        fornecedorId: regra.fornecedor_id,
+        semFornecedor: regra.sem_fornecedor,
+      }));
+      const classificacoes = aplicarRegrasAMovimentos(inseridos, regras);
+      const agora = new Date().toISOString();
+      for (const classificacao of classificacoes) {
+        const { data, error } = await supabase
+          .from("movimentos_bancarios")
+          .update({
+            fornecedor_id: classificacao.fornecedorId,
+            fornecedor_nao_aplicavel: classificacao.semFornecedor,
+            fornecedor_origem: "regra",
+            fornecedor_atribuido_em: agora,
+            // A "pessoa" é a regra: fica null, a proveniência é 'regra'.
+            fornecedor_atribuido_por: null,
+            atualizado_em: agora,
+          })
+          .eq("id", classificacao.movimentoId)
+          .eq("tenant_id", ctx.tenant.id)
+          // Mesma guarda de pendentes de aplicarRegrasPendentes: se entretanto
+          // alguém atribuiu à mão (ou uma corrida com outra importação), a
+          // regra perde — e o zero linhas só não conta no total.
+          .is("fornecedor_id", null)
+          .eq("fornecedor_nao_aplicavel", false)
+          .select("id");
+        if (error) {
+          console.error("Erro ao aplicar regra a movimento importado:", error);
+          continue;
+        }
+        classificadasPorRegras += data?.length ?? 0;
+      }
+      if (classificadasPorRegras > 0) {
+        avisos.push(
+          `${classificadasPorRegras} movimento(s) classificado(s) automaticamente pelas regras de triagem — revê as atribuições com origem «regra».`,
+        );
+      }
+    }
   }
 
   for (const erroLinha of resultado.erros.slice(0, MAXIMO_AVISOS)) {
@@ -224,6 +300,7 @@ export async function importarExtratoBcp(formData: FormData): Promise<ImportarEx
     importados,
     duplicados,
     ignorados: resultado.erros.length,
+    classificadasPorRegras,
     avisos,
     saldoInicial: emEuros(resultado.saldoInicialCents ?? 0),
     saldoFinal: emEuros(resultado.saldoFinalCents ?? 0),
