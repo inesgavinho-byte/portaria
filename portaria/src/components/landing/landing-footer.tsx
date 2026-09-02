@@ -11,6 +11,12 @@ export function LandingFooter() {
           <Link href="/contactos" className="hover:text-paper/80 transition-colors">
             Contactos
           </Link>
+          <Link href="/privacidade" className="hover:text-paper/80 transition-colors">
+            Privacidade
+          </Link>
+          <Link href="/termos" className="hover:text-paper/80 transition-colors">
+            Termos
+          </Link>
           <Link href="/login" className="hover:text-paper/80 transition-colors">
             Área reservada
           </Link>
