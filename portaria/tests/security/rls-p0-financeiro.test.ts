@@ -23,7 +23,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { ANON_KEY, hasEnv, userClient, anonClient, rpcRaw, restInsert, serviceClient } from "./helpers";
-import { seed, vec1536, type Fixtures } from "./fixtures";
+import { seed, vec1024, type Fixtures } from "./fixtures";
 
 const d = hasEnv ? describe : describe.skip;
 
@@ -243,7 +243,7 @@ d("RLS P0 (2026-08) — views financeiras e RPCs SECURITY DEFINER", () => {
     it("NEG: anon é recusado em buscar_chunks", async () => {
       const { status } = await rpcRaw(
         "buscar_chunks",
-        { p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 5, p_threshold: -1 },
+        { p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 5, p_threshold: -1 },
         { apikey: ANON_KEY }
       );
       expect(status).toBeGreaterThanOrEqual(400);
@@ -253,7 +253,7 @@ d("RLS P0 (2026-08) — views financeiras e RPCs SECURITY DEFINER", () => {
       const c = userClient(fx.users.condoB.accessToken);
       const { data, error } = await c.rpc("buscar_chunks", {
         p_tenant_id: fx.tenantA,
-        p_embedding: vec1536(),
+        p_embedding: vec1024(),
         p_limite: 5,
         p_threshold: -1,
       });

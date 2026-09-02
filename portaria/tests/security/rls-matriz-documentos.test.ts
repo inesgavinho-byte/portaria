@@ -11,7 +11,7 @@
  */
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { ANON_KEY, hasEnv, userClient, anonClient, restInsert, serviceClient } from "./helpers";
-import { seed, vec1536, type Fixtures } from "./fixtures";
+import { seed, vec1024, type Fixtures } from "./fixtures";
 
 const d = hasEnv ? describe : describe.skip;
 
@@ -235,7 +235,7 @@ d("RLS matriz — documentos e conhecimento", () => {
     it("NEG: membro não insere embeddings por via directa", async () => {
       const { status } = await restInsert(
         "conhecimento_embeddings",
-        { tenant_id: fx.tenantA, origem: "regulamento", origem_id: "forjado", conteudo: "x", embedding: vec1536() },
+        { tenant_id: fx.tenantA, origem: "regulamento", origem_id: "forjado", conteudo: "x", embedding: vec1024() },
         { apikey: ANON_KEY, token: fx.users.condoA.accessToken }
       );
       expect(status).toBeGreaterThanOrEqual(400);
