@@ -106,3 +106,82 @@ export async function marcarMovimentoSemFornecedor(
   revalidar();
   return { ok: true };
 }
+
+/**
+ * Imputa — ou des-imputa — um movimento bancário a uma factura, pela UI.
+ *
+ * `movimentos_bancarios.despesa_id` significa uma só coisa: a factura que o
+ * processo demonstra ter sido liquidada por aquele movimento (migração
+ * 20260826000000). Só se imputa o que o processo demonstra; as posições
+ * sustentadas pelas partes vivem em `imputacoes_posicoes`, ao lado, e nunca
+ * por esta via.
+ *
+ * O estado de reconciliação segue o padrão fixado nas migrações de
+ * reconciliação (20260824160000 / 20260825120000): imputar marca
+ * `reconciliado`; des-imputar volta a `parcial` — o movimento continua
+ * atribuído ao fornecedor, deixa de estar ligado à factura exacta. Nada é
+ * apagado: des-imputar é anular a ligação, o histórico do dossiê permanece.
+ */
+export async function imputarMovimentoADespesa(
+  movimentoId: string,
+  despesaId: string | null,
+): Promise<AtribuicaoResultado> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { ok: false, error: "Sem permissões para esta operação." };
+
+  const supabase = await createClient();
+
+  if (despesaId) {
+    const { data: despesa } = await supabase
+      .from("despesas")
+      .select("id,fornecedor_id")
+      .eq("id", despesaId)
+      .eq("tenant_id", ctx.tenant.id)
+      .maybeSingle();
+    if (!despesa) return { ok: false, error: "Factura não encontrada neste condomínio." };
+
+    // Uma imputação atravessa fornecedores quando o movimento e a factura
+    // dizem contrapartes diferentes. Se ambos os lados já têm fornecedor e
+    // não coincide, é quase de certeza a factura errada — recusar aqui evita
+    // reconciliar um pagamento a uma factura de outro fornecedor.
+    const { data: movimento } = await supabase
+      .from("movimentos_bancarios")
+      .select("id,fornecedor_id")
+      .eq("id", movimentoId)
+      .eq("tenant_id", ctx.tenant.id)
+      .maybeSingle();
+    if (!movimento) return { ok: false, error: "Movimento não encontrado." };
+
+    if (
+      movimento.fornecedor_id &&
+      despesa.fornecedor_id &&
+      movimento.fornecedor_id !== despesa.fornecedor_id
+    ) {
+      return {
+        ok: false,
+        error: "O movimento e a factura pertencem a fornecedores diferentes — verifique antes de imputar.",
+      };
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("movimentos_bancarios")
+    .update({
+      despesa_id: despesaId,
+      estado_reconciliacao: despesaId ? "reconciliado" : "parcial",
+      atualizado_em: new Date().toISOString(),
+    })
+    .eq("id", movimentoId)
+    .eq("tenant_id", ctx.tenant.id)
+    .select("id,fornecedor_id")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Erro ao imputar movimento a factura:", error);
+    return { ok: false, error: "Erro ao guardar a imputação." };
+  }
+  if (!data) return { ok: false, error: "Movimento não encontrado." };
+
+  revalidar(data.fornecedor_id);
+  return { ok: true };
+}

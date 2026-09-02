@@ -29,7 +29,18 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/hoje");
+    // S11: com convites pendentes, a decisão é explícita antes de entrar
+    // (nada é aceite automaticamente). Se a verificação falhar, entra
+    // normalmente — os convites continuam acessíveis em /convite/pendentes.
+    let destino = "/hoje";
+    try {
+      const { data: pendentes } = await supabase.rpc("convites_pendentes");
+      if ((pendentes ?? []).length > 0) destino = "/convite/pendentes";
+    } catch {
+      // verificação meramente orientativa; nunca bloqueia o login
+    }
+
+    router.push(destino);
     router.refresh();
   }
 

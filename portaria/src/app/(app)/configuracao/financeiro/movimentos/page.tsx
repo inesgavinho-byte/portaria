@@ -72,7 +72,15 @@ export default async function AtribuicaoMovimentosPage({
     <div className="max-w-5xl">
       <div className="mb-7">
         <p className="mb-1 font-body text-xs font-semibold uppercase tracking-[0.12em] text-britishGreen">Financeiro</p>
-        <h1 className="font-title text-h1 text-ink">Atribuição de movimentos</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-title text-h1 text-ink">Atribuição de movimentos</h1>
+          <Link
+            href="/configuracao/financeiro/movimentos/importar"
+            className="rounded-lg border border-britishGreen/15 px-3 py-1.5 font-body text-xs font-semibold text-oliveGray transition-colors hover:text-britishGreen"
+          >
+            Importar extrato
+          </Link>
+        </div>
         <p className="mt-2 max-w-3xl font-body text-sm leading-6 text-oliveGray">
           A quem pertence cada movimento bancário. Esta decisão alimenta as saídas confirmadas na ficha de cada
           fornecedor. Atribuir um fornecedor não reconcilia nenhuma factura — são decisões separadas.

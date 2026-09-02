@@ -11,11 +11,45 @@ não representam migrações perdidas nem schema em falta. Confirmado no histór
 de git:
 
 - **0010–0014** — nunca existiram.
-- **0019** — nunca existiu.
+- ~~**0019** — nunca existiu.~~ **Reocupado a 2026-09-02** por
+  `0019_fornecedores_contratos_base.sql` (ver abaixo) — era o número livre
+  imediatamente antes da primeira migração que toca em `fornecedores` (0020).
 
-Não reutilizar estes números. As migrações novas continuam a partir do
+Não reutilizar os restantes números. As migrações novas continuam a partir do
 **último número existente** (atualmente a próxima livre é a seguir à mais alta
 presente nesta pasta).
+
+## A cadeia é reprouzível (2026-09-02)
+
+`supabase start` / `supabase db reset` aplicam 0001→`20260902400000` do zero
+com sucesso, e a suite de segurança completa corre verde contra essa
+reconstrução (**262/262**). Para chegar lá foi preciso reparar o histórico que
+só existia em produção, aplicado à mão (D3):
+
+- **`0019_fornecedores_contratos_base.sql`** — `fornecedores` e `contratos`
+  nunca tinham sido versionadas (lacuna G-1); cria-as de forma idempotente e
+  inerte em produção, e repõe a postura de grants-padrão do Supabase
+  (`ALL` a anon/authenticated/service_role + `ALTER DEFAULT PRIVILEGES`), que
+  o init local não instala. A migração `20260826030000` volta a apertar os
+  defaults no fim da cadeia («tabelas novas nascem fechadas»).
+- **`0024_ia_rag.sql`** — pgvector passa a instalar-se explicitamente em
+  `extensions` (onde produção o tem) e as funções que usam `<=>` passam a
+  `search_path = public, extensions`.
+- **`0026_reservas.sql`** — cria `btree_gist` (necessário ao constraint GIST
+  de sobreposição de reservas; em produção existia instalado à mão).
+- **`0028` / `20260826030000` / `20260902310000`** — `buscar_chunks` e
+  `estado_conhecimento` com `search_path = public, extensions` (o `<=>` vive
+  no schema da extensão).
+- **`20260824200000`** — `tenant_id` ambíguo num JOIN qualificado
+  (`c.tenant_id`).
+- **`20260825030000`** — o UUID do tenant era um literal de produção; passa a
+  derivar-se do contrato do processo, com guarda: numa reconstrução limpa o
+  bloco é um no-op (o que a migração guarda é a memória do processo real,
+  não um requisito de schema).
+
+Reconstrução local de referência: projeto CLI com os mesmos ficheiros,
+`supabase start`, depois `npm run test:security` com o env de
+`supabase status -o env`.
 
 ## Convenções
 

@@ -4,15 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-interface NovaPasswordFormProps {
-  /**
-   * true no fluxo de convite: além de definir a password, aceita os
-   * convites pendentes (rpc aceitar_convites) antes de entrar.
-   */
-  aceitarConvites?: boolean;
-}
-
-export function NovaPasswordForm({ aceitarConvites = false }: NovaPasswordFormProps) {
+/**
+ * S11: os convites já não são aceites aqui automaticamente. Havendo
+ * convites pendentes, o utilizador segue para /convite/pendentes, onde
+ * aceita ou recusa cada convite explicitamente.
+ */
+export function NovaPasswordForm() {
   const router = useRouter();
   const supabase = createClient();
   const [password, setPassword] = useState("");
@@ -42,14 +39,18 @@ export function NovaPasswordForm({ aceitarConvites = false }: NovaPasswordFormPr
       return;
     }
 
-    if (aceitarConvites) {
-      const { error: rpcError } = await supabase.rpc("aceitar_convites");
-      if (rpcError) {
-        console.error("aceitar_convites falhou:", rpcError);
-      }
+    // S11: com convites pendentes, a decisão é explícita e separada, no
+    // passo seguinte. Sem convites (ex.: recuperação de password), entra
+    // como antes. Se a verificação falhar, entra normalmente.
+    let destino = "/avisos";
+    try {
+      const { data: pendentes } = await supabase.rpc("convites_pendentes");
+      if ((pendentes ?? []).length > 0) destino = "/convite/pendentes";
+    } catch {
+      // verificação meramente orientativa; nunca bloqueia a entrada
     }
 
-    router.push("/avisos");
+    router.push(destino);
     router.refresh();
   }
 

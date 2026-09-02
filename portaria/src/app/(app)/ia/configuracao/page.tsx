@@ -63,7 +63,7 @@ export default async function IAConfigPage({
           <div className="flex items-center justify-between">
             <span className="font-body text-sm text-oliveGray flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Documentos <span className="text-xs text-oliveGray/70">(só título e descrição)</span>
+              Documentos <span className="text-xs text-oliveGray/70">(texto integral dos PDF)</span>
             </span>
             <span className="font-title text-lg text-ink">{dados.documento ?? 0}</span>
           </div>
@@ -89,18 +89,23 @@ export default async function IAConfigPage({
             className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
-            Reindexar regulamento e ocorrências
+            Reindexar regulamento, documentos e ocorrências
           </button>
         </form>
         <p className="font-body text-xs text-oliveGray/80">
-          A pesquisa do assistente cobre o texto integral do regulamento. Dos
-          documentos apenas o título e a descrição são indexados — o conteúdo
-          dos PDF não é lido.
+          A pesquisa do assistente cobre o texto integral do regulamento e o
+          texto extraído dos PDF carregados como documentos — extraído
+          localmente, sem serviço externo — até 80 páginas por documento.
+          PDFs digitalizados sem camada de texto, ou ilegíveis, ficam
+          indexados apenas pelo título e pela descrição; o estado fica
+          registado em cada chunk.
         </p>
 
         <p className="font-body text-xs text-oliveGray">
-          A reindexação apaga todos os embeddings existentes e recria-os a partir do regulamento e ocorrências resolvidas.
-          Documentos PDF ainda requerem extração manual de texto.
+          A reindexação é não destrutiva: a nova geração de embeddings é
+          calculada antes de a anterior ser substituída, fonte a fonte.
+          Documentos já carregados ganham o texto do PDF na próxima
+          reindexação.
         </p>
       </div>
     </div>

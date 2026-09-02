@@ -122,6 +122,7 @@ export type Convite = {
   criado_em: string;
   expira_em: string;
   aceite_em: string | null;
+  recusado_em: string | null;
 };
 
 export type Ocorrencia = {

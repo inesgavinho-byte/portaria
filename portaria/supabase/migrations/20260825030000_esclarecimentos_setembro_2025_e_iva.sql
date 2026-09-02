@@ -95,7 +95,7 @@
 
 do $$
 declare
-  v_tenant   uuid := '0fa92de6-aa62-44ed-858b-c7b88091a502';
+  v_tenant   uuid;
   v_contrato uuid := '95dad36e-c84d-42ce-aab4-7f376ca83f68';
   v_autor    uuid;
   v_f_jan    uuid;
@@ -133,6 +133,14 @@ declare
     'Acompanhamento técnico declara defeituosa a imunização das armaduras de aço'
   ];
 begin
+  -- O tenant vem do próprio contrato, não de um literal: numa reconstrução
+  -- limpa da cadeia o contrato do processo não existe e estes registos são
+  -- um no-op. Em produção o contrato existe e o comportamento é o de sempre.
+  select tenant_id into v_tenant from public.contratos where id = v_contrato;
+  if v_tenant is null then
+    return;
+  end if;
+
   select criado_por into v_autor
     from contrato_memoria_eventos
    where contrato_id = v_contrato and criado_por is not null
@@ -237,7 +245,7 @@ end $$;
 
 do $$
 declare
-  v_tenant   uuid := '0fa92de6-aa62-44ed-858b-c7b88091a502';
+  v_tenant   uuid;
   v_contrato uuid := '95dad36e-c84d-42ce-aab4-7f376ca83f68';
   v_autor    uuid;
   v_f_jan    uuid;
@@ -275,6 +283,13 @@ declare
     'Acompanhamento técnico declara defeituosa a imunização das armaduras de aço'
   ];
 begin
+  -- Guarda idêntica à do bloco anterior: sem o contrato do processo, o
+  -- bloco é um no-op numa reconstrução limpa da cadeia.
+  select tenant_id into v_tenant from public.contratos where id = v_contrato;
+  if v_tenant is null then
+    return;
+  end if;
+
   select id into v_f_jan   from ia_documental_fontes where checksum = '671845d6';
   select id into v_f_esc   from ia_documental_fontes where checksum = '88148939';
   select id into v_f_doc   from ia_documental_fontes where checksum = '30f29954';

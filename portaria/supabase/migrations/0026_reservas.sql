@@ -3,6 +3,12 @@
 -- Reservas de Espaços Comuns
 -- =====================================================================
 
+-- A exclusão de sobreposição de reservas usa um constraint GIST sobre
+-- (espaco_id, tstzrange); GIST sobre uuid exige btree_gist. Em produção a
+-- extensão existia instalada à mão (cadeia nunca foi reconstruída até
+-- 2026-09); create if not exists é no-op onde já existe.
+create extension if not exists btree_gist with schema extensions;
+
 -- ----------------------------------------------------------------------
 -- 1. ESPACOS_COMUNS
 -- ----------------------------------------------------------------------

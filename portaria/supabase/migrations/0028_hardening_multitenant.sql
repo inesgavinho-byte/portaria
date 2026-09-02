@@ -272,7 +272,7 @@ returns table (
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select
     e.id,
@@ -310,7 +310,7 @@ returns table (origem text, count bigint)
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select e.origem, count(*)::bigint
   from public.conhecimento_embeddings e
