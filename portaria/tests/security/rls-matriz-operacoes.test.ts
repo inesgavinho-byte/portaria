@@ -28,6 +28,8 @@ d("RLS matriz — operações (e-mail, manutenção, alertas, ausências, bluepr
   let mensagemA: string;
   let anexoA: string;
   let ativoA: string;
+  let planoA: string;
+  let tarefaA: string;
   let alertaA: string;
   let ausenciaA: string;
   let blueprintA: string;
@@ -53,14 +55,24 @@ d("RLS matriz — operações (e-mail, manutenção, alertas, ausências, bluepr
     });
 
     // Manutenção preventiva (0038).
-    // NOTA: o INSERT em planos_manutencao está PARTIDO na cadeia de migrações —
-    // o trigger validar_tenant_manutencao (0038) referencia NEW.plano_id, que só
-    // existe em tarefas_manutencao; todo o INSERT em planos falha com
-    // 'record "new" has no field "plano_id"' (42703). Sem plano não há tarefas.
-    // Ver lacunas em tests/security/README.md e o achado no relatório da tarefa.
+    // O trigger validar_tenant_manutencao corre também sobre inserts via
+    // service_role (não contorna triggers): plano e tarefa têm de ser
+    // coerentes com o tenant. A correção A-2
+    // (20260902320000) eliminou o 42703 que partia todo o INSERT em
+    // planos_manutencao.
     ativoA = uid();
     await svc.from("ativos_manutencao").insert({
       id: ativoA, tenant_id: fx.tenantA, nome: `Elevador ${stamp()}`, categoria: "elevadores",
+    });
+    planoA = uid();
+    await svc.from("planos_manutencao").insert({
+      id: planoA, tenant_id: fx.tenantA, ativo_id: ativoA,
+      titulo: `Inspeção ${stamp()}`, periodicidade: "anual", proxima_execucao: "2088-03-01",
+    });
+    tarefaA = uid();
+    await svc.from("tarefas_manutencao").insert({
+      id: tarefaA, tenant_id: fx.tenantA, plano_id: planoA, ativo_id: ativoA,
+      titulo: `Tarefa ${stamp()}`, data_planeada: "2088-03-01",
     });
 
     // Alertas operacionais (0037).
@@ -144,7 +156,7 @@ d("RLS matriz — operações (e-mail, manutenção, alertas, ausências, bluepr
       expect((rAt.data ?? []).length).toBe(1);
     });
 
-    it.skip("POS: admin lê planos e tarefas — BLOQUEADO por bug 0038: o trigger validar_tenant_manutencao referencia NEW.plano_id em planos_manutencao e todo INSERT falha (42703); sem plano não há tarefas a semear", async () => {
+    it("POS: admin lê planos e tarefas do tenant (correção A-2: 20260902320000)", async () => {
       const c = userClient(fx.users.adminA.accessToken);
       const rPl = await c.from("planos_manutencao").select("id").eq("tenant_id", fx.tenantA);
       const rTa = await c.from("tarefas_manutencao").select("id").eq("tenant_id", fx.tenantA);

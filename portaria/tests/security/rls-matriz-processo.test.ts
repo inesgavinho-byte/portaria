@@ -247,13 +247,13 @@ d("RLS matriz — processo (imputações, IA documental, contrato-memória, comu
 
   // --------------------------------- contrato_memoria (SÓ LEITURA — ver topo)
   describe("contrato_memoria_eventos / _evidencias (só leitura; contratos fora das migrações)", () => {
-    // NOTA (achado): estas tabelas mantêm os grants por omissão do Supabase
-    // (anon/authenticated com SELECT etc.) — 20260823175458 só fez GRANT a
-    // authenticated, sem revogar anon. O RLS (is_tenant_admin) continua a
-    // devolver 0 linhas a quem não é admin, pelo que não há exposição de
-    // dados; a lacuna é de defesa em profundidade (o mesmo padrão que
-    // 20260826020000 corrigiu só para imputacoes_posicoes). Aqui prova-se a
-    // garantia RLS; a camada de grants está registada como achado.
+    // NOTA (achado A-5 — corrigido por 20260902330000): estas tabelas mantinham
+    // os grants por omissão do Supabase (anon/authenticated com SELECT etc.).
+    // O RLS (is_tenant_admin) continua a devolver 0 linhas a quem não é admin;
+    // a migração de correção apertou a segunda camada (revoke a anon;
+    // authenticated só com as operações que a app usa), no padrão que
+    // 20260826020000 aplicou a imputacoes_posicoes. Aqui prova-se a
+    // garantia RLS; os grants novos ficam verificados por SQL (has_table_privilege).
     it("NEG: anon não vê eventos (RLS: 0 linhas)", async () => {
       const c = anonClient();
       const r = await c.from("contrato_memoria_eventos").select("id").limit(1);

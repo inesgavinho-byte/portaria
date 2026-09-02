@@ -151,10 +151,10 @@ d("RLS matriz — RPCs de sessão, conhecimento, reservas e notificação", () =
   //     0030 DEPOIS do ciclo de grants de 0028 e ficaram sem EXECUTE para
   //     authenticated (só owner). A app (src/) nunca as chama — hardening
   //     efetivo; a linha da matriz ("authenticated ✓") está desatualizada.
-  //   • total_permilagem_tenant TEM EXECUTE para authenticated mas não valida
-  //     membership no corpo: devolve o agregado de permilagem de QUALQUER
-  //     tenant a qualquer autenticado (fuga agregada, sem dados pessoais —
-  //     achado LOW reportado ao Engineer).
+  //   • total_permilagem_tenant: o achado A-3 ("não valida membership") não se
+  //     confirmou na inspecção à cadeia — o corpo de 0028 (bloco 2.1, com
+  //     validação de membership) está em vigor e foi reafirmado em
+  //     20260902330000; não-membros recebem 0, não o agregado.
   describe("total_permilagem_tenant / verificar_disponibilidade / contar_reservas_semana", () => {
     it("POS: membro consulta a permilagem agregada do seu tenant", async () => {
       const c = userClient(fx.users.condoA.accessToken);
@@ -163,14 +163,13 @@ d("RLS matriz — RPCs de sessão, conhecimento, reservas e notificação", () =
       expect(typeof data).toBe("number");
     });
 
-    it("NEG→ACHADO: autenticado de outro tenant recebe só o AGREGADO (número), nunca dados por membro", async () => {
+    it("NEG: autenticado de outro tenant recebe 0, não o agregado (correção A-3: 20260902330000)", async () => {
       const c = userClient(fx.users.condoB.accessToken);
       const { data, error } = await c.rpc("total_permilagem_tenant", { p_tenant_id: fx.tenantA });
-      // Divergência S2 registada: a função devolve o somatório de permilagem do
-      // tenant pedido sem validar membership. O teste fixa a propriedade que
-      // hoje garante a fronteira: é um número agregado, não linhas.
+      // S2/S3 (padrão 0028, reafirmado em 20260902330000): a função devolve 0
+      // a não-membros, sem revelar existência de dados do tenant.
       expect(error).toBeNull();
-      expect(typeof data).toBe("number");
+      expect(data).toBe(0);
     });
 
     it("NEG: authenticated não executa verificar_disponibilidade (grants 0030, hardening)", async () => {

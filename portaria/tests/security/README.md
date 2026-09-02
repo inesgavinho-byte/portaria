@@ -40,7 +40,7 @@ Legenda: C=condómino, I=inquilino, A=admin, A≠=admin de outro tenant, K=comis
 | `documentos` | p0 (S6), matriz-documentos | C/K todas; I sem `conta`/`ata`/`contrato`/`apolice`; ⊖/A≠ negados; ✎ C negado, A OK |
 | `documentos_administracao` | matriz-documentos | A; C/I/A≠/⊖ negados; ✎ C negado, A OK |
 | `conhecimento_embeddings` (tabela) | matriz-documentos | C regulamento; C2 direto (⊖ ocorrência p/ C, ✓ p/ A); I só regulamento/legislação; A≠/⊖ negados; ✎ C negado |
-| `conhecimento_embeddings` (RPC `buscar_chunks`/`estado_conhecimento`) | p0 (S3/C2), p0-fin, matriz-rpc | membership do próprio; cross-tenant 0; ⊖ negado — **ver achado A-1 abaixo** |
+| `conhecimento_embeddings` (RPC `buscar_chunks`/`estado_conhecimento`) | p0 (S3/C2), p0-fin, matriz-rpc | membership do próprio; cross-tenant 0; ⊖ negado; C2/S6 no RPC — **A-1 corrigido (20260902310000)** |
 | `ocorrencias` | matriz-core | criador; outro membro do tenant negado; A; A≠/⊖ negados; ✎ criador não edita |
 | `ocorrencia_eventos` | matriz-core | A tudo; criador sem notas internas; A≠/⊖ negados |
 | `ocorrencia_fotografias` | matriz-core | criador e A; ⊖ negado |
@@ -67,48 +67,70 @@ Legenda: C=condómino, I=inquilino, A=admin, A≠=admin de outro tenant, K=comis
 | RPC `gerar_quotas_mes` / `obter_proximo_numero_recibo` / `calcular_divida_fracao` | p0-fin | ⊖/C negados; A OK; A≠/fração alheia negados |
 | RPC `user_tenant_ids` / `is_tenant_admin` / `user_tem_papel` | matriz-rpc | próprio OK; A≠/⊖ negados |
 | RPC `user_permilagem` | p0 (S8) | própria OK; A≠ null |
-| RPC `total_permilagem_tenant` | matriz-rpc | C OK; ⊖ negado — **ver achado A-3** |
+| RPC `total_permilagem_tenant` | matriz-rpc | C OK; ⊖ negado; A≠ recebe 0 — **A-3 corrigido/reavaliado (20260902330000)** |
 | `imputacoes_posicoes` / `imputacoes_posicoes_evidencias` | matriz-processo | A SELECT; C sem linhas (RLS); ⊖ sem grant; ✎ sem grant INSERT (20260826020000); A≠ negado |
 | `ia_documental_configuracoes` / `fontes` / `fonte_blocos` / `sessoes` / `mensagens` | matriz-processo | A; C/A≠/⊖ negados; ✎ C negado |
-| `contrato_memoria_eventos` / `_evidencias` (leitura) | matriz-processo | C/A≠/⊖ sem linhas — escrita **não testável** (ver lacuna G-1) |
+| `contrato_memoria_eventos` / `_evidencias` (leitura) | matriz-processo | C/A≠/⊖ sem linhas; grants mínimos (A-5, 20260902330000) — escrita **não testável** (ver lacuna G-1) |
 | `comunicacoes` / `comunicacao_destinatarios` / `comunicacao_documentos` | matriz-processo | A; C/A≠/⊖ negados; ✎ C negado |
 | `email_caixas` / `email_mensagens` / `email_anexos` | matriz-operacoes | A; C/A≠/⊖ negados; ✎ C negado |
 | `ativos_manutencao` | matriz-operacoes | A; C/A≠/⊖ negados; ✎ C negado |
-| `planos_manutencao` / `tarefas_manutencao` | matriz-operacoes | negações (C/A≠/⊖) — POS **bloqueado** (ver lacuna G-2) |
+| `planos_manutencao` / `tarefas_manutencao` | matriz-operacoes | negações (C/A≠/⊖); POS admin (A-2 corrigido: 20260902320000) |
 | `alertas_operacionais` | matriz-operacoes | A; C/A≠/⊖ negados |
 | `funcionarios_ausencias` | matriz-operacoes | C e I leem (mural); A✎ OK; ✎ C negado; A≠/⊖ negados |
 | `blueprints` | matriz-operacoes | A; C/A≠/⊖ negados; ✎ C negado |
 
-## Achados abertos (descobertos ao construir esta rede)
+## Achados — estado (descobertos ao construir esta rede)
 
 Estes achados foram confirmados contra um stack local reconstruído apenas a
 partir de `supabase/migrations/` (0001 → 20260902090000). Estado em produção:
 **não verificado** (as suites não se ligam a produção).
 
-- **A-1 (alto) — `buscar_chunks` perdeu os filtros C2/S6.** A reescrita em
-  `20260826030000_p0_security_hardening_views_rpc.sql` preservou a validação de
-  membership mas perdeu o filtro C2 (`ocorrencia_resolvida` só admins) e o S6
-  (inquilino só regulamento/legislação) que `0028` tinha introduzido. O teste
-  C2 pré-existente em `rls-p0.test.ts` **falha** contra esta cadeia: qualquer
-  membro volta a ler conteúdo de ocorrências resolvidas via RPC.
-- **A-2 (alto para a funcionalidade) — `planos_manutencao` não aceita INSERT.**
-  O trigger `validar_tenant_manutencao` (0038) corre sobre `planos` e
-  `tarefas`; a condição da branch `tarefas` referencia `NEW.plano_id`, que não
-  existe em `planos_manutencao` — todo o INSERT em planos falha com
-  `42703 record "new" has no field "plano_id"`. Sem plano não há tarefas.
-- **A-3 (baixo) — `total_permilagem_tenant` não valida membership** (desvio da
-  matriz S2): devolve o somatório de permilagem de qualquer tenant a qualquer
-  autenticado (fuga agregada, sem dados por membro). A função não é usada em
-  `src/`.
-- **A-4 (info) — `verificar_disponibilidade` / `contar_reservas_semana` sem
-  EXECUTE para authenticated** (recriadas por 0030 depois do ciclo de grants de
-  0028). Hardening efetivo — `src/` nunca as chama — mas a linha da matriz
+**Correção de 2026-09-02** (migrações `2026090231*`–`2026090233*`): A-1, A-2,
+A-3 e A-5 ficaram tratados (detalhe em cada item). **A-4 permanece aberto**
+(hardening efectivo; alinhar a linha da matriz é decisão documental própria).
+Depois da correção, a suite completa corre verde contra o stack local
+(257/257, 10 ficheiros, 0 falhas).
+
+Nota de reconstrução: numa reconstrução **pura** a partir da pasta (sem o
+stub local de tabelas de produção — ver G-1), duas migrações de dados do
+processo documental não aplicam e são alheias a estes achados:
+`20260824200000` (ambiguidade de `tenant_id` num JOIN pré-existente) e
+`20260825030000` (FK sem a fonte criada pela anterior). Os objectos de
+segurança (tabelas, políticas, RPCs, grants) aplicam todos.
+
+- **A-1 (alto, segurança) — CORRIGIDO em `20260902310000`.** `buscar_chunks`/
+  `estado_conhecimento` voltaram a perder os filtros C2/S6 na reescrita de
+  `20260826030000` (que partiu do corpo de 0023). A migração de correção
+  restaura C2 (`ocorrencia_resolvida` só admins) e S6 (inquilino só
+  regulamento/legislação) mantendo a assinatura `extensions.vector`, o
+  `search_path` e os grants de 20260826030000. O teste C2 em `rls-p0.test.ts`
+  volta a passar.
+- **A-2 (alto para a funcionalidade) — CORRIGIDO em `20260902320000`.** O
+  trigger `validar_tenant_manutencao` (0038) referenciava `NEW.plano_id` na
+  branch das tarefas e rebentava todo o INSERT em `planos_manutencao` com
+  `42703`. A correção reestrutura o trigger por `TG_TABLE_NAME`: cada tabela
+  só referencia colunas que tem, com as validações e mensagens de 0038
+  intactas. O teste POS de planos/tarefas em `rls-matriz-operacoes.test.ts`
+  foi reactivado (G-2 fechado).
+- **A-3 (baixo) — REAVALIADO; reafirmado em `20260902330000`.** A inspecção
+  à cadeia mostra que o corpo de 0028 (bloco 2.1, com validação de
+  membership e grants mínimos do bloco 2.4) está em vigor — o achado não
+  distinguia «0 a não-membros» de «fuga agregada» (o teste media o tipo, não
+  o valor). A migração fixa o corpo validado e os grants numa migração
+  própria, para que uma reescrita futura não volte a perdê-los (o mecanismo
+  exacto do A-1). Não-membros recebem 0. A função não é usada em `src/`.
+- **A-4 (info) — ABERTO (não abrangido por esta correção).**
+  `verificar_disponibilidade` / `contar_reservas_semana` sem EXECUTE para
+  authenticated (recriadas por 0030 depois do ciclo de grants de 0028).
+  Hardening efectivo — `src/` nunca as chama — mas a linha da matriz
   ("authenticated ✓") está desatualizada.
-- **A-5 (info) — grants por omissão em `contrato_memoria_*`** (e restantes
-  tabelas de 2026-08 não abrangidas por 20260826020000): `anon` mantém
-  SELECT/INSERT/etc. ao nível do grant; o RLS (`is_tenant_admin`) devolve 0
-  linhas, pelo que não há exposição — a segunda camada (revoke, padrão
-  20260826020000) ficou por apertar.
+- **A-5 (info) — CORRIGIDO em `20260902330000`.** Grants por omissão em
+  `contrato_memoria_eventos`/`_evidencias` revogados no padrão de
+  `20260826020000`, calibrados ao uso real da app: `anon` nada;
+  `authenticated` só SELECT em eventos (a app não escreve) e
+  SELECT+INSERT+DELETE em evidências (`dossier-evidencias.ts` insere/apaga
+  com `requireAdmin()`, gated pela política `is_tenant_admin`). `service_role`
+  inalterado. RLS fica como está.
 
 ## Lacunas de cobertura conhecidas
 
@@ -119,9 +141,10 @@ partir de `supabase/migrations/` (0001 → 20260902090000). Estado em produção
   ambiente reconstruído — os caminhos de escrita (política `admins manage`)
   ficam por exercitar. Ações possíveis: миграção que crie `contratos`, ou
   `NOT VALID`/remodelação da FK.
-- **G-2 — POS de `planos_manutencao`/`tarefas_manutencao`** bloqueado pelo
-  achado A-2 (teste marcado `it.skip` com a razão no título). Reativar após
-  correção do trigger.
+- **G-2 — POS de `planos_manutencao`/`tarefas_manutencao`** — **FECHADO.** O
+  bloqueio era o achado A-2; o trigger foi corrigido em `20260902320000`, o
+  teste POS foi reactivado e passa (o seed via service_role também passa pelo
+  trigger — prova directa de que o INSERT funciona).
 - **G-3 — Storage.** As políticas de buckets (`documentos`,
   `documentos-admin`, `ocorrencias`, `email-anexos`) não são exercidas: estas
   suites testam a API relacional (PostgREST), não uploads de Storage.
