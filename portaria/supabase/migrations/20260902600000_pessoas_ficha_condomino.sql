@@ -152,9 +152,7 @@ grant select, insert, update, delete
 -- 4. Documentação
 -- --------------------------------------------------------------------
 
-comment on table public.pessoas is
-  'Condóminos (pessoas) do condomínio. Admin-only. O nome normalizado é '
-  || 'único por tenant; a ligação às frações vive em fracao_pessoas.';
-comment on table public.fracao_pessoas is
-  'Relação pessoa ↔ fração com papel (proprietario/inquilino/representante) '
-  || 'e vigência (desde/ate). Papéis terminados fecham-se com ate, nunca se apagam.';
+-- Nota: o runner de migrações parte statements de forma ingênua — evitar
+-- concatenação de literais (||) e strings multi-linha nos comentários SQL.
+comment on table public.pessoas is 'Condóminos (pessoas) do condomínio. Admin-only. O nome normalizado é único por tenant; a ligação às frações vive em fracao_pessoas.';
+comment on table public.fracao_pessoas is 'Relação pessoa ↔ fração com papel (proprietario/inquilino/representante) e vigência (desde/ate). Papéis terminados fecham-se com ate, nunca se apagam.';
