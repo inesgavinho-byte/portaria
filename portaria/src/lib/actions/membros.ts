@@ -32,7 +32,8 @@ async function baseUrl(): Promise<string> {
  * Convida um membro para o tenant atual.
  *
  * - Utilizador novo: regista o convite e envia email via Supabase Auth;
- *   ao definir password, aceitar_convites() cria o membership.
+ *   ao definir password, o convidado aceita o convite explicitamente
+ *   em /convite/pendentes (S11) e aí é criado o membership.
  * - Utilizador já existente na plataforma: associa-o imediatamente.
  */
 export async function convidarMembro(
