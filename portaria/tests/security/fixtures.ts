@@ -8,9 +8,10 @@
  */
 import { createConfirmedUser, deleteUsers, serviceClient, type TestUser } from "./helpers";
 
-/** Vetor 1536-dim em formato pgvector ('[1,0,0,...]'). Norma não-nula. */
-export function vec1536(): string {
-  const arr = new Array(1536).fill(0);
+/** Vetor 1024-dim em formato pgvector ('[1,0,0,...]'), igual à dimensão da
+ *  coluna desde a L-44 (20260902510000, bge-m3). Norma não-nula. */
+export function vec1024(): string {
+  const arr = new Array(1024).fill(0);
   arr[0] = 1;
   return `[${arr.join(",")}]`;
 }
@@ -122,7 +123,7 @@ export async function seed(): Promise<Fixtures> {
   ]);
 
   // Embeddings (A): regulamento (todos) + ocorrencia_resolvida (só admin, C2).
-  const emb = vec1536();
+  const emb = vec1024();
   await svc.from("conhecimento_embeddings").insert([
     { tenant_id: tenantA, origem: "regulamento", origem_id: "reg1", conteudo: "Artigo do regulamento", embedding: emb },
     { tenant_id: tenantA, origem: "ocorrencia_resolvida", origem_id: ocorrenciaPrivadaA, conteudo: "Queixa privada indexada", embedding: emb },

@@ -15,7 +15,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import {
   ANON_KEY, hasEnv, userClient, anonClient, rpcRaw, restInsert,
 } from "./helpers";
-import { seed, vec1536, type Fixtures } from "./fixtures";
+import { seed, vec1024, type Fixtures } from "./fixtures";
 
 const d = hasEnv ? describe : describe.skip;
 
@@ -71,7 +71,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("NEG: anon não pode chamar buscar_chunks", async () => {
       const { status } = await rpcRaw(
         "buscar_chunks",
-        { p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 5, p_threshold: -1 },
+        { p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 5, p_threshold: -1 },
         { apikey: ANON_KEY }
       );
       expect(status).toBeGreaterThanOrEqual(400);
@@ -80,7 +80,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("POS: um membro autenticado pode chamar buscar_chunks no seu tenant", async () => {
       const { status } = await rpcRaw(
         "buscar_chunks",
-        { p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 5, p_threshold: -1 },
+        { p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 5, p_threshold: -1 },
         { apikey: ANON_KEY, token: fx.users.condoA.accessToken }
       );
       expect(status).toBe(200);
@@ -92,7 +92,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("POS: condómino do tenant vê o regulamento no RAG", async () => {
       const c = userClient(fx.users.condoA.accessToken);
       const { data } = await c.rpc("buscar_chunks", {
-        p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 10, p_threshold: -1,
+        p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 10, p_threshold: -1,
       });
       const origens = (data ?? []).map((r: { origem: string }) => r.origem);
       expect(origens).toContain("regulamento");
@@ -101,7 +101,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("NEG(C2): condómino NÃO vê chunks de ocorrência resolvida", async () => {
       const c = userClient(fx.users.condoA.accessToken);
       const { data } = await c.rpc("buscar_chunks", {
-        p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 10, p_threshold: -1,
+        p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 10, p_threshold: -1,
       });
       const origens = (data ?? []).map((r: { origem: string }) => r.origem);
       expect(origens).not.toContain("ocorrencia_resolvida");
@@ -110,7 +110,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("POS(C2): admin do tenant vê chunks de ocorrência resolvida", async () => {
       const c = userClient(fx.users.adminA.accessToken);
       const { data } = await c.rpc("buscar_chunks", {
-        p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 10, p_threshold: -1,
+        p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 10, p_threshold: -1,
       });
       const origens = (data ?? []).map((r: { origem: string }) => r.origem);
       expect(origens).toContain("ocorrencia_resolvida");
@@ -119,7 +119,7 @@ d("RLS P0 — isolamento multi-tenant", () => {
     it("NEG(S3): membro de OUTRO tenant não obtém dados via buscar_chunks", async () => {
       const c = userClient(fx.users.condoB.accessToken);
       const { data } = await c.rpc("buscar_chunks", {
-        p_tenant_id: fx.tenantA, p_embedding: vec1536(), p_limite: 10, p_threshold: -1,
+        p_tenant_id: fx.tenantA, p_embedding: vec1024(), p_limite: 10, p_threshold: -1,
       });
       expect((data ?? []).length).toBe(0);
     });
