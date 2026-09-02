@@ -9,10 +9,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, getCurrentUserInTenant } from "@/lib/supabase/tenant";
-import { openaiConfigurado } from "@/lib/ai/openai";
+import { embeddingsConfiguradas } from "@/lib/ai/openai";
 
 export type EstadoConhecimento = {
-  openai: boolean;
+  /** IA de embeddings disponível — MLX local (L-44) ou OpenAI legada. */
+  iaConfigurada: boolean;
   legislacao: number;
   regulamento: number;
 };
@@ -20,8 +21,8 @@ export type EstadoConhecimento = {
 /** Estado da base de conhecimento, para a página de configuração. */
 export async function estadoConhecimento(): Promise<EstadoConhecimento> {
   const ctx = await requireAdmin();
-  const openai = openaiConfigurado();
-  if (!ctx) return { openai, legislacao: 0, regulamento: 0 };
+  const iaConfigurada = embeddingsConfiguradas();
+  if (!ctx) return { iaConfigurada, legislacao: 0, regulamento: 0 };
 
   const supabase = await createClient();
   const [leg, reg] = await Promise.all([
@@ -31,7 +32,7 @@ export async function estadoConhecimento(): Promise<EstadoConhecimento> {
       .eq("tenant_id", ctx.tenant.id).eq("tipo", "regulamento"),
   ]);
 
-  return { openai, legislacao: leg.count ?? 0, regulamento: reg.count ?? 0 };
+  return { iaConfigurada, legislacao: leg.count ?? 0, regulamento: reg.count ?? 0 };
 }
 
 /**

@@ -7,9 +7,10 @@ import { requireAdmin, getCurrentUserInTenant } from "@/lib/supabase/tenant";
 import {
   gerarEmbedding,
   chatTexto,
-  extrairTextoPdf,
-  openaiConfigurado,
+  chatConfigurado,
+  embeddingsConfiguradas,
 } from "@/lib/ai/openai";
+import { extrairTextoPdfLocal } from "@/lib/ai/pdf-texto";
 import { LEGISLACAO } from "@/lib/ai/legislacao";
 
 export type Fonte = { titulo: string; fonte: string | null };
@@ -33,7 +34,9 @@ export async function perguntarConselheira(
 ): Promise<RespostaConselheira> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões." };
-  if (!openaiConfigurado()) return { indisponivel: true };
+  if (!chatConfigurado() || !embeddingsConfiguradas()) {
+    return { indisponivel: true };
+  }
 
   const p = pergunta.trim();
   if (!p) return { error: "Escreva uma pergunta." };
@@ -103,7 +106,12 @@ export async function semearLegislacao(
 ): Promise<SemearState> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões." };
-  if (!openaiConfigurado()) return { error: "Falta configurar a OPENAI_API_KEY." };
+  if (!embeddingsConfiguradas()) {
+    return {
+      error:
+        "IA indisponível: define MLX_EMBEDDINGS_URL (servidor local) ou OPENAI_API_KEY.",
+    };
+  }
 
   const admin = createAdminClient();
   if (!admin) return { error: "Service-role não configurado." };
@@ -161,7 +169,12 @@ export async function carregarRegulamento(
 ): Promise<RegulamentoState> {
   const ctx = await requireAdmin();
   if (!ctx) return { error: "Sem permissões." };
-  if (!openaiConfigurado()) return { error: "Falta configurar a OPENAI_API_KEY." };
+  if (!embeddingsConfiguradas()) {
+    return {
+      error:
+        "IA indisponível: define MLX_EMBEDDINGS_URL (servidor local) ou OPENAI_API_KEY.",
+    };
+  }
 
   const file = formData.get("ficheiro");
   if (!(file instanceof File) || file.size === 0) {
@@ -170,11 +183,21 @@ export async function carregarRegulamento(
   if (file.type !== "application/pdf") return { error: "O regulamento tem de ser PDF." };
   if (file.size > 15 * 1024 * 1024) return { error: "PDF demasiado grande (máx. 15 MB)." };
 
-  const b64 = Buffer.from(await file.arrayBuffer()).toString("base64");
-  const texto = await extrairTextoPdf(b64);
-  if (!texto || texto.trim().length < 50) {
-    return { error: "Não foi possível ler o texto do regulamento." };
+  // L-44: o texto é extraído LOCALMENTE (unpdf — sem LLM, ver
+  // src/lib/ai/pdf-texto.ts). PDFs digitalizados (sem camada de texto) ficam
+  // com um estado explícito e nada é alterado — nunca lançar.
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const extracao = await extrairTextoPdfLocal(bytes);
+  if (extracao.estado === "falha") {
+    return { error: "Não foi possível ler o PDF do regulamento." };
   }
+  if (extracao.estado === "sem_texto") {
+    return {
+      error:
+        "O PDF não tem texto extraível (digitalizado?). É necessária uma versão com camada de texto.",
+    };
+  }
+  const texto = extracao.texto;
 
   const blocos = dividirEmBlocos(texto);
   const supabase = await createClient();
@@ -184,7 +207,7 @@ export async function carregarRegulamento(
   const path = `${ctx.tenant.id}/regulamento/regulamento.pdf`;
   const { error: upErr } = await supabase.storage
     .from("documentos")
-    .upload(path, Buffer.from(b64, "base64"), {
+    .upload(path, Buffer.from(bytes), {
       contentType: "application/pdf",
       upsert: true,
     });

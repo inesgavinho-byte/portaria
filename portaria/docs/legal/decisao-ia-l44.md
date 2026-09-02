@@ -171,17 +171,20 @@ de OpenAI/DeepSeek como «inativo (chave não configurada)».
 
 ## Decisão
 
-*(A preencher pela GAVINHO, Arq.ª Inês Gavinho. Sem este registo, o estado da
-matéria L-44 é PROPOSTO — não decidido.)*
+**DECIDIDA a 2026-09-02** — instrução expressa da GAVINHO, Arq.ª Inês Gavinho
+(«vamos usar IA local, tenho um modelo mlx»), registada por DECIMIN Prime no
+mesmo dia:
 
 | Campo | Registo |
 |---|---|
-| Opção escolhida (A / B / C / outra) | ____________________ |
-| Âmbito e condições (ex.: B para o Beta; A antes de reativação) | ____________________ |
-| Provedor-alvo, se A (a avaliar/contratar) | ____________________ |
-| Data da decisão | ____/____/______ |
-| Assinatura | ____________________ |
+| Opção escolhida | **D — Processamento local (MLX)** — variante mais forte da Opção A: os dados nunca saem da infraestrutura da GAVINHO, não há transferência para país terceiro nenhum |
+| Âmbito e condições | Embeddings via servidor MLX local (bge-m3, 1024 dims, porta 8099, padrão DECIMA) e chat via servidor MLX local (Qwen3-8B-4bit). Provedores externos (OpenAI, DeepSeek) deixam de ser chamados. Exposição à Netlify de produção depende de túnel da infraestrutura própria (Tailscale/Cloudflare) — sem túnel, a IA opera em desenvolvimento e degrada em produção (equivalente operacional à Opção B) |
+| Provedor-alvo | Infraestrutura própria Apple Silicon (MLX): `mlx-community/bge-m3-mlx-8bit` + `mlx-community/Qwen3-8B-4bit` |
+| Data da decisão | 02/09/2026 |
+| Registo | Instruções de implementação no branch `feat/ia-local`; migração de dimensão dos embeddings (1536→1024) com reindexação total incluída |
 
-Notas da decisão:
-_____________________________________________
-_____________________________________________
+Notas da decisão: por ser processamento local em infraestrutura própria, os
+arts. 44.º–49.º não se aplicam — não há transferência para terceiros. Mantém-se
+a exigência de DPA intra-UE apenas para os restantes subcontratantes (Supabase,
+Netlify, Resend, Hostinger). `subcontratantes.md` atualizado: OpenAI e DeepSeek
+passam a «inativo (substituídos por processamento local MLX)».

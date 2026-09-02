@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { chatTexto, openaiConfigurado } from "@/lib/ai/openai";
+import { chatTexto, chatConfigurado } from "@/lib/ai/openai";
 import { sanitizarHtml } from "@/lib/sanitize";
 import { renderBlueprintPdf } from "@/lib/pdf/blueprint-pdf";
 import { montarDocumentoHtml, carregarLogoDataUri } from "@/lib/pdf/documento-blueprint";
@@ -258,7 +258,7 @@ export async function carregarSessaoDocumental(sessaoId: string): Promise<{
 export async function enviarMensagemDocumental(sessaoId: string, conteudo: string): Promise<RespostaAssistenteDocumental> {
   const base = await obterConfigEFonte();
   if ("error" in base) return base;
-  if (!openaiConfigurado()) return { indisponivel: true };
+  if (!chatConfigurado()) return { indisponivel: true }; // MLX local (L-44) ou OpenAI
   const pergunta = textoLimpo(conteudo, 12000);
   if (!pergunta) return { error: "Escreva um ponto, instrução ou pergunta para a assistente." };
 
