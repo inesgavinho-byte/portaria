@@ -77,7 +77,9 @@ export async function importarExtratoBcp(formData: FormData): Promise<ImportarEx
     return { estado: "erro", erro: "Nenhum movimento encontrado no extrato." };
   }
 
-  const cadeia = validarCadeiaSaldos(resultado.movimentos);
+  const avisos: string[] = [];
+
+  const cadeia = validarCadeiaSaldos(resultado.movimentos, resultado.lacunasApos);
   if (!cadeia.ok && cadeia.quebra) {
     const movimento = resultado.movimentos[cadeia.quebra.indice];
     return {
@@ -89,11 +91,24 @@ export async function importarExtratoBcp(formData: FormData): Promise<ImportarEx
         "O ficheiro pode estar truncado ou corrompido — exporta o extrato outra vez. Nada foi importado.",
     };
   }
+  for (const naoVerificada of cadeia.naoVerificadas) {
+    const acima = resultado.movimentos[naoVerificada.indice];
+    const abaixo = resultado.movimentos[naoVerificada.indice + 1];
+    avisos.push(
+      `Entre "${acima.descricao}" e "${abaixo.descricao}" há linhas ignoradas e a diferença de saldo ` +
+        `(${emEuros(naoVerificada.deltaCents)}) não é verificável — tipicamente uma operação em moeda estrangeira.`,
+    );
+  }
+  if (resultado.linhasIgnoradasAposUltimo > 0) {
+    avisos.push(
+      `${resultado.linhasIgnoradasAposUltimo} linha(s) ignorada(s) a seguir ao último movimento — ` +
+        "o saldo inicial mostrado pode reflectir apenas os movimentos em EUR.",
+    );
+  }
 
-  // O BCP apresenta a conta como "0000045406856047 - EUR"; fica só o número.
+  // O BCP apresenta a conta como "0000123456789012 - EUR"; fica só o número.
   const conta = resultado.metadados.conta?.split(" - ")[0]?.trim() || null;
 
-  const avisos: string[] = [];
   if (conta) {
     const configuracao = await obterConfiguracaoFinanceira();
     const iban = configuracao?.iban?.replace(/\s+/g, "");
@@ -170,6 +185,7 @@ export async function importarExtratoBcp(formData: FormData): Promise<ImportarEx
         // realizadas. O que continua pendente é a triagem de fornecedor —
         // `estado_reconciliacao` fica no default (`nao_reconciliado`).
         confirmado: true,
+        criado_por: ctx.user.id,
         fonte_referencia: ficheiro.name,
       })),
     );

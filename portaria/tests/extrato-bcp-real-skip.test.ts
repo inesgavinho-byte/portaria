@@ -3,42 +3,28 @@ import { describe, expect, it } from "vitest";
 import { parseExtratoBcp, validarCadeiaSaldos } from "../src/lib/financeiro/extrato-bcp";
 
 /**
- * Smoke contra um extrato real, fora do repositório: o teste salta-se
- * silenciosamente quando o ficheiro não existe na máquina. Nada de dados do
- * utilizador entra no repo nem no output — só contagens e totais.
+ * Smoke contra um extrato real, FORA do repositório: aponta-se o ficheiro pela
+ * variável de ambiente PORTARIA_EXTRATO_SMOKE e o teste salta-se quando não há
+ * nenhum. Nada de dados do utilizador entra no repo nem no output — o que se
+ * afirma são propriedades internas do ficheiro (cadeia de saldos, identidade
+ * contabilística), não valores concretos.
  */
-const CANDIDATOS = [
-  "/Users/ig/Downloads/EXTMV12682136341.xlsx",
-  "/Users/ig/Documents/Documents - Inês’s MacBook Pro/kimi/Workspaces/EUROPA/EXTMV12682136341.xlsx",
-];
-const CAMINHO_EXTRATO_REAL = CANDIDATOS.find((caminho) => existsSync(caminho)) ?? CANDIDATOS[0];
+const CAMINHO_EXTRATO_REAL = process.env.PORTARIA_EXTRATO_SMOKE ?? "";
 
-// Valores esperados do ficheiro (verificados à mão no Excel).
-const ESPERADO = {
-  movimentos: 171,
-  saldoInicialCents: 513421,
-  saldoFinalCents: 1690374,
-  somaCreditosCents: 4027976,
-  somaDebitosCents: -2851023,
-};
+describe.skipIf(!CAMINHO_EXTRATO_REAL || !existsSync(CAMINHO_EXTRATO_REAL))(
+  "extrato real do Millennium BCP (ficheiro local)",
+  () => {
+    it("faz o parse integral, valida a cadeia de saldos e fecha a identidade contabilística", () => {
+      const resultado = parseExtratoBcp(readFileSync(CAMINHO_EXTRATO_REAL));
+      if (!("movimentos" in resultado)) throw new Error(resultado.erro);
 
-describe.skipIf(!existsSync(CAMINHO_EXTRATO_REAL))("extrato real do Millennium BCP (ficheiro local)", () => {
-  it("faz o parse integral, valida a cadeia de saldos e fecha as contas", () => {
-    const resultado = parseExtratoBcp(readFileSync(CAMINHO_EXTRATO_REAL));
-    if (!("movimentos" in resultado)) throw new Error(resultado.erro);
+      expect(resultado.movimentos.length).toBeGreaterThan(0);
+      expect(validarCadeiaSaldos(resultado.movimentos, resultado.lacunasApos).ok).toBe(true);
 
-    expect(resultado.movimentos).toHaveLength(ESPERADO.movimentos);
-    expect(validarCadeiaSaldos(resultado.movimentos).ok).toBe(true);
-    expect(resultado.saldoInicialCents).toBe(ESPERADO.saldoInicialCents);
-    expect(resultado.saldoFinalCents).toBe(ESPERADO.saldoFinalCents);
-
-    const somaCreditos = resultado.movimentos
-      .filter((m) => m.montanteCents > 0)
-      .reduce((soma, m) => soma + m.montanteCents, 0);
-    const somaDebitos = resultado.movimentos
-      .filter((m) => m.montanteCents < 0)
-      .reduce((soma, m) => soma + m.montanteCents, 0);
-    expect(somaCreditos).toBe(ESPERADO.somaCreditosCents);
-    expect(somaDebitos).toBe(ESPERADO.somaDebitosCents);
-  });
-});
+      // Identidade contabilística: o saldo final tem de ser o saldo inicial
+      // mais a soma algébrica de todos os movimentos do ficheiro.
+      const somaMovimentos = resultado.movimentos.reduce((soma, m) => soma + m.montanteCents, 0);
+      expect(resultado.saldoInicialCents! + somaMovimentos).toBe(resultado.saldoFinalCents);
+    });
+  },
+);

@@ -99,7 +99,7 @@ describe("validarCadeiaSaldos", () => {
       linha({ dataLancamento: "2026-01-05", montanteCents: 3000, saldoCents: 10000 }),
       linha({ dataLancamento: "2026-01-02", montanteCents: -7000, saldoCents: 7000 }),
     ];
-    expect(validarCadeiaSaldos(movimentos)).toEqual({ ok: true, quebra: null });
+    expect(validarCadeiaSaldos(movimentos)).toEqual({ ok: true, quebra: null, naoVerificadas: [] });
   });
 
   it("detecta a quebra com índice, esperado e real", () => {
@@ -115,11 +115,44 @@ describe("validarCadeiaSaldos", () => {
   it("aceita uma lista de um elemento", () => {
     expect(validarCadeiaSaldos([linha({ dataLancamento: "2026-01-10" })]).ok).toBe(true);
   });
+
+  it("uma linha a zero entre dois movimentos não cria diferença — cadeia segue verificada", () => {
+    const movimentos = [
+      linha({ dataLancamento: "2026-01-10", montanteCents: -2000, saldoCents: 8000 }),
+      linha({ dataLancamento: "2026-01-05", montanteCents: 3000, saldoCents: 10000 }),
+    ];
+    // A linha ignorada a zero estava entre os índices 0 e 1.
+    const resultado = validarCadeiaSaldos(movimentos, [0]);
+    expect(resultado).toEqual({ ok: true, quebra: null, naoVerificadas: [] });
+  });
+
+  it("diferença de saldo num troço com linhas ignoradas é reportada, não parte a importação", () => {
+    // Operação FX a meio: o montante veio em moeda original, o saldo em EUR —
+    // a aritmética da cadeia não fecha nesse troço nem no ficheiro do banco.
+    const movimentos = [
+      linha({ dataLancamento: "2026-01-10", montanteCents: -2000, saldoCents: 8000 }),
+      linha({ dataLancamento: "2026-01-05", montanteCents: 3000, saldoCents: 4500 }),
+    ];
+    const resultado = validarCadeiaSaldos(movimentos, [0]);
+    expect(resultado.ok).toBe(true);
+    expect(resultado.quebra).toBeNull();
+    expect(resultado.naoVerificadas).toEqual([{ indice: 0, deltaCents: 5500 }]);
+  });
+
+  it("sem lacuna declarada, a mesma diferença é uma quebra a sério", () => {
+    const movimentos = [
+      linha({ dataLancamento: "2026-01-10", montanteCents: -2000, saldoCents: 8000 }),
+      linha({ dataLancamento: "2026-01-05", montanteCents: 3000, saldoCents: 4500 }),
+    ];
+    const resultado = validarCadeiaSaldos(movimentos);
+    expect(resultado.ok).toBe(false);
+    expect(resultado.quebra).toEqual({ indice: 0, esperadoCents: 2500, realCents: 8000 });
+  });
 });
 
 describe("hashReferencia", () => {
   const chave = {
-    conta: "0000045406856047",
+    conta: "0000123456789012",
     dataLancamento: "2026-01-10",
     dataValor: "2026-01-10",
     montanteCents: -200000,
@@ -137,7 +170,7 @@ describe("hashReferencia", () => {
     expect(await hashReferencia({ ...chave, descricao: "outra" })).not.toBe(base);
     expect(await hashReferencia({ ...chave, conta: null })).not.toBe(base);
     expect(await hashReferencia({ ...chave, dataValor: null })).not.toBe(base);
-    expect(base.startsWith("bcp:0000045406856047:")).toBe(true);
+    expect(base.startsWith("bcp:0000123456789012:")).toBe(true);
   });
 });
 
@@ -150,7 +183,7 @@ describe("hashReferencia", () => {
 function extratoSintetico(): Buffer {
   const folha = XLSX.utils.aoa_to_sheet([
     ["Millennium bcp"],
-    ["Conta", null, "0000045406856047 - EUR"],
+    ["Conta", null, "0000123456789012 - EUR"],
     ["Data de inicio", null, "01/01/2026"],
     ["Data fim", null, "31/01/2026"],
     ["Tipos de Pesquisa", null, "Todos"],
@@ -174,7 +207,7 @@ describe("parseExtratoBcp", () => {
     if (!("movimentos" in resultado)) throw new Error(resultado.erro);
 
     expect(resultado.metadados).toEqual({
-      conta: "0000045406856047 - EUR",
+      conta: "0000123456789012 - EUR",
       dataInicio: "01/01/2026",
       dataFim: "31/01/2026",
       exportadoEm: "02-09-2026 13:06:41",
@@ -207,9 +240,45 @@ describe("parseExtratoBcp", () => {
     expect(resultado.erros.map((e) => e.motivo)).toEqual(["valor a zero", "moeda USD — só se importa EUR"]);
     expect(resultado.erros.every((e) => e.linha > 8)).toBe(true);
 
-    expect(validarCadeiaSaldos(resultado.movimentos).ok).toBe(true);
+    // A linha a zero fica entre os movimentos 0 e 1; a FX fica em cauda.
+    expect(resultado.lacunasApos).toEqual([0]);
+    expect(resultado.linhasIgnoradasAposUltimo).toBe(1);
+
+    // A cadeia fecha: o troço com a linha a zero tem diferença nula e a FX em
+    // cauda só afecta o saldo inicial, que é avisado à parte.
+    expect(validarCadeiaSaldos(resultado.movimentos, resultado.lacunasApos)).toEqual({
+      ok: true,
+      quebra: null,
+      naoVerificadas: [],
+    });
     expect(resultado.saldoInicialCents).toBe(1400000);
     expect(resultado.saldoFinalCents).toBe(800000);
+  });
+
+  it("uma operação FX a meio do ficheiro não parte a cadeia — vira diferença não verificável", () => {
+    const folha = XLSX.utils.aoa_to_sheet([
+      ["Millennium bcp"],
+      ["Conta", null, "0000123456789012 - EUR"],
+      ["Data de inicio", null, "01/01/2026"],
+      ["Data fim", null, "31/01/2026"],
+      [null],
+      ["Data Lançamento", "Data Valor", "Descrição", "Montante", "Saldo Contabilístico", "Moeda", "Notas", "Tratado"],
+      ["10/01/2026", "10/01/2026", "TRF. P/O  PINTURAS VERTICAIS", -2000, 8000, "EUR", null, null],
+      ["08/01/2026", "08/01/2026", "COMPRA MOEDA ESTRANGEIRA", 50, 7500, "USD", null, null],
+      ["05/01/2026", "06/01/2026", "TRF DE QUOTIZACAO MES DE JANEIRO", 3000, 4500, "EUR", null, null],
+    ]);
+    const livro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(livro, folha, "Extrato");
+    const buffer = XLSX.write(livro, { type: "buffer", bookType: "xlsx" }) as Buffer;
+
+    const resultado = parseExtratoBcp(buffer);
+    if (!("movimentos" in resultado)) throw new Error(resultado.erro);
+
+    expect(resultado.movimentos).toHaveLength(2);
+    expect(resultado.lacunasApos).toEqual([0]);
+    const cadeia = validarCadeiaSaldos(resultado.movimentos, resultado.lacunasApos);
+    expect(cadeia.ok).toBe(true);
+    expect(cadeia.naoVerificadas).toEqual([{ indice: 0, deltaCents: 550000 }]);
   });
 
   it("recusa um ficheiro sem o cabeçalho do extrato BCP", () => {

@@ -51,6 +51,15 @@ export type ParseExtratoResultado = {
   movimentos: LinhaExtrato[];
   /** Linhas ignoradas (valor a zero, moeda estrangeira, dados ilegíveis). */
   erros: ErroLinha[];
+  /**
+   * Índices de movimento depois dos quais há linhas ignoradas (ex.: o
+   * movimento 0 seguido de uma linha FX ignorada antes do movimento 1).
+   * A cadeia de saldos não pode ser verificada de forma estrita nesses
+   * troços — o montante de uma operação em moeda estrangeira não está em EUR.
+   */
+  lacunasApos: number[];
+  /** Linhas ignoradas depois do último movimento — podem alterar o saldo inicial. */
+  linhasIgnoradasAposUltimo: number;
   /** Saldo antes do movimento mais antigo do ficheiro. */
   saldoInicialCents: number | null;
   /** Saldo do movimento mais recente (primeira linha de movimentos). */
@@ -182,18 +191,37 @@ export function extrairContraparte(descricao: string): string | null {
  * significa extrato truncado, editado ou corrompido — nada deve ser gravado.
  * O saldo corre de baixo para cima porque o banco escreve de cima para baixo
  * os dias mais recentes primeiro.
+ *
+ * `lacunasApos` marca os troços onde o próprio banco omite linhas (uma
+ * operação FX traz o montante na moeda original, pelo que a aritmética em EUR
+ * não fecha aí nem no ficheiro do banco). Nesses troços uma diferença de
+ * saldo não prova corrupção: é reportada em `naoVerificadas` em vez de
+ * partir a importação — o utilizador decide com o delta à vista.
  */
-export function validarCadeiaSaldos(movimentos: LinhaExtrato[]): {
+export function validarCadeiaSaldos(
+  movimentos: LinhaExtrato[],
+  lacunasApos: readonly number[] = [],
+): {
   ok: boolean;
   quebra: { indice: number; esperadoCents: number; realCents: number } | null;
+  naoVerificadas: { indice: number; deltaCents: number }[];
 } {
+  const trocosComLacuna = new Set(lacunasApos);
+  const naoVerificadas: { indice: number; deltaCents: number }[] = [];
   for (let i = 0; i < movimentos.length - 1; i++) {
     const esperado = movimentos[i + 1].saldoCents + movimentos[i].montanteCents;
-    if (movimentos[i].saldoCents !== esperado) {
-      return { ok: false, quebra: { indice: i, esperadoCents: esperado, realCents: movimentos[i].saldoCents } };
+    if (movimentos[i].saldoCents === esperado) continue;
+    if (trocosComLacuna.has(i)) {
+      naoVerificadas.push({ indice: i, deltaCents: movimentos[i].saldoCents - esperado });
+    } else {
+      return {
+        ok: false,
+        quebra: { indice: i, esperadoCents: esperado, realCents: movimentos[i].saldoCents },
+        naoVerificadas,
+      };
     }
   }
-  return { ok: true, quebra: null };
+  return { ok: true, quebra: null, naoVerificadas };
 }
 
 export type ChaveHashReferencia = {
@@ -277,6 +305,8 @@ export function parseExtratoBcp(dados: ArrayBuffer | Buffer): ParseExtratoResult
   const metadados = extrairMetadados(linhas.slice(0, indiceCabecalho));
   const movimentos: LinhaExtrato[] = [];
   const erros: ErroLinha[] = [];
+  const lacunasApos: number[] = [];
+  let ignoradasDesdeUltimoMovimento = 0;
 
   for (let i = indiceCabecalho + 1; i < linhas.length; i++) {
     const linha = linhas[i];
@@ -287,28 +317,33 @@ export function parseExtratoBcp(dados: ArrayBuffer | Buffer): ParseExtratoResult
     const dataLancamento = dataIso(linha[COLUNAS.dataLancamento]);
     if (!dataLancamento) {
       erros.push({ linha: numeroLinha, motivo: "data de lançamento ilegível" });
+      ignoradasDesdeUltimoMovimento += 1;
       continue;
     }
 
     const montanteCents = paraCents(linha[COLUNAS.montante]);
     if (montanteCents === null) {
       erros.push({ linha: numeroLinha, motivo: "montante ilegível" });
+      ignoradasDesdeUltimoMovimento += 1;
       continue;
     }
     if (montanteCents === 0) {
       erros.push({ linha: numeroLinha, motivo: "valor a zero" });
+      ignoradasDesdeUltimoMovimento += 1;
       continue;
     }
 
     const saldoCents = paraCents(linha[COLUNAS.saldo]);
     if (saldoCents === null) {
       erros.push({ linha: numeroLinha, motivo: "saldo ilegível" });
+      ignoradasDesdeUltimoMovimento += 1;
       continue;
     }
 
     const moeda = linha[COLUNAS.moeda];
     if (typeof moeda === "string" && moeda.trim() && moeda.trim().toUpperCase() !== "EUR") {
       erros.push({ linha: numeroLinha, motivo: `moeda ${moeda.trim()} — só se importa EUR` });
+      ignoradasDesdeUltimoMovimento += 1;
       continue;
     }
 
@@ -320,6 +355,11 @@ export function parseExtratoBcp(dados: ArrayBuffer | Buffer): ParseExtratoResult
       montanteCents,
       saldoCents,
     });
+    if (ignoradasDesdeUltimoMovimento > 0 && movimentos.length >= 2) {
+      // A lacuna fica entre o movimento anterior e este.
+      lacunasApos.push(movimentos.length - 2);
+    }
+    ignoradasDesdeUltimoMovimento = 0;
   }
 
   const ultimo = movimentos[movimentos.length - 1];
@@ -327,6 +367,8 @@ export function parseExtratoBcp(dados: ArrayBuffer | Buffer): ParseExtratoResult
     metadados,
     movimentos,
     erros,
+    lacunasApos,
+    linhasIgnoradasAposUltimo: ignoradasDesdeUltimoMovimento,
     // O ficheiro está em ordem descendente: o saldo inicial está na última
     // linha, menos o montante dela (o saldo que lá vem já é depois do movimento).
     saldoInicialCents: ultimo ? ultimo.saldoCents - ultimo.montanteCents : null,
