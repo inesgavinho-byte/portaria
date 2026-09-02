@@ -95,5 +95,69 @@ fechada.
 
 ## Registo de execução
 
-*(Preenchido fase a fase, com estados de evidência — WRITTEN/APPLIED/VERIFIED
-/etc. — não linguagem vaga.)*
+*(Execução de 2026-09-02, no branch `feat/goal-1.0`. Estados de evidência
+honestos — WRITTEN ≠ IMPLEMENTED ≠ TESTED ≠ APPLIED ≠ VERIFIED.)*
+
+### Fase A — gate do Beta
+
+| Item | Estado | Evidência |
+|---|---|---|
+| A1.1 contrato art. 28.º | WRITTEN (minuta) | `docs/legal/contrato-subcontratacao-rgpd.md`; assinatura pendente (humano) |
+| A1.2 decisão IA L-44 | WRITTEN (dossier + recomendação) | `docs/legal/decisao-ia-l44.md`; pipeline verificado no código; **decisão pendente (Inês)** |
+| A1.3 subcontratantes | WRITTEN | `docs/legal/subcontratantes.md` — 6 registos, factos verificados no código; DPA/localizações «a confirmar» |
+| A1.4 /privacidade + /termos | IMPLEMENTED, build verde | páginas no grupo `(landing)` + links nos rodapés; placeholders `[a indicar]` para NIPC/email/contacto (dados que só a Inês tem) |
+| A1.5 retenção e direitos | WRITTEN | `docs/legal/retencao-e-direitos.md`; prazos `[PROPOSTA]` pendem aprovação do responsável |
+| A1.6 afirmações da landing | IMPLEMENTED | `section-confianca.tsx` só afirma o demonstrável; comentário no ficheiro trava regressão |
+| A2.1 S11 convites | IMPLEMENTED + TESTED local | migração `20260902090000` exercitada em cluster descartável (16/16); suite `rls-s11` (9 testes); UI `/convite/pendentes`; `aceitar_convites()` removida |
+| A2.2 matriz RLS | IMPLEMENTED + TESTED | 58 tabelas + 20 RPCs cobertos; **262/262 testes a passar** contra stack local; prova de regressão registada e executada (`docs/security/rls-regression-proof.md`) |
+| A2.3 CI primeira execução | PENDENTE do PR | primeira execução real acontece com este branch |
+
+**Bónus da A2.2:** a matriz apanhou **duas regressões reais** na cadeia de
+migrações — A-1 (a `20260826030000` tinha perdido os filtros C2/S6 do
+`buscar_chunks`: fuga de ocorrências privadas pelo RAG) e A-2 (trigger de
+0038 impedia criar planos de manutenção). Corrigidas em `20260902310000`–
+`20260902330000` e testadas (262/262). É a prova de que a rede de segurança
+serve.
+
+### Fase B — dossiê pela UI
+
+| Item | Estado | Evidência |
+|---|---|---|
+| Reconhecimento | VERIFIED | já existia de agosto: evidências pela UI, dossiê/timeline, relatório a ler das tabelas certas — verificado por inspecção, não duplicado |
+| B2 registo do processo | IMPLEMENTED + TESTED | `criarAcontecimento`, `corrigirAcontecimento`, `registarPosicao`, `mudarEstadoPosicao`, `imputarMovimentoADespesa` + componentes; 150 testes unitários verdes |
+| B1 ingestão ligada | IMPLEMENTED | upload cria/atualiza fonte em `ia_documental_fontes` (checksum SHA-256, data_documento, contraparte) |
+| B3 relatório | VERIFIED (já lia das tabelas certas) | `relatorio/page.tsx` lê memória+evidências+posições+movimentos |
+| B4 correção sem SQL | IMPLEMENTED | posições `retirada`/`superada` com histórico; sem hard-delete |
+| Grants de escrita | WRITTEN + TESTED local | migração `20260902400000`; POS/NEG exercidos pela suite (admin escreve, condómino negado pela RLS com grant na mão) |
+
+### Fase C — fundação para Assistir
+
+| Item | Estado | Evidência |
+|---|---|---|
+| C1 extração de PDF | IMPLEMENTED + TESTED local | `unpdf` (extração 100% local, sem LLM); contrato de indexação `texto`/`metadados`; PDFs sem camada de texto ficam com estado explícito; 8 testes novos; limites: 80 páginas / 200k caracteres |
+| C2 pipeline | PRESERVADO | reindexação não-destrutiva mantida (A2); provedor de embeddings inalterado até decisão L-44 |
+
+### Verificação integrada (2026-09-02)
+
+- `tsc --noEmit`: limpo. `next build`: verde (inclui `/privacidade`, `/termos`).
+- Unitários: 150/150 (11 ficheiros). Segurança: **262/262** contra stack
+  Supabase local com a cadeia 0001→`20260902400000`.
+
+### Não feito / pendente de humano
+
+- **Produção intocada** — e o estado real das migrações em produção é
+  DESCONHECIDO a partir do repo; verificar no fluxo pós-merge. Migrações
+  pendentes de aplicação: `20260902090000`, `20260902310000`–`20260902330000`,
+  `20260902400000`.
+- Decisão L-44 (provedor de IA) — secção 5 da página de privacidade foi
+  publicada com a variante honesta face à realidade atual (IA ativa, base de
+  transferência por fechar); atualizar quando a decisão for registada.
+- Assinatura do contrato art. 28.º; aprovação dos prazos de retenção; NIPC,
+  email e contactos nas páginas públicas (placeholders visíveis).
+- Branch protection no GitHub (requer admin) — configuração documentada em
+  `docs/engineering/branch-protection.md`.
+- A-4 da matriz (alinhar linha documental de `verificar_disponibilidade`) —
+  documental, fica para o próximo toque na matriz.
+- Follow-ups registados: `atualizarDocumento` não re-ingere (cobre-se com
+  reindexação); extração de DOCX; latência de upload com atas grandes a
+  monitorar em produção.
