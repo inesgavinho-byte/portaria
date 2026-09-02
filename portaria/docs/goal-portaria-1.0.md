@@ -159,6 +159,18 @@ serve.
   (Netlify deteta pnpm e congela o lockfile); reconciliado — previews
   `ready` nos commits seguintes.
 
+### Produção (2026-09-02, pós-merge do PR #91)
+
+O merge publicou o código novo na Netlify de imediato, e a inspeção a
+produção revelou que **a geração de hardening 0028–0030 nunca lá tinha sido
+aplicada** — os buracos P0 da auditoria estavam vivos (S5 reservas cruzadas,
+S6 inquilino a ver contas/atas) e o código S11/Fase B chamava funções
+inexistentes. Aplicado e **verificado por consulta** no mesmo dia
+(APPLIED + VERIFIED — ver secção «Estado de produção» em
+`supabase/migrations/README.md` para a lista completa e as exclusões
+deliberadas: 0019 não vai a produção; módulo de votações não existe lá e
+fica excluído até decisão própria).
+
 ### Não feito / pendente de humano
 
 - **Produção intocada** — e o estado real das migrações em produção é

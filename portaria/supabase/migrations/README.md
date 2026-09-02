@@ -71,6 +71,37 @@ Reconstrução local de referência: projeto CLI com os mesmos ficheiros,
 Ver `docs/security/rls-audit-0027.md`, `docs/security/phase-0-report.md` e
 `docs/beta/phase-1-report.md`.
 
+## Estado de produção (2026-09-02)
+
+Produção estava **sem toda a geração de hardening 0028–0030** (as falhas P0 da
+auditoria estavam vivas: reservas cruzadas S5, inquilino com acesso a
+contas/atas S6, `registar_voto`/`disponibilidade_reservas` inexistentes para o
+código deployed) e sem as migrações do goal 1.0. Nesse dia aplicou-se, por
+ordem, via Management API, com verificação por consulta após cada bloco:
+
+`20260902090000` (S11) → `0028` → `0029` → `0030` → `20260902310000` (C2/S6) →
+`20260902330000` → `20260902400000` (Fase B).
+
+**Exclusões deliberadas:**
+
+- **0019 NÃO se aplica a produção** — é reparação da cadeia para reconstruções
+  limpas (as tabelas já lá existem) e o seu bloco de grants reabriria tabelas
+  de menor privilégio.
+- **O módulo de votações (0023) não existe em produção** — estava fora do
+  âmbito do Beta por decisão registada. A 0028 foi aplicada com as instruções
+  de votações saltadas (tabelas inexistentes). Quando as votações entrarem,
+  aplicar 0023 e depois as instruções S4 da 0028 (as políticas e
+  `registar_voto`).
+
+**Verificado em produção pós-aplicação:** S1 (sem INSERT de cliente em
+notificações, por desenho), S3/S6/C2 no `buscar_chunks` (`is_tenant_admin` +
+`user_tem_papel` no corpo), S5 (coerência user+tenant+espaço na política de
+INSERT de reservas), S6 (`documentos` com `user_tem_papel`), S7 (trigger
+`user_tenants_self_update_guard`), A-2 (trigger de manutenção com branch por
+`TG_TABLE_NAME`), grants da Fase B em `contrato_memoria_eventos`/
+`imputacoes_posicoes`, política de embeddings C2, `convites_pendentes()`
+executável.
+
 ## Dívida conhecida
 
 - `0027_financeiro.sql` cria funções `SECURITY DEFINER` (`gerar_quotas_mes`,
