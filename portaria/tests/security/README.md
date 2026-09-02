@@ -149,13 +149,12 @@ segurança (tabelas, políticas, RPCs, grants) aplicam todos.
 ## Lacunas de cobertura conhecidas
 
 - **G-1 — `contrato_memoria_eventos`/`_evidencias`: escrita por exercitar.**
-  As tabelas referenciam `public.contratos`, que **não existe** na cadeia de
-  migrações (o schema de memória da contratação foi aplicado em produção fora
-  do histórico). Sem a tabela `contratos`, é impossível semear eventos num
-  ambiente reconstruído — os caminhos de escrita ficam por exercitar, mesmo
-  depois de a Fase B (`20260902400000`) conceder INSERT/UPDATE a
-  `authenticated` (a política RLS já os cobria). Ações possíveis: миграção
-  que crie `contratos`, ou `NOT VALID`/remodelação da FK.
+  ~~As tabelas referenciam `public.contratos`, que não existe na cadeia de
+  migrações.~~ **FECHADO a 2026-09-02**: a migração
+  `0019_fornecedores_contratos_base.sql` versionou `fornecedores` e
+  `contratos` (idempotente, inerte em produção), a cadeia reconstrói do zero
+  e a suite completa corre verde contra a reconstrução (262/262). Registado
+  em `supabase/migrations/README.md`.
 - **G-2 — POS de `planos_manutencao`/`tarefas_manutencao`** — **FECHADO.** O
   bloqueio era o achado A-2; o trigger foi corrigido em `20260902320000`, o
   teste POS foi reactivado e passa (o seed via service_role também passa pelo
