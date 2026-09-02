@@ -20,6 +20,6 @@
 alter table public.contratos
   add column if not exists notas_internas text;
 
-comment on column public.contratos.notas_internas is
-  'Notas internas do contrato: constatações e reconciliações registadas '
-  || 'pela administração (append-only por convenção).';
+-- Nota: o runner de migrações parte statements de forma ingênua — evitar
+-- concatenação de literais (||) e strings multi-linha nos comentários SQL.
+comment on column public.contratos.notas_internas is 'Notas internas do contrato: constatações e reconciliações registadas pela administração (append-only por convenção).';
