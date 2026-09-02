@@ -20,12 +20,40 @@ type DocumentoOpcao = {
 export function ComunicacaoForm({
   fracoes,
   documentos,
+  preSelecionadas,
 }: {
   fracoes: FracaoOpcao[];
   documentos: DocumentoOpcao[];
+  // Ids de frações pré-selecionadas (ex.: a chegar da ficha do condómino).
+  // Quando presente, parte com essas frações e só elas; sem ele, parte com
+  // todas selecionadas — comportamento antigo.
+  preSelecionadas?: string[];
 }) {
   const [state, formAction, pending] = useActionState<ComunicacaoFormState, FormData>(criarComunicacao, {});
-  const [todosSelecionados, setTodosSelecionados] = useState(true);
+  const idsValidos = preSelecionadas
+    ? preSelecionadas.filter((fid) => fracoes.some((f) => f.id === fid))
+    : undefined;
+  // `null` significa "todas": o estado explícito só existe quando a seleção
+  // deixa de ser "todas" ou chega de fora como subconjunto.
+  const [selecionadas, setSelecionadas] = useState<Set<string> | null>(
+    idsValidos ? new Set(idsValidos) : null
+  );
+  const todasSelecionadas = selecionadas === null;
+  function alternarFracao(fracaoId: string) {
+    setSelecionadas((atual) => {
+      if (atual === null) {
+        // De "todas" para "todas menos esta".
+        const proximo = new Set(fracoes.map((f) => f.id));
+        proximo.delete(fracaoId);
+        return proximo;
+      }
+      const proximo = new Set(atual);
+      if (proximo.has(fracaoId)) proximo.delete(fracaoId);
+      else proximo.add(fracaoId);
+      // De volta a "todas" sem estado especial quando cobre o conjunto inteiro.
+      return proximo.size === fracoes.length ? null : proximo;
+    });
+  }
   const inputClass = "w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige";
   const labelClass = "block font-body text-xs tracking-widest uppercase text-oliveGray mb-2";
   const hoje = new Date().toISOString().slice(0, 10);
@@ -115,13 +143,20 @@ export function ComunicacaoForm({
           </div>
         </div>
         <label className="inline-flex items-center gap-2 font-body text-sm text-ink mb-4 cursor-pointer">
-          <input type="checkbox" checked={todosSelecionados} onChange={(event) => setTodosSelecionados(event.target.checked)} className="accent-ink" />
+          <input type="checkbox" checked={todasSelecionadas} onChange={() => setSelecionadas(todasSelecionadas ? new Set<string>() : null)} className="accent-ink" />
           Selecionar todas as frações
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-72 overflow-y-auto border border-warmBeige/20 p-3">
           {fracoes.map((fracao) => (
             <label key={fracao.id} className="flex items-start gap-2 p-2 hover:bg-softCream/50 cursor-pointer">
-              <input type="checkbox" name="fracao_ids" value={fracao.id} defaultChecked={todosSelecionados} checked={todosSelecionados || undefined} onChange={() => setTodosSelecionados(false)} className="mt-1 accent-ink" />
+              <input
+                type="checkbox"
+                name="fracao_ids"
+                value={fracao.id}
+                checked={todasSelecionadas || (selecionadas?.has(fracao.id) ?? false)}
+                onChange={() => alternarFracao(fracao.id)}
+                className="mt-1 accent-ink"
+              />
               <span className="min-w-0">
                 <span className="block font-body text-sm text-ink">{fracao.codigo}</span>
                 <span className="block font-body text-xs text-oliveGray truncate">{fracao.proprietario_nome ?? fracao.inquilino_nome ?? "Sem contacto"}</span>

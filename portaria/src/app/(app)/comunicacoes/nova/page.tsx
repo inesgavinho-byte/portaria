@@ -3,9 +3,20 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { ComunicacaoForm } from "@/components/admin/comunicacao-form";
 
-export default async function NovaComunicacaoPage() {
+export default async function NovaComunicacaoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fracao?: string }>;
+}) {
   const ctx = await requireAdmin();
   if (!ctx) redirect("/avisos");
+  const { fracao: fracaoParam } = await searchParams;
+
+  // A ficha do condómino chega aqui com ?fracao=id1,id2 — pré-seleciona
+  // essas frações em vez de partir com todas marcadas.
+  const preSelecionadas = fracaoParam
+    ? fracaoParam.split(",").map((fid) => fid.trim()).filter(Boolean)
+    : undefined;
 
   const supabase = await createClient();
   const [{ data: fracoes }, { data: documentos }, { data: confidenciais }] = await Promise.all([
@@ -37,7 +48,7 @@ export default async function NovaComunicacaoPage() {
           Registe o envio, selecione as frações e associe o documento correspondente. O sistema não envia mensagens automaticamente nesta fase.
         </p>
       </div>
-      <ComunicacaoForm fracoes={fracoes ?? []} documentos={opcoesDocumento} />
+      <ComunicacaoForm fracoes={fracoes ?? []} documentos={opcoesDocumento} preSelecionadas={preSelecionadas} />
     </div>
   );
 }
