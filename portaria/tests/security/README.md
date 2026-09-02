@@ -89,7 +89,9 @@ partir de `supabase/migrations/` (0001 → 20260902090000). Estado em produção
 A-3 e A-5 ficaram tratados (detalhe em cada item). **A-4 permanece aberto**
 (hardening efectivo; alinhar a linha da matriz é decisão documental própria).
 Depois da correção, a suite completa corre verde contra o stack local
-(257/257, 10 ficheiros, 0 falhas).
+(257/257, 10 ficheiros, 0 falhas). **Re-executada a 2026-09-02 com a migração
+da Fase B aplicada: 262/262, 10 ficheiros, 0 falhas** (inclui os POS/NEG novos
+da matriz-processo).
 
 **Fase B do goal-portaria-1.0** (migração `20260902400000`): o dossiê de
 fornecedor passa a ser operado pela UI, pelo que `authenticated` recebe as
