@@ -13,6 +13,7 @@ node_modules/
 **/.graphify/worktree.json
 **/.graphify/needs_update
 **/.graphify/cache/
+**/.graphify/.graphify_root
 
 # Enriquecimento por LLM, não usado nesta fase.
 #

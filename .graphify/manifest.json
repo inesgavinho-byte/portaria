@@ -1,1070 +1,1682 @@
 {
-  "portaria/next.config.ts": {
-    "mtime": 1787521362786.9395,
-    "hash": "2974598ae8c3d57ac1e54c442337a2e0"
-  },
-  "portaria/postcss.config.mjs": {
-    "mtime": 1787521362793.1475,
-    "hash": "d3fd1d29b05a09ff76b595a70e1e7d50"
-  },
-  "portaria/src/app/(app)/assembleias/[id]/page.tsx": {
-    "mtime": 1787521362799.0266,
-    "hash": "ee8ffc5385274a0f78f00bd2277fb8ec"
-  },
-  "portaria/src/app/(app)/assembleias/page.tsx": {
-    "mtime": 1787521362799.0266,
-    "hash": "9521de9c94f20c0ef45a533a11b3d670"
-  },
-  "portaria/src/app/(app)/avisos/page.tsx": {
-    "mtime": 1787521362799.0266,
-    "hash": "49783a009b4496ba7321c1a594e8d2c0"
-  },
-  "portaria/src/app/(app)/blueprints/[id]/assistente/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "2d4ef6a3a190909ea6cb89afbc6eed7a"
-  },
-  "portaria/src/app/(app)/blueprints/[id]/editar/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "1a2cdc6af53fed20cefeffa92511d4b4"
-  },
-  "portaria/src/app/(app)/blueprints/[id]/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "b37ff11119b3db1a23427fb8e3f85928"
-  },
-  "portaria/src/app/(app)/blueprints/novo/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "076b1d38be4895359321d97653a05687"
-  },
-  "portaria/src/app/(app)/blueprints/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "9109f994af187daf1c3ceeeb42aca5ac"
-  },
-  "portaria/src/app/(app)/calendario/page.tsx": {
-    "mtime": 1787521362800.9019,
-    "hash": "9b5cacc49c56738a09e5ac0b998f85d7"
-  },
-  "portaria/src/app/(app)/comunicacoes/[id]/page.tsx": {
-    "mtime": 1787521362803.258,
-    "hash": "8aecb16e9c522602ce411e5e8e88277f"
-  },
-  "portaria/src/app/(app)/comunicacoes/nova/page.tsx": {
-    "mtime": 1787521362803.258,
-    "hash": "cf100ff0857ac7b01f2a01f65c04d485"
-  },
-  "portaria/src/app/(app)/comunicacoes/page.tsx": {
-    "mtime": 1787521362803.258,
-    "hash": "a6fdf5c5c793a124f333a0e3a72122e9"
-  },
-  "portaria/src/app/(app)/configuracao/assembleias/[id]/page.tsx": {
-    "mtime": 1787521362805.0627,
-    "hash": "81c449ccef28f81cc39df0fa96ccaad7"
-  },
-  "portaria/src/app/(app)/configuracao/assembleias/[id]/votacoes/[vid]/resultados/page.tsx": {
-    "mtime": 1787521362806.3313,
-    "hash": "aed78c7e6f83f941d768fd602c85dad8"
-  },
-  "portaria/src/app/(app)/configuracao/assembleias/[id]/votacoes/nova/page.tsx": {
-    "mtime": 1787521362806.3313,
-    "hash": "f12967a09f8ad5be91614ac59d0976e2"
-  },
-  "portaria/src/app/(app)/configuracao/assembleias/nova/page.tsx": {
-    "mtime": 1787521362806.3313,
-    "hash": "35249796362c457b627a593aa6da0ff8"
-  },
-  "portaria/src/app/(app)/configuracao/assembleias/page.tsx": {
-    "mtime": 1787521362806.3313,
-    "hash": "fd2b402fa1e7176a540a5a5928fd3674"
-  },
-  "portaria/src/app/(app)/configuracao/avisos/[id]/editar/page.tsx": {
-    "mtime": 1787521362808.7554,
-    "hash": "9eeca796886dc5514878a85092a94390"
-  },
-  "portaria/src/app/(app)/configuracao/avisos/novo/page.tsx": {
-    "mtime": 1787521362808.7554,
-    "hash": "6173d3ec750260b8c4cef355b6d22c92"
-  },
-  "portaria/src/app/(app)/configuracao/avisos/page.tsx": {
-    "mtime": 1787521362808.7554,
-    "hash": "9bbb4ea24377b6bcd33399fa0f5618ad"
-  },
-  "portaria/src/app/(app)/configuracao/conselheira/page.tsx": {
-    "mtime": 1787521362808.7554,
-    "hash": "a1e37eaf224700e0278175b48448b2c6"
-  },
-  "portaria/src/app/(app)/configuracao/documentos-administracao/importar-drive/page.tsx": {
-    "mtime": 1787521362810.8477,
-    "hash": "29c82e2b95e07a9784fe0e497e017753"
-  },
-  "portaria/src/app/(app)/configuracao/documentos-administracao/lote/page.tsx": {
-    "mtime": 1787521362810.8477,
-    "hash": "e7bc90d5cecec815ba94e407f103acec"
-  },
-  "portaria/src/app/(app)/configuracao/documentos-administracao/novo/page.tsx": {
-    "mtime": 1787521362810.8477,
-    "hash": "a28dc118c82b67733ac17b631ce749ef"
-  },
-  "portaria/src/app/(app)/configuracao/documentos-administracao/page.tsx": {
-    "mtime": 1787521362810.8477,
-    "hash": "cda2737ad54a81368b0e7e0ddfeac32e"
-  },
-  "portaria/src/app/(app)/configuracao/documentos/[id]/editar/page.tsx": {
-    "mtime": 1787521362812.9905,
-    "hash": "6abdffaf91ecbe72b5cd609c0c1844ac"
-  },
-  "portaria/src/app/(app)/configuracao/documentos/novo/page.tsx": {
-    "mtime": 1787521362812.9905,
-    "hash": "7b0ce80772ced34255b3550deda0c526"
-  },
-  "portaria/src/app/(app)/configuracao/documentos/page.tsx": {
-    "mtime": 1787645823318.81,
-    "hash": "e993e4a061c22b2f14943ce4c917b52d"
-  },
-  "portaria/src/app/(app)/configuracao/financeiro/mapa/page.tsx": {
-    "mtime": 1787521362815.264,
-    "hash": "603903ca9184efae15305e373f5fc303"
-  },
-  "portaria/src/app/(app)/configuracao/financeiro/movimentos/page.tsx": {
-    "mtime": 1787607900370.2893,
-    "hash": "a8222296bf87e29a64d291f5aaac0faa"
-  },
-  "portaria/src/app/(app)/configuracao/financeiro/page.tsx": {
-    "mtime": 1787521362815.264,
-    "hash": "749f4a1ac981e9aff2c484f815684167"
-  },
-  "portaria/src/app/(app)/configuracao/layout.tsx": {
-    "mtime": 1787521362815.264,
-    "hash": "653ac58ac4c12823fa7005ed4bf383ca"
-  },
-  "portaria/src/app/(app)/configuracao/manutencao/page.tsx": {
-    "mtime": 1787521362815.264,
-    "hash": "2f7d88f1437216342d48fbec393d8d52"
-  },
-  "portaria/src/app/(app)/configuracao/membros/novo/page.tsx": {
-    "mtime": 1787521362817.3032,
-    "hash": "a0afed89751cf416856ac9424a2bbc60"
-  },
-  "portaria/src/app/(app)/configuracao/membros/page.tsx": {
-    "mtime": 1787521362817.3032,
-    "hash": "a0de4e2fb9f3a33458ff0737f615c393"
-  },
-  "portaria/src/app/(app)/configuracao/notificacoes/page.tsx": {
-    "mtime": 1787521362817.3032,
-    "hash": "aba91c30c10f20547199da3baa60e9b5"
-  },
-  "portaria/src/app/(app)/configuracao/ocorrencias/[id]/page.tsx": {
-    "mtime": 1787521362819.1523,
-    "hash": "d7f0dbc065155dacb18a0042135c59c9"
-  },
-  "portaria/src/app/(app)/configuracao/ocorrencias/page.tsx": {
-    "mtime": 1787521362819.1523,
-    "hash": "d9f0de48beb595b084396d5b53f787b1"
-  },
-  "portaria/src/app/(app)/configuracao/page.tsx": {
-    "mtime": 1787521362819.1523,
-    "hash": "585243cef62589be0f3c65c2c8576e41"
-  },
-  "portaria/src/app/(app)/configuracao/perfil/page.tsx": {
-    "mtime": 1787521362819.1523,
-    "hash": "1902b3a373479cd7d8a76edb968b365a"
-  },
-  "portaria/src/app/(app)/configuracao/reservas/novo/page.tsx": {
-    "mtime": 1787521362820.7192,
-    "hash": "ea4ce51de47b4fa8af554af904e7a37d"
-  },
-  "portaria/src/app/(app)/configuracao/reservas/page.tsx": {
-    "mtime": 1787521362820.7192,
-    "hash": "511dc809fe80f1a8da17dc55b019574e"
-  },
-  "portaria/src/app/(app)/contactos/[id]/editar/page.tsx": {
-    "mtime": 1787521362821.6213,
-    "hash": "1975478fad71ada5f7dc2196ec934795"
-  },
-  "portaria/src/app/(app)/contactos/novo/page.tsx": {
-    "mtime": 1787521362821.6213,
-    "hash": "e37ef5fc9310a77f01a3607fc7c5da6b"
-  },
-  "portaria/src/app/(app)/contactos/page.tsx": {
-    "mtime": 1787521362821.6213,
-    "hash": "297cbf7f4040237fafc98d1ef76a2a99"
-  },
-  "portaria/src/app/(app)/contratos/[id]/editar/page.tsx": {
-    "mtime": 1787521362823.7087,
-    "hash": "9f7aeedce9fb44a96d583e2d449b0fd4"
-  },
-  "portaria/src/app/(app)/contratos/[id]/page.tsx": {
-    "mtime": 1787521362823.7087,
-    "hash": "96e6a4ff871c044d7c1e92805f23d1e3"
-  },
-  "portaria/src/app/(app)/contratos/novo/page.tsx": {
-    "mtime": 1787521362823.7087,
-    "hash": "5d1d60fb84eab746c73e62d595891d25"
-  },
-  "portaria/src/app/(app)/contratos/page.tsx": {
-    "mtime": 1787521362823.7087,
-    "hash": "8562b80b6f45ea1243cf7de8b5cb9c91"
-  },
-  "portaria/src/app/(app)/contribuicoes-extraordinarias/[id]/page.tsx": {
-    "mtime": 1787521362826.1477,
-    "hash": "b84528599f41acb925329909b7a84c69"
-  },
-  "portaria/src/app/(app)/contribuicoes-extraordinarias/nova/page.tsx": {
-    "mtime": 1787521362826.1477,
-    "hash": "96313191d3eba665aba1f0cbd938251c"
-  },
-  "portaria/src/app/(app)/contribuicoes-extraordinarias/page.tsx": {
-    "mtime": 1787521362826.1477,
-    "hash": "812c6f4d90e561c947fb5db6643a62a9"
-  },
-  "portaria/src/app/(app)/conversas/[id]/page.tsx": {
-    "mtime": 1787521362827.586,
-    "hash": "3713f5023e4576eec4aab4b22e19b39c"
-  },
-  "portaria/src/app/(app)/conversas/nova/page.tsx": {
-    "mtime": 1787521362827.586,
-    "hash": "ae86c6fed9b4f1c111e0d4e1643effa7"
-  },
-  "portaria/src/app/(app)/conversas/page.tsx": {
-    "mtime": 1787521362827.586,
-    "hash": "93d64ce7b385a4a6f0e42ee06bd0b9c7"
-  },
-  "portaria/src/app/(app)/documentos/page.tsx": {
-    "mtime": 1787521362827.586,
-    "hash": "0e94b1f95609e323591ce0c5c7e4c8f3"
-  },
-  "portaria/src/app/(app)/fornecedores/[id]/editar/page.tsx": {
-    "mtime": 1787521362829.523,
-    "hash": "e7ae84bfab8de80a803725ac3793abd9"
-  },
-  "portaria/src/app/(app)/fornecedores/[id]/page.tsx": {
-    "mtime": 1787646136157.6565,
-    "hash": "17038c743a4713e2a5deabfcb397475f"
-  },
-  "portaria/src/app/(app)/fornecedores/[id]/relatorio/error.tsx": {
-    "mtime": 1787652840250.8823,
-    "hash": "28de18bba53a49bc369f6c82d0ee2c5a"
-  },
-  "portaria/src/app/(app)/fornecedores/[id]/relatorio/page.tsx": {
-    "mtime": 1787653520915.7263,
-    "hash": "f6683ccb247bb66cd217d0c3d5fff16a"
-  },
-  "portaria/src/app/(app)/fornecedores/novo/page.tsx": {
-    "mtime": 1787521362829.523,
-    "hash": "b222bd0405ef7d6a0f5a68f0c36e0b89"
-  },
-  "portaria/src/app/(app)/fornecedores/page.tsx": {
-    "mtime": 1787521362829.523,
-    "hash": "c5401cd207a19d2916b3d5d45f0e2651"
-  },
-  "portaria/src/app/(app)/fracoes/[id]/editar/page.tsx": {
-    "mtime": 1787521362832.1936,
-    "hash": "158786bb8c4dcb4a24a4bce70d11af63"
-  },
-  "portaria/src/app/(app)/fracoes/[id]/page.tsx": {
-    "mtime": 1787521362832.1936,
-    "hash": "89cb0412b411fe538d1d6afd13cafc2b"
-  },
-  "portaria/src/app/(app)/fracoes/nova/page.tsx": {
-    "mtime": 1787521362832.1936,
-    "hash": "2e8b0903b731e6711d261c4a5c1e7dcd"
-  },
-  "portaria/src/app/(app)/fracoes/page.tsx": {
-    "mtime": 1787521362832.1936,
-    "hash": "18f7b81d411262d9efb52ea96197170d"
-  },
-  "portaria/src/app/(app)/hoje/page.tsx": {
-    "mtime": 1787521362832.1936,
-    "hash": "36c4811e529f6216bedbabf5f089d475"
-  },
-  "portaria/src/app/(app)/ia/configuracao/documentos/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "2dc25dc5fbaf9b96e357a9fc71248501"
-  },
-  "portaria/src/app/(app)/ia/configuracao/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "7380eccf853613d9ccc91ab2737b0650"
-  },
-  "portaria/src/app/(app)/ia/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "691a44b51b1858cd1f73a6178970be93"
-  },
-  "portaria/src/app/(app)/inicio/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "7cc8dea02b2ce1f7119a2e97a59e2636"
-  },
-  "portaria/src/app/(app)/integracoes/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "5bb0f3c9a7d1474adcdfc27649db85af"
-  },
-  "portaria/src/app/(app)/layout.tsx": {
-    "mtime": 1787607900370.2893,
-    "hash": "f6a5ff8abc7d8d151b6e15ab5ea92248"
-  },
-  "portaria/src/app/(app)/notificacoes/page.tsx": {
-    "mtime": 1787521362835.3997,
-    "hash": "23253acd3fefd99fb965a4f7c227b9b9"
-  },
-  "portaria/src/app/(app)/ocorrencias/[id]/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "4ea77762712eb317f719670e0d18f135"
-  },
-  "portaria/src/app/(app)/ocorrencias/nova/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "687d075efd8ed1fb4e38e8fefecce5c0"
-  },
-  "portaria/src/app/(app)/ocorrencias/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "bfab0854e665facb349c33b79fd6c934"
-  },
-  "portaria/src/app/(app)/pesquisa/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "eb39e306191c7bcae41787c0dcb54d0f"
-  },
-  "portaria/src/app/(app)/regulamento/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "d6746392584eeab1b45b850c5bed0598"
-  },
-  "portaria/src/app/(app)/reservas/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "e430b2158ee6c4b78233516c87f89231"
-  },
-  "portaria/src/app/(app)/timeline/page.tsx": {
-    "mtime": 1787521362838.3962,
-    "hash": "9dd3ab6f70fd7c5d636bc6facea64160"
-  },
-  "portaria/src/app/(app)/votacoes/[id]/page.tsx": {
-    "mtime": 1787521362841.563,
-    "hash": "cf5698be21860aac946e5cb3ce8178b6"
-  },
-  "portaria/src/app/(app)/votacoes/[id]/resultados/page.tsx": {
-    "mtime": 1787521362842.0208,
-    "hash": "bd76dfcde4cc6aa98eb942ed236bbf4d"
-  },
-  "portaria/src/app/(app)/votacoes/page.tsx": {
-    "mtime": 1787521362842.0208,
-    "hash": "c0314a60ad398a6a13c9f974f7debbc9"
-  },
-  "portaria/src/app/(auth)/convite/page.tsx": {
-    "mtime": 1787521362843.012,
-    "hash": "e8c217fdc0aa95f20da98f2751be473b"
-  },
-  "portaria/src/app/(auth)/login/page.tsx": {
-    "mtime": 1787521362843.012,
-    "hash": "5b6c8a69f4f583dbe213935a22619803"
-  },
-  "portaria/src/app/(auth)/recuperar/confirmar/page.tsx": {
-    "mtime": 1787521362844.0583,
-    "hash": "b1fde44670d35e2e0aff9b1698a3bb3c"
-  },
-  "portaria/src/app/(auth)/recuperar/page.tsx": {
-    "mtime": 1787521362844.0583,
-    "hash": "0e361c0bf4df168c58f097a9e12e2bae"
-  },
-  "portaria/src/app/(landing)/layout.tsx": {
-    "mtime": 1787521362844.0583,
-    "hash": "f5cf806a35fe361acf07a88c962a4f30"
-  },
-  "portaria/src/app/(landing)/page.tsx": {
-    "mtime": 1787521362845.4458,
-    "hash": "f205e353d292b3e0a0b6c465e970d1fd"
-  },
-  "portaria/src/app/(public)/historia/page.tsx": {
-    "mtime": 1787521362845.9648,
-    "hash": "47b2f48dde0097541e4b4b0ac4913538"
-  },
-  "portaria/src/app/(public)/layout.tsx": {
-    "mtime": 1787521362845.9648,
-    "hash": "6a0e44d778180a06ac3bc74d19d48f98"
-  },
-  "portaria/src/app/api/cron/contratos-renovacao/route.ts": {
-    "mtime": 1787521362846.9478,
-    "hash": "3b40a9d0c7c1c9001515cb500016758c"
-  },
-  "portaria/src/app/auth/confirm/route.ts": {
-    "mtime": 1787521362847.784,
-    "hash": "194b5289918605d82546a011944455ed"
-  },
-  "portaria/src/app/layout.tsx": {
-    "mtime": 1787521362847.784,
-    "hash": "5d4344c1179038876e0573a3b7f01b83"
-  },
-  "portaria/src/app/not-found.tsx": {
-    "mtime": 1787521362847.784,
-    "hash": "b9f9f3e19b6ca0dcc4af76df458f4bf7"
-  },
-  "portaria/src/components/admin/assembleia-editor.tsx": {
-    "mtime": 1787521362849.5737,
-    "hash": "aa31704bf9cc4487a6088d212f6c7703"
-  },
-  "portaria/src/components/admin/assembleia-nova-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "1f3a4b268331f9fa8517b5dceb55d5ad"
-  },
-  "portaria/src/components/admin/assistente-documental-chat.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "2417a28d5149e125636fa001a721c64e"
-  },
-  "portaria/src/components/admin/aviso-actions.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "58796aef6c0fd8a8011f36f3fa06a066"
-  },
-  "portaria/src/components/admin/aviso-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "895d15cf74b52fa99ee229460f6c211c"
-  },
-  "portaria/src/components/admin/biblioteca-documentos-administracao.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "793c4657cb13ae1157a50781f8fca946"
-  },
-  "portaria/src/components/admin/calendario-administrativo.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "2f983b8d937fad89b2ffa4b55cceb5c9"
-  },
-  "portaria/src/components/admin/comunicacao-documento-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "268eee8685324bb5f4dcfb082a2f7fa2"
-  },
-  "portaria/src/components/admin/comunicacao-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "3cd603ce13a56a07bf3a4eddb550fdec"
-  },
-  "portaria/src/components/admin/conselheira-config.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "651760329eeac7d4e709fbfd9a9d14a1"
-  },
-  "portaria/src/components/admin/contacto-actions.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "10a57be13a59d41443d0a450d7b364e7"
-  },
-  "portaria/src/components/admin/contacto-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "468e588c01c4a415a1bfb62e8013aab0"
-  },
-  "portaria/src/components/admin/contrato-actions.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "1edd61631ccdd3d476fb1a12b3bb95bb"
-  },
-  "portaria/src/components/admin/contrato-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "65eda7a693f3d36c964932c856ffd701"
-  },
-  "portaria/src/components/admin/contrato-memoria.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "9d7e721a001967d3ab1edf73733735ca"
-  },
-  "portaria/src/components/admin/contribuicao-extraordinaria-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "1a8d2e778886d3a428c5ff740152eafd"
-  },
-  "portaria/src/components/admin/conversa-mensagem-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "ac562601dfb480f8b862c5fe5c67a44c"
-  },
-  "portaria/src/components/admin/conversa-nova-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "5e585484a0abe14b5e3d35a2d8dabef9"
-  },
-  "portaria/src/components/admin/convite-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "a980280e3f5f390f64042fa699562cbb"
-  },
-  "portaria/src/components/admin/despesas-obrigacoes-painel.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "5b0e0eb65bc17ad19594d0f3253409b1"
-  },
-  "portaria/src/components/admin/documento-actions.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "353d75110989fc64271eab8715774b8e"
-  },
-  "portaria/src/components/admin/documento-administracao-download.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "738d06cf19776889ed935589ed392643"
-  },
-  "portaria/src/components/admin/documento-administracao-form.tsx": {
-    "mtime": 1787521362850.0818,
-    "hash": "a74ad423665e37b97e90fb617796f7d2"
-  },
-  "portaria/src/components/admin/documento-administracao-lote-form.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "0f2abc4e6ee964349fc1775fc267868d"
-  },
-  "portaria/src/components/admin/documento-administracao-preview.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "7e95dce2608a2e36c63977ab06f2109a"
-  },
-  "portaria/src/components/admin/documento-form.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "1411039ec634b5c3d350d33fd56fa20d"
-  },
-  "portaria/src/components/admin/documento-upload-inline.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "9b0ce5265e52ac0b616c81342c256a48"
-  },
-  "portaria/src/components/admin/dossier-arquivo.tsx": {
-    "mtime": 1787645878787.641,
-    "hash": "eeb773972b304bfb6bf367f63fd96836"
-  },
-  "portaria/src/components/admin/editor-core.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "bd488a414b223dcc3834a96a48737b49"
-  },
-  "portaria/src/components/admin/espaco-form.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "3ba3c192384e9885212a9207796290fe"
-  },
-  "portaria/src/components/admin/evidencia-juntar.tsx": {
-    "mtime": 1787645910174.886,
-    "hash": "ec9170cc7b919581a27e5fbfcd161d0b"
-  },
-  "portaria/src/components/admin/exportar-blueprint.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "e666a4e70c9f8a65c06736e96175f5b1"
-  },
-  "portaria/src/components/admin/financeiro-tabs.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "0f787a8114623f6596201d152db5f284"
-  },
-  "portaria/src/components/admin/fornecedor-arquivar.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "69cf16e90a09c4a186e7a305ee1267e5"
-  },
-  "portaria/src/components/admin/fornecedor-form.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "a4c962be606d6ce4248804e987233394"
-  },
-  "portaria/src/components/admin/fracao-actions.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "e0be5cec868b8d916e0e681e814f5875"
-  },
-  "portaria/src/components/admin/fracao-form.tsx": {
-    "mtime": 1787521362853.1475,
-    "hash": "f971caf4ae4b975ead89adeb6de3cb51"
-  },
-  "portaria/src/components/admin/ia-documental-configuracao.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "cbec9496f180b78b22174f0ab63d18a0"
-  },
-  "portaria/src/components/admin/importar-drive-administracao-form.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "12da63b249a05b0ebe5531ee7151b34c"
-  },
-  "portaria/src/components/admin/integracoes-view.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "fa345cf714ae3cf651f2810812321f09"
-  },
-  "portaria/src/components/admin/manutencao-preventiva-painel.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "7adcceee2b0abd63087b226d3e1814d2"
-  },
-  "portaria/src/components/admin/mapa-contas-anual.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "15fa0a24daf021e1b4a25f385b1e31cd"
-  },
-  "portaria/src/components/admin/membro-actions.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "95b20df08f25b9eb25a748476dfe2a98"
-  },
-  "portaria/src/components/admin/membro-fracao-select.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "589bbccae5811de67ae8e84adba6e9cc"
-  },
-  "portaria/src/components/admin/migrar-quotas-historico.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "b163f0324f6f1c392d683a260c341854"
-  },
-  "portaria/src/components/admin/movimento-atribuicao.tsx": {
-    "mtime": 1787607900370.2893,
-    "hash": "4672b6d619ab5478946e0b6ebcc6cabb"
-  },
-  "portaria/src/components/admin/notificacoes-form.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "b930733910ffeade219805fb1b499631"
-  },
-  "portaria/src/components/admin/ocorrencia-admin-controls.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "132cca6380cd741b8e2dde223efc18ee"
-  },
-  "portaria/src/components/admin/perfil-form.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "f0d5b21879c779839410acbeb07a8cf7"
-  },
-  "portaria/src/components/admin/pesquisa-input.tsx": {
-    "mtime": 1787521362857.1475,
-    "hash": "38f8546bcb9b161a3b8ff4f1abb5b408"
-  },
-  "portaria/src/components/admin/relatorio-fornecedor-imprimir.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "19c5d7798dfddab88b8728c27b152203"
-  },
-  "portaria/src/components/admin/rich-editor.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "5cba24bed4834a9819ceade40eecb1db"
-  },
-  "portaria/src/components/admin/sugestao-ia.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "1de38c0026622efce6877b7f71a6e0ba"
-  },
-  "portaria/src/components/admin/template-editor.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "bb864184b0ecf34be6463fa2a4ed23df"
-  },
-  "portaria/src/components/admin/votacao-admin-actions.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "6520892270a622f13f21f9dbef1294a2"
-  },
-  "portaria/src/components/admin/votacao-nova-form.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "f99081afc862d763ae8833d6711ecc7b"
-  },
-  "portaria/src/components/admin/votacoes-lista.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "6f75ed24550d5e187cc9ebfe5bb73f73"
-  },
-  "portaria/src/components/app/assembleia-badge.tsx": {
-    "mtime": 1787521362861.1475,
-    "hash": "ce7f992cb03556e4f886eb740a76b016"
-  },
-  "portaria/src/components/app/chat-interface.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "f46fae0838b204148b597de4b7db091a"
-  },
-  "portaria/src/components/app/chat-sidebar.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "4b18976b3c1891b77dfd4b5e5361d005"
-  },
-  "portaria/src/components/app/documentos-filtro.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "379071dc011927046e06b48ecae63089"
-  },
-  "portaria/src/components/app/download-button.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "887592f9ac85e1fc3e7d934e6f8bd7c3"
-  },
-  "portaria/src/components/app/fotografia-form.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "5698ebe2b600c79213633914529c2eac"
-  },
-  "portaria/src/components/app/login-form.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "4dbb6ec59140cc6d8fa79bf7c746496c"
-  },
-  "portaria/src/components/app/notificacoes-lista.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "2bf543a5bf694d04474c6fe833ff67e7"
-  },
-  "portaria/src/components/app/ocorrencia-detalhe.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "c72d5fe8500e12cdfacdb1a98a2b867a"
-  },
-  "portaria/src/components/app/ocorrencia-estado-badge.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "d07ac6cfd435adc1dc8c634deb7479ca"
-  },
-  "portaria/src/components/app/ocorrencia-form.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "b856240370ecbafd6a3247683cc8efbe"
-  },
-  "portaria/src/components/app/ocorrencia-timeline.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "bf222fcec60770e2ba5901f5c23f83a6"
-  },
-  "portaria/src/components/app/recuperar-form.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "45dc323c43c7ca7c4bca2716ed308e6a"
-  },
-  "portaria/src/components/app/reservas-cliente.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "a6e769d156c93ff44cd0a2251012a3dd"
-  },
-  "portaria/src/components/app/votacao-condomino.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "e2121ebdd4a803a5b7c2b324e4e19a6b"
-  },
-  "portaria/src/components/condomino/download-regulamento.tsx": {
-    "mtime": 1787521362867.6304,
-    "hash": "227199bf4be2b5eeec2ac71ff85780a8"
-  },
-  "portaria/src/components/condomino/mural.tsx": {
-    "mtime": 1787521362871.7473,
-    "hash": "4276d27dbcc2a74648d416a5911a197a"
-  },
-  "portaria/src/components/conselheira/conselheira.tsx": {
-    "mtime": 1787521362871.7473,
-    "hash": "b085c8fb8075de3636143db192b6ed0e"
-  },
-  "portaria/src/components/landing/hero.tsx": {
-    "mtime": 1787521362871.7473,
-    "hash": "a15272db7bb9bb19d6381add044adc8c"
-  },
-  "portaria/src/components/landing/landing-footer.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "e7379e2159f5f54eaec30cde2b6439d7"
-  },
-  "portaria/src/components/landing/landing-header.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "d4a9b7605361a3b9b29068523f76af7a"
-  },
-  "portaria/src/components/landing/reveal.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "f4c6491dc8e72c5baa2a6e2abc80d657"
-  },
-  "portaria/src/components/landing/section-confianca.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "6f4745f3131dab989fd617c0c1e5de25"
-  },
-  "portaria/src/components/landing/section-cta.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "00ec2d1544aed9ffd82244d99579f3d2"
-  },
-  "portaria/src/components/landing/section-ia.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "af9ac847caa89c917944c76426ef3d8a"
-  },
-  "portaria/src/components/landing/section-intro.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "d680d73a73d0dc097c64e89ad5cabbdf"
-  },
-  "portaria/src/components/landing/section-problema.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "1387ae48c5916250b829c79fafbbd6ce"
-  },
-  "portaria/src/components/landing/section-solucao.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "060101ead9c72e89ce91bac8cabd13f5"
-  },
-  "portaria/src/components/layout/app-nav.tsx": {
-    "mtime": 1787521362873.3582,
-    "hash": "93cb2dab1184518a6920a40a14867e00"
-  },
-  "portaria/src/components/layout/notificacoes-badge.tsx": {
-    "mtime": 1787521362875.6414,
-    "hash": "5b1296b881b8be5db9feb9792be18712"
-  },
-  "portaria/src/components/layout/pesquisa-global.tsx": {
-    "mtime": 1787521362875.6414,
-    "hash": "796bcdd146e1ee4b5a9b82d470c2c07e"
-  },
-  "portaria/src/components/layout/public-footer.tsx": {
-    "mtime": 1787521362875.6414,
-    "hash": "1e31b2ae80246df942089a6db6fc2a41"
-  },
-  "portaria/src/components/layout/public-header.tsx": {
-    "mtime": 1787521362875.6414,
-    "hash": "035b3beeccd78b53152a4cd57fdf954a"
-  },
-  "portaria/src/lib/actions/assembleias.ts": {
-    "mtime": 1787521362876.837,
-    "hash": "2408ebc8c88e78e742237f0689bf1a33"
-  },
-  "portaria/src/lib/actions/avisos.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "7ac423b9fecfb17964d380eb824ccbaf"
-  },
-  "portaria/src/lib/actions/blueprints.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "8028dcdc3f44de6ddced9d9c4c4db879"
-  },
-  "portaria/src/lib/actions/comunicacoes.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "84856185323df8d42ce8c6c5fd584414"
-  },
-  "portaria/src/lib/actions/conhecimento.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "7eea8049bf094ad06be680bf278413c5"
-  },
-  "portaria/src/lib/actions/contactos.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "680fe487efe2e773e9a50e75fe492b5d"
-  },
-  "portaria/src/lib/actions/contratos.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "33a401bdc7e185b4811df75ecc2b1759"
-  },
-  "portaria/src/lib/actions/contribuicoes-extraordinarias.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "ba51bf6ce89e204dc2eef1cb444a3773"
-  },
-  "portaria/src/lib/actions/conversas.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "5a45d625b5ac0c2a4eb0fcf5e0297f1e"
-  },
-  "portaria/src/lib/actions/documentos-administracao.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "ec85ceb8352a6f24a45aea113aa0eb82"
-  },
-  "portaria/src/lib/actions/documentos.ts": {
-    "mtime": 1787645747510.3818,
-    "hash": "e076ac658e656efc236ead1e2f9344e5"
-  },
-  "portaria/src/lib/actions/dossier-evidencias.ts": {
-    "mtime": 1787645723188.4329,
-    "hash": "29035fe2018db233ad9ab129e2e943bf"
-  },
-  "portaria/src/lib/actions/extrair-contrato.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "5ab244816383b7b8bce2ac92c1129f4d"
-  },
-  "portaria/src/lib/actions/financeiro.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "a6c447346bfcd65230757f71a0d5759a"
-  },
-  "portaria/src/lib/actions/fornecedores.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "677d42602f7ce1e8d9372f41d2efabc6"
-  },
-  "portaria/src/lib/actions/fracoes.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "419a5a9052936f6c271dd7ca829daf7f"
-  },
-  "portaria/src/lib/actions/ia-documental.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "c8614e1142ca10bf99d8a0bfc87fd59c"
-  },
-  "portaria/src/lib/actions/ia-rag.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "ae2056f9ee2028ddc84c6e46881683fd"
-  },
-  "portaria/src/lib/actions/importar-drive-administracao.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "4e8a130c54c4c6ed0cc6dc8fd27c168a"
-  },
-  "portaria/src/lib/actions/manutencao.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "59f7415cb19b3c7f3daed7986e5011d0"
-  },
-  "portaria/src/lib/actions/mapa-contas.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "f497649cd686b487129db469e06d0af0"
-  },
-  "portaria/src/lib/actions/membros.ts": {
-    "mtime": 1787521362877.575,
-    "hash": "2df8f6a2682c4b7c1d16cc92e46f2743"
-  },
-  "portaria/src/lib/actions/movimentos-bancarios.ts": {
-    "mtime": 1787607900370.2893,
-    "hash": "ecfd036d3e1dfff61386e17b397f0798"
-  },
-  "portaria/src/lib/actions/notificacoes.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "33bb8fb75536493e8b69036f0242f419"
-  },
-  "portaria/src/lib/actions/ocorrencias.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "c05cf574c598a10ba7caf0adba3aa168"
-  },
-  "portaria/src/lib/actions/perfil.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "cbd31911d0be798060158998c31216e9"
-  },
-  "portaria/src/lib/actions/reservas.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "0b273888bd30f3bde0e9fbd6b2dcc999"
-  },
-  "portaria/src/lib/actions/vista.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "9d4065338adacedb70213ea932728968"
-  },
-  "portaria/src/lib/actions/votacoes.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "71d2f7fe61513d309868c0149a59c5b4"
-  },
-  "portaria/src/lib/ai/conhecimento-consultas.ts": {
-    "mtime": 1787521362881.1475,
-    "hash": "871c7710ac90a866f8c40295b3c0f465"
-  },
-  "portaria/src/lib/ai/deepseek.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "bfea5eb01832415a2081014d0bbc9ddf"
-  },
-  "portaria/src/lib/ai/legislacao.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "f9e74cd232bfee01a0e417b2775b7b11"
-  },
-  "portaria/src/lib/ai/openai.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "a669a26a84ee764396e7aef47ec08985"
-  },
-  "portaria/src/lib/ai/sugestoes.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "1231a5fa5af228dac4f8cc09a28b29d8"
-  },
-  "portaria/src/lib/assembleias.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "b35353fe19a5da4c84411f06d64f6ee3"
-  },
-  "portaria/src/lib/blueprints.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "41d19bc9d0e4b64984c81816aaf0d22e"
-  },
-  "portaria/src/lib/calendario.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "fc34cfac6f6c9fac6b17e68e225b5125"
-  },
-  "portaria/src/lib/contactos.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "d4d4b3cc820e32be98fc726df6110277"
-  },
-  "portaria/src/lib/documentos.ts": {
-    "mtime": 1787645823281.7856,
-    "hash": "2e06ddb7ea34762dec564d59ea33d35d"
-  },
-  "portaria/src/lib/email.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "dca4f7e13bf0463a89034f9eff5f53f9"
-  },
-  "portaria/src/lib/emergencia.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "a0fe952b198ab4fa61d1221eed2615c6"
-  },
-  "portaria/src/lib/financeiro/atribuicao-movimentos.ts": {
-    "mtime": 1787607900374.2893,
-    "hash": "e3f16e8809423f0d647595110916d2cb"
-  },
-  "portaria/src/lib/fornecedores.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "cafe5c27a535641e0d3b620185e83789"
-  },
-  "portaria/src/lib/fornecedores/timeline.ts": {
-    "mtime": 1787646156921.4524,
-    "hash": "9d392c36efe2684e298821ea472e2e90"
-  },
-  "portaria/src/lib/inicio.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "ed5fd30f1c747cdf9b95ac55455805ea"
-  },
-  "portaria/src/lib/integracoes.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "b286929b34e58219234cd23a931161f1"
-  },
-  "portaria/src/lib/notificacoes.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "03a306aa1ed1d97667a5ce1953c7df0b"
-  },
-  "portaria/src/lib/ocorrencias.ts": {
-    "mtime": 1787521362886.6887,
-    "hash": "1f43cc765b2f6bfe54ce63649db16bba"
-  },
-  "portaria/src/lib/pdf/blueprint-pdf.tsx": {
-    "mtime": 1787521362886.6887,
-    "hash": "feee9ebcfc0a6342b46a710e0b442509"
-  },
-  "portaria/src/lib/pdf/documento-blueprint.ts": {
-    "mtime": 1787521362891.1401,
-    "hash": "898acab3a5ead4d4c1325b2f8932eb2f"
-  },
-  "portaria/src/lib/pesquisa.ts": {
-    "mtime": 1787521362891.1401,
-    "hash": "91a76437180efaadd31ea69b55f90ac8"
-  },
-  "portaria/src/lib/relatorios/valores-fornecedor.ts": {
-    "mtime": 1787607900374.2893,
-    "hash": "a0c8ec2c82b31e5af55b944e382a3489"
-  },
-  "portaria/src/lib/sanitize.ts": {
-    "mtime": 1787521362891.1401,
-    "hash": "815a163578767c7a330df3a870c0cfce"
-  },
-  "portaria/src/lib/supabase/admin.ts": {
-    "mtime": 1787521362891.1401,
-    "hash": "1f5e56ea714161b5babb416466bc97b2"
-  },
-  "portaria/src/lib/supabase/client.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "b33330f68f89b14d2fff3dc2ae3106ae"
-  },
-  "portaria/src/lib/supabase/env.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "8a2a90c7b0b945e2e0824e23cd2c6217"
-  },
-  "portaria/src/lib/supabase/ocorrencias.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "3cdaa62a65e0cd28982e6c395ccbe7c5"
-  },
-  "portaria/src/lib/supabase/server.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "b64c8dde64fee15bfe87b6f867f64063"
-  },
-  "portaria/src/lib/supabase/tenant.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "1e09c83f3d527e55f2fb6bd513cbb160"
-  },
-  "portaria/src/lib/timeline.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "3f32d16bac36d459d85ff963be3693a9"
-  },
-  "portaria/src/lib/utils/cn.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "ad95ec3b1db490e0e0d58bfc62e6caa4"
-  },
-  "portaria/src/middleware.ts": {
-    "mtime": 1787521362892.858,
-    "hash": "7aea8eb964c0b458e9caa485634bef16"
-  },
-  "portaria/src/types/database.ts": {
-    "mtime": 1787645973624.844,
-    "hash": "e1c1d02565b2f9e436dae6485bf4895f"
-  },
-  "portaria/supabase/functions/hostinger-inbox-webhook/index.ts": {
-    "mtime": 1787521362896.7673,
-    "hash": "8c3a5adc6866e8f1ed2060f66bd8840e"
-  },
-  "portaria/supabase/functions/send-notification-email/index.ts": {
-    "mtime": 1787521362896.7673,
-    "hash": "881e4d9f66b75b02149cb6195f0980fe"
-  },
-  "portaria/tailwind.config.ts": {
-    "mtime": 1787521362905.1475,
-    "hash": "d4a0a8311f79aec6f2b1f9f2d429f5e3"
-  },
-  "portaria/tests/atribuicao-movimentos.test.ts": {
-    "mtime": 1787607900374.2893,
-    "hash": "27c66d8c7bcb42bd08cd3ace08e495c2"
-  },
-  "portaria/tests/fornecedor-timeline.test.ts": {
-    "mtime": 1787606639119.2148,
-    "hash": "5b3719c87b80de8fef25f147bc6828a6"
-  },
-  "portaria/tests/security/fixtures.ts": {
-    "mtime": 1787521362911.9312,
-    "hash": "fc84f942f829100588b844460f31dd07"
-  },
-  "portaria/tests/security/helpers.ts": {
-    "mtime": 1787521362911.9312,
-    "hash": "3e85a4ef65d3077f73e9c6be80aa6f75"
-  },
-  "portaria/tests/security/rls-p0.test.ts": {
-    "mtime": 1787521362911.9312,
-    "hash": "50d483f2fde442d30471c4967daa9040"
-  },
-  "portaria/tests/security/rls-p1.test.ts": {
-    "mtime": 1787521362911.9312,
-    "hash": "f5cf2b52f3b425be45904576bc9d2d7c"
-  },
-  "portaria/tests/valores-fornecedor.test.ts": {
-    "mtime": 1787646080986.7312,
-    "hash": "276bcd87556fbb5b15c6b1c4f79e81cd"
-  },
-  "portaria/vitest.config.ts": {
-    "mtime": 1787521362911.9312,
-    "hash": "d02cd88df079fe5f1b007b2c1305ba28"
-  },
-  "CLAUDE.md": {
-    "mtime": 1787654392043.8796,
-    "hash": "43933251c7da7a98da7b57cd858902b1"
-  },
-  "README.md": {
-    "mtime": 1787521362769.1475,
-    "hash": "f45c7df2bc095ea62a152c43ca95bfbb"
-  },
-  "portaria/.github/workflows/ci.yml": {
-    "mtime": 1787521362775.7478,
-    "hash": "d14c4435b605721f88a091acc08aac63"
-  },
-  "portaria/README.md": {
-    "mtime": 1787521362775.7478,
-    "hash": "05c5568e2fa79778e1285fd7d03fe7e6"
-  },
-  "portaria/tests/security/README.md": {
-    "mtime": 1787521362911.454,
-    "hash": "a7e2ce0b27230f9f07572c24f6ff0f0b"
+  "/Users/ig/inesgavinho-byte/portaria/.claude/settings.json": {
+    "mtime": 1788339997.4138217,
+    "ast_hash": "fac09aacef4c8edea63201c04f382a44",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/.codex/hooks.json": {
+    "mtime": 1788339997.4139798,
+    "ast_hash": "005ac71c84af2cae38e255e2b9de2411",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/scripts/graphify-medicao.sh": {
+    "mtime": 1788339997.4629798,
+    "ast_hash": "c8694e6e277d3d7a52e669244f9b1d1e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/scripts/graphify-podar-git.mjs": {
+    "mtime": 1788339997.4630702,
+    "ast_hash": "90a37f6385d3d84ad8709d2cb8776c8a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/postcss.config.mjs": {
+    "mtime": 1788339997.4223487,
+    "ast_hash": "d3fd1d29b05a09ff76b595a70e1e7d50",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tailwind.config.ts": {
+    "mtime": 1788339997.46045,
+    "ast_hash": "d4a0a8311f79aec6f2b1f9f2d429f5e3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/package.json": {
+    "mtime": 1788375484.886221,
+    "ast_hash": "95d0c9c68aeeb29c992e2276639088fd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tsconfig.json": {
+    "mtime": 1788339997.462739,
+    "ast_hash": "1fe85376e0c8f37fe52807c937515214",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/vitest.config.ts": {
+    "mtime": 1788339997.4628,
+    "ast_hash": "d1669cbe8e868dcc8e6a147b72ca7647",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/next.config.ts": {
+    "mtime": 1788339997.4208226,
+    "ast_hash": "2974598ae8c3d57ac1e54c442337a2e0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/relatorio-apuramentos.test.ts": {
+    "mtime": 1788339997.4611788,
+    "ast_hash": "4fefcbd9161f3b7fb90928cbc747f6b9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/extrato-bcp.test.ts": {
+    "mtime": 1788375484.903831,
+    "ast_hash": "61502c54f3e0c6267b4ebdfa8c496111",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/extrato-bcp-real-skip.test.ts": {
+    "mtime": 1788375484.9035752,
+    "ast_hash": "717022db843a4956225dc650f6644558",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/ia-local-live.test.ts": {
+    "mtime": 1788383548.4884896,
+    "ast_hash": "5da0001e1c998721bf19d887e28b0629",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/recebimentos.test.ts": {
+    "mtime": 1788379308.4336708,
+    "ast_hash": "fd17dfcd14a800f00ef6372cc03b8ff1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/relatorio-imputacoes.test.ts": {
+    "mtime": 1788339997.4616177,
+    "ast_hash": "8f6437531ef05c44a086ff5b55df0b5f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/relatorio-evidencias.test.ts": {
+    "mtime": 1788339997.4614582,
+    "ast_hash": "8cafe0fbf62950afa5272d38cce55929",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/fornecedor-dossie-render.test.ts": {
+    "mtime": 1788339997.4607556,
+    "ast_hash": "7343f9cebc92c564b1d15e2c4ffedd1b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/ia-local.test.ts": {
+    "mtime": 1788383548.4888775,
+    "ast_hash": "35d70e580e9e9275e22faf8b02dd217f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/pdf-texto.test.ts": {
+    "mtime": 1788375484.904232,
+    "ast_hash": "e3e4966d1c9e6646ad8f1c63d1b9d085",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/fornecedor-timeline.test.ts": {
+    "mtime": 1788339997.4609523,
+    "ast_hash": "848cadadcc1fa64ca3f572e521d67699",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/regras-classificacao.test.ts": {
+    "mtime": 1788379308.4338734,
+    "ast_hash": "cd0ec1c974aa2adfe9c299dfdfe44fad",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/valores-fornecedor.test.ts": {
+    "mtime": 1788339997.4626627,
+    "ast_hash": "276bcd87556fbb5b15c6b1c4f79e81cd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/atribuicao-movimentos.test.ts": {
+    "mtime": 1788379308.43346,
+    "ast_hash": "be7a20baabf6784c144fc070ab420957",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/fornecedor-processo.test.ts": {
+    "mtime": 1788375484.9040053,
+    "ast_hash": "e4b2a26272e62c127acf72a7818d3461",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/pessoas-sincronizacao.test.ts": {
+    "mtime": 1788384089.6065412,
+    "ast_hash": "c41ec815ed691a36538b2b0d60152642",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/fixtures.ts": {
+    "mtime": 1788375484.9048252,
+    "ast_hash": "389719ba35881b5069fef3b932ad55bc",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/helpers.ts": {
+    "mtime": 1788339997.4620435,
+    "ast_hash": "3e85a4ef65d3077f73e9c6be80aa6f75",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-core.test.ts": {
+    "mtime": 1788375484.9050488,
+    "ast_hash": "24d47f0d8ed3cca8ca02e663447f0483",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-p0-financeiro.test.ts": {
+    "mtime": 1788339997.4621882,
+    "ast_hash": "0179cd24e1a73ba762e8e695ff8eb9ba",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-p1.test.ts": {
+    "mtime": 1788339997.4625454,
+    "ast_hash": "f5cf2b52f3b425be45904576bc9d2d7c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-operacoes.test.ts": {
+    "mtime": 1788375484.9058616,
+    "ast_hash": "ed7613be7aac59c3834b5fe9a693bb1b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-p0.test.ts": {
+    "mtime": 1788339997.46233,
+    "ast_hash": "50d483f2fde442d30471c4967daa9040",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-s11.test.ts": {
+    "mtime": 1788375484.906742,
+    "ast_hash": "c0be808bf5701367da77e487e9a8b1de",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-documentos.test.ts": {
+    "mtime": 1788375484.9053056,
+    "ast_hash": "3f5d1c0fc600dfe4f6748f827b8bad0d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-rpc.test.ts": {
+    "mtime": 1788375484.906459,
+    "ast_hash": "3004e6750eeff4bd9bd85a4f3746b15d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-financeiro.test.ts": {
+    "mtime": 1788375484.9055164,
+    "ast_hash": "15f2ab8c65d626c1d146ec88b2187e7c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/rls-matriz-processo.test.ts": {
+    "mtime": 1788375484.9061928,
+    "ast_hash": "1c71c13f6ef1b4b93472d6c7ecab7cd0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/supabase/functions/hostinger-inbox-webhook/index.ts": {
+    "mtime": 1788339997.4526935,
+    "ast_hash": "8c3a5adc6866e8f1ed2060f66bd8840e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/supabase/functions/send-notification-email/index.ts": {
+    "mtime": 1788339997.4528348,
+    "ast_hash": "881e4d9f66b75b02149cb6195f0980fe",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/scripts/mlx-local/install.sh": {
+    "mtime": 1788383548.4648259,
+    "ast_hash": "87d93d4de99e7c8839ac430a3175e095",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/middleware.ts": {
+    "mtime": 1788339997.4518104,
+    "ast_hash": "7aea8eb964c0b458e9caa485634bef16",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/types/database.ts": {
+    "mtime": 1788383797.8725257,
+    "ast_hash": "a1cba6bc6c010ea3c03bf7772a146809",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/layout.tsx": {
+    "mtime": 1788339997.4352155,
+    "ast_hash": "e997c284495dc41b28aacf9d3f8215fd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/not-found.tsx": {
+    "mtime": 1788339997.4352856,
+    "ast_hash": "b9f9f3e19b6ca0dcc4af76df458f4bf7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/layout.tsx": {
+    "mtime": 1788383988.703063,
+    "ast_hash": "036cdb86be97c1f3d0e73d9f1ec3cf00",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/conversas/page.tsx": {
+    "mtime": 1788339997.4293919,
+    "ast_hash": "93d64ce7b385a4a6f0e42ee06bd0b9c7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/conversas/nova/page.tsx": {
+    "mtime": 1788339997.4293215,
+    "ast_hash": "ae86c6fed9b4f1c111e0d4e1643effa7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/conversas/[id]/page.tsx": {
+    "mtime": 1788339997.4292076,
+    "ast_hash": "3713f5023e4576eec4aab4b22e19b39c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/calendario/page.tsx": {
+    "mtime": 1788339997.42363,
+    "ast_hash": "9b5cacc49c56738a09e5ac0b998f85d7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/pesquisa/page.tsx": {
+    "mtime": 1788339997.4326766,
+    "ast_hash": "eb39e306191c7bcae41787c0dcb54d0f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/page.tsx": {
+    "mtime": 1788339997.430531,
+    "ast_hash": "c5401cd207a19d2916b3d5d45f0e2651",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/novo/page.tsx": {
+    "mtime": 1788339997.4304602,
+    "ast_hash": "b222bd0405ef7d6a0f5a68f0c36e0b89",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/[id]/error.tsx": {
+    "mtime": 1788339997.4298744,
+    "ast_hash": "12a1a7d1a195819ee51255b18b289efc",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/[id]/page.tsx": {
+    "mtime": 1788375484.8884895,
+    "ast_hash": "78733ccf9fcdbf10eb63afff2e8c3018",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/[id]/relatorio/error.tsx": {
+    "mtime": 1788339997.4301534,
+    "ast_hash": "28de18bba53a49bc369f6c82d0ee2c5a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/[id]/relatorio/page.tsx": {
+    "mtime": 1788339997.4303372,
+    "ast_hash": "16a9c39b663e6b31b7553f20e4e5a022",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fornecedores/[id]/editar/page.tsx": {
+    "mtime": 1788339997.4297905,
+    "ast_hash": "e7ae84bfab8de80a803725ac3793abd9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/avisos/page.tsx": {
+    "mtime": 1788339997.4228823,
+    "ast_hash": "49783a009b4496ba7321c1a594e8d2c0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/blueprints/page.tsx": {
+    "mtime": 1788339997.4234974,
+    "ast_hash": "9109f994af187daf1c3ceeeb42aca5ac",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/blueprints/novo/page.tsx": {
+    "mtime": 1788339997.4234169,
+    "ast_hash": "076b1d38be4895359321d97653a05687",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/blueprints/[id]/page.tsx": {
+    "mtime": 1788339997.4232962,
+    "ast_hash": "b37ff11119b3db1a23427fb8e3f85928",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/blueprints/[id]/editar/page.tsx": {
+    "mtime": 1788339997.42317,
+    "ast_hash": "1a2cdc6af53fed20cefeffa92511d4b4",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/blueprints/[id]/assistente/page.tsx": {
+    "mtime": 1788339997.4230711,
+    "ast_hash": "2d4ef6a3a190909ea6cb89afbc6eed7a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/condominos/page.tsx": {
+    "mtime": 1788383890.3203611,
+    "ast_hash": "fa6e85616a1ddb8bcddcccb2852337c7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/condominos/[id]/page.tsx": {
+    "mtime": 1788383957.2216332,
+    "ast_hash": "5dc842c8c92dcf414359a083616907d2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/condominos/[id]/editar/page.tsx": {
+    "mtime": 1788383976.9246233,
+    "ast_hash": "54bbe098dc1fcf8925a281bd8a83ddc0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/inicio/page.tsx": {
+    "mtime": 1788339997.4318614,
+    "ast_hash": "7cc8dea02b2ce1f7119a2e97a59e2636",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/documentos/page.tsx": {
+    "mtime": 1788339997.429566,
+    "ast_hash": "0e94b1f95609e323591ce0c5c7e4c8f3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ia/page.tsx": {
+    "mtime": 1788339997.431733,
+    "ast_hash": "691a44b51b1858cd1f73a6178970be93",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ia/configuracao/page.tsx": {
+    "mtime": 1788375484.8888907,
+    "ast_hash": "40358174a039efe7efc64fe034a47285",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ia/configuracao/documentos/page.tsx": {
+    "mtime": 1788339997.431541,
+    "ast_hash": "2dc25dc5fbaf9b96e357a9fc71248501",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/layout.tsx": {
+    "mtime": 1788339997.4265387,
+    "ast_hash": "653ac58ac4c12823fa7005ed4bf383ca",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/page.tsx": {
+    "mtime": 1788339997.4272413,
+    "ast_hash": "585243cef62589be0f3c65c2c8576e41",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/conselheira/page.tsx": {
+    "mtime": 1788383548.4659638,
+    "ast_hash": "e22a1b752e2efd5d1132cfea5ec26d0d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/avisos/page.tsx": {
+    "mtime": 1788339997.4251351,
+    "ast_hash": "9bbb4ea24377b6bcd33399fa0f5618ad",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/avisos/novo/page.tsx": {
+    "mtime": 1788339997.4250422,
+    "ast_hash": "6173d3ec750260b8c4cef355b6d22c92",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/avisos/[id]/editar/page.tsx": {
+    "mtime": 1788339997.4249187,
+    "ast_hash": "9eeca796886dc5514878a85092a94390",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/perfil/page.tsx": {
+    "mtime": 1788339997.4273398,
+    "ast_hash": "1902b3a373479cd7d8a76edb968b365a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos/page.tsx": {
+    "mtime": 1788339997.4261205,
+    "ast_hash": "e993e4a061c22b2f14943ce4c917b52d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos/novo/page.tsx": {
+    "mtime": 1788339997.4260528,
+    "ast_hash": "7b0ce80772ced34255b3550deda0c526",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos/[id]/editar/page.tsx": {
+    "mtime": 1788339997.425953,
+    "ast_hash": "6abdffaf91ecbe72b5cd609c0c1844ac",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/manutencao/page.tsx": {
+    "mtime": 1788339997.4266295,
+    "ast_hash": "2f7d88f1437216342d48fbec393d8d52",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/membros/page.tsx": {
+    "mtime": 1788339997.426866,
+    "ast_hash": "a0de4e2fb9f3a33458ff0737f615c393",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/membros/novo/page.tsx": {
+    "mtime": 1788339997.4267569,
+    "ast_hash": "a0afed89751cf416856ac9424a2bbc60",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/reservas/page.tsx": {
+    "mtime": 1788339997.427617,
+    "ast_hash": "511dc809fe80f1a8da17dc55b019574e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/reservas/novo/page.tsx": {
+    "mtime": 1788339997.4275074,
+    "ast_hash": "ea4ce51de47b4fa8af554af904e7a37d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/page.tsx": {
+    "mtime": 1788339997.4264748,
+    "ast_hash": "749f4a1ac981e9aff2c484f815684167",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/mapa/page.tsx": {
+    "mtime": 1788339997.4262602,
+    "ast_hash": "603903ca9184efae15305e373f5fc303",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/movimentos/page.tsx": {
+    "mtime": 1788379308.4300132,
+    "ast_hash": "1eabe3faf70a69ca9f2b9f14c0a5572a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/movimentos/importar/page.tsx": {
+    "mtime": 1788375484.887739,
+    "ast_hash": "77377e6bd8651ee65e9018f47a1eaf86",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/movimentos/regras/page.tsx": {
+    "mtime": 1788379308.4307897,
+    "ast_hash": "05fae99b29f02907ab8dfd55e7db9df6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/financeiro/movimentos/recebimentos/page.tsx": {
+    "mtime": 1788379308.4303386,
+    "ast_hash": "bc32bd22e46ec7282751e4fdfd2db26c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/notificacoes/page.tsx": {
+    "mtime": 1788339997.4269772,
+    "ast_hash": "aba91c30c10f20547199da3baa60e9b5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/assembleias/page.tsx": {
+    "mtime": 1788339997.4247308,
+    "ast_hash": "fd2b402fa1e7176a540a5a5928fd3674",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/assembleias/nova/page.tsx": {
+    "mtime": 1788339997.4246516,
+    "ast_hash": "35249796362c457b627a593aa6da0ff8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/assembleias/[id]/page.tsx": {
+    "mtime": 1788339997.4242322,
+    "ast_hash": "81c449ccef28f81cc39df0fa96ccaad7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/assembleias/[id]/votacoes/nova/page.tsx": {
+    "mtime": 1788339997.42453,
+    "ast_hash": "f12967a09f8ad5be91614ac59d0976e2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/assembleias/[id]/votacoes/[vid]/resultados/page.tsx": {
+    "mtime": 1788339997.4244213,
+    "ast_hash": "aed78c7e6f83f941d768fd602c85dad8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/ocorrencias/page.tsx": {
+    "mtime": 1788339997.4271677,
+    "ast_hash": "d9f0de48beb595b084396d5b53f787b1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/ocorrencias/[id]/page.tsx": {
+    "mtime": 1788339997.4271102,
+    "ast_hash": "d7f0dbc065155dacb18a0042135c59c9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos-administracao/page.tsx": {
+    "mtime": 1788339997.4257255,
+    "ast_hash": "cda2737ad54a81368b0e7e0ddfeac32e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos-administracao/novo/page.tsx": {
+    "mtime": 1788339997.4256446,
+    "ast_hash": "a28dc118c82b67733ac17b631ce749ef",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos-administracao/importar-drive/page.tsx": {
+    "mtime": 1788339997.4254198,
+    "ast_hash": "29c82e2b95e07a9784fe0e497e017753",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/configuracao/documentos-administracao/lote/page.tsx": {
+    "mtime": 1788339997.4255412,
+    "ast_hash": "e7bc90d5cecec815ba94e407f103acec",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/votacoes/page.tsx": {
+    "mtime": 1788339997.4335237,
+    "ast_hash": "c0314a60ad398a6a13c9f974f7debbc9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/votacoes/[id]/page.tsx": {
+    "mtime": 1788339997.4333043,
+    "ast_hash": "cf5698be21860aac946e5cb3ce8178b6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/votacoes/[id]/resultados/page.tsx": {
+    "mtime": 1788339997.4334402,
+    "ast_hash": "bd76dfcde4cc6aa98eb942ed236bbf4d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/hoje/page.tsx": {
+    "mtime": 1788339997.431306,
+    "ast_hash": "36c4811e529f6216bedbabf5f089d475",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contactos/page.tsx": {
+    "mtime": 1788339997.4280024,
+    "ast_hash": "297cbf7f4040237fafc98d1ef76a2a99",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contactos/novo/page.tsx": {
+    "mtime": 1788339997.427933,
+    "ast_hash": "e37ef5fc9310a77f01a3607fc7c5da6b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contactos/[id]/editar/page.tsx": {
+    "mtime": 1788339997.427817,
+    "ast_hash": "1975478fad71ada5f7dc2196ec934795",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/reservas/page.tsx": {
+    "mtime": 1788339997.4329586,
+    "ast_hash": "e430b2158ee6c4b78233516c87f89231",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/comunicacoes/page.tsx": {
+    "mtime": 1788339997.4240515,
+    "ast_hash": "a6fdf5c5c793a124f333a0e3a72122e9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/comunicacoes/nova/page.tsx": {
+    "mtime": 1788384041.0704532,
+    "ast_hash": "34c4b13295ee979f5de2af630c16aeb2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/comunicacoes/[id]/page.tsx": {
+    "mtime": 1788339997.4238214,
+    "ast_hash": "8aecb16e9c522602ce411e5e8e88277f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contratos/page.tsx": {
+    "mtime": 1788339997.4286318,
+    "ast_hash": "8562b80b6f45ea1243cf7de8b5cb9c91",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contratos/novo/page.tsx": {
+    "mtime": 1788339997.4285755,
+    "ast_hash": "5d1d60fb84eab746c73e62d595891d25",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contratos/[id]/page.tsx": {
+    "mtime": 1788339997.428452,
+    "ast_hash": "96e6a4ff871c044d7c1e92805f23d1e3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contratos/[id]/editar/page.tsx": {
+    "mtime": 1788339997.428164,
+    "ast_hash": "9f7aeedce9fb44a96d583e2d449b0fd4",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/integracoes/page.tsx": {
+    "mtime": 1788339997.4319758,
+    "ast_hash": "5bb0f3c9a7d1474adcdfc27649db85af",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/regulamento/page.tsx": {
+    "mtime": 1788339997.4328208,
+    "ast_hash": "d6746392584eeab1b45b850c5bed0598",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/notificacoes/page.tsx": {
+    "mtime": 1788339997.4322162,
+    "ast_hash": "23253acd3fefd99fb965a4f7c227b9b9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contribuicoes-extraordinarias/page.tsx": {
+    "mtime": 1788339997.429044,
+    "ast_hash": "812c6f4d90e561c947fb5db6643a62a9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contribuicoes-extraordinarias/nova/page.tsx": {
+    "mtime": 1788339997.4289324,
+    "ast_hash": "96313191d3eba665aba1f0cbd938251c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/contribuicoes-extraordinarias/[id]/page.tsx": {
+    "mtime": 1788339997.428822,
+    "ast_hash": "b84528599f41acb925329909b7a84c69",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/timeline/page.tsx": {
+    "mtime": 1788339997.4331114,
+    "ast_hash": "9dd3ab6f70fd7c5d636bc6facea64160",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/assembleias/page.tsx": {
+    "mtime": 1788339997.4227686,
+    "ast_hash": "9521de9c94f20c0ef45a533a11b3d670",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/assembleias/[id]/page.tsx": {
+    "mtime": 1788339997.4226727,
+    "ast_hash": "ee8ffc5385274a0f78f00bd2277fb8ec",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ocorrencias/page.tsx": {
+    "mtime": 1788339997.432555,
+    "ast_hash": "bfab0854e665facb349c33b79fd6c934",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ocorrencias/nova/page.tsx": {
+    "mtime": 1788339997.432475,
+    "ast_hash": "687d075efd8ed1fb4e38e8fefecce5c0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/ocorrencias/[id]/page.tsx": {
+    "mtime": 1788339997.432374,
+    "ast_hash": "4ea77762712eb317f719670e0d18f135",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fracoes/page.tsx": {
+    "mtime": 1788339997.4311419,
+    "ast_hash": "18f7b81d411262d9efb52ea96197170d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fracoes/nova/page.tsx": {
+    "mtime": 1788339997.4310098,
+    "ast_hash": "2e8b0903b731e6711d261c4a5c1e7dcd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fracoes/[id]/page.tsx": {
+    "mtime": 1788384071.1128657,
+    "ast_hash": "ef0ad92feeb03e5e8c7c683f07ea66e3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(app)/fracoes/[id]/editar/page.tsx": {
+    "mtime": 1788339997.4307425,
+    "ast_hash": "158786bb8c4dcb4a24a4bce70d11af63",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/auth/confirm/route.ts": {
+    "mtime": 1788339997.4349408,
+    "ast_hash": "194b5289918605d82546a011944455ed",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(public)/layout.tsx": {
+    "mtime": 1788339997.4345877,
+    "ast_hash": "6a0e44d778180a06ac3bc74d19d48f98",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(public)/historia/page.tsx": {
+    "mtime": 1788339997.4345183,
+    "ast_hash": "47b2f48dde0097541e4b4b0ac4913538",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/api/cron/contratos-renovacao/route.ts": {
+    "mtime": 1788339997.4347942,
+    "ast_hash": "3b40a9d0c7c1c9001515cb500016758c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(landing)/layout.tsx": {
+    "mtime": 1788339997.4342759,
+    "ast_hash": "f5cf806a35fe361acf07a88c962a4f30",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(landing)/page.tsx": {
+    "mtime": 1788339997.434361,
+    "ast_hash": "f205e353d292b3e0a0b6c465e970d1fd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(landing)/privacidade/page.tsx": {
+    "mtime": 1788375484.8897233,
+    "ast_hash": "dd29c3e0a197a3a1899ed334ca46cefb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(landing)/termos/page.tsx": {
+    "mtime": 1788375484.8900928,
+    "ast_hash": "8790ba9c04d30ca233ab32e768c75f8b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(auth)/recuperar/page.tsx": {
+    "mtime": 1788339997.4341106,
+    "ast_hash": "0e361c0bf4df168c58f097a9e12e2bae",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(auth)/recuperar/confirmar/page.tsx": {
+    "mtime": 1788339997.4339643,
+    "ast_hash": "b1fde44670d35e2e0aff9b1698a3bb3c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(auth)/convite/page.tsx": {
+    "mtime": 1788375484.889169,
+    "ast_hash": "aecc1ce184c7f7109ba4260660f7c3fc",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(auth)/convite/pendentes/page.tsx": {
+    "mtime": 1788375484.8893962,
+    "ast_hash": "4525570849b722b9560706904b4d4e20",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/app/(auth)/login/page.tsx": {
+    "mtime": 1788339997.433797,
+    "ast_hash": "5b6c8a69f4f583dbe213935a22619803",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/conselheira/conselheira.tsx": {
+    "mtime": 1788339997.443406,
+    "ast_hash": "b085c8fb8075de3636143db192b6ed0e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/hero.tsx": {
+    "mtime": 1788339997.443508,
+    "ast_hash": "a15272db7bb9bb19d6381add044adc8c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-ia.tsx": {
+    "mtime": 1788339997.4439135,
+    "ast_hash": "af9ac847caa89c917944c76426ef3d8a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-cta.tsx": {
+    "mtime": 1788339997.4438431,
+    "ast_hash": "00ec2d1544aed9ffd82244d99579f3d2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/landing-header.tsx": {
+    "mtime": 1788339997.4436376,
+    "ast_hash": "d4a9b7605361a3b9b29068523f76af7a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-problema.tsx": {
+    "mtime": 1788339997.4440382,
+    "ast_hash": "1387ae48c5916250b829c79fafbbd6ce",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-intro.tsx": {
+    "mtime": 1788339997.4439752,
+    "ast_hash": "d680d73a73d0dc097c64e89ad5cabbdf",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/landing-footer.tsx": {
+    "mtime": 1788375484.8921049,
+    "ast_hash": "1c869926523c5f1401dc03ab4092b028",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-solucao.tsx": {
+    "mtime": 1788339997.4441001,
+    "ast_hash": "060101ead9c72e89ce91bac8cabd13f5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/legal-page.tsx": {
+    "mtime": 1788375484.8923616,
+    "ast_hash": "c1d50f242f36ce06ddf70f08b7d907dc",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/reveal.tsx": {
+    "mtime": 1788339997.4437149,
+    "ast_hash": "f4c6491dc8e72c5baa2a6e2abc80d657",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/landing/section-confianca.tsx": {
+    "mtime": 1788375484.8925939,
+    "ast_hash": "89fcd8ba5886418f6678c6c37063ecc4",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/convites-pendentes.tsx": {
+    "mtime": 1788375484.8914318,
+    "ast_hash": "fbcd5f4bddd82eb2162b430a5ed669ba",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/chat-interface.tsx": {
+    "mtime": 1788339997.4418843,
+    "ast_hash": "f46fae0838b204148b597de4b7db091a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/ocorrencia-estado-badge.tsx": {
+    "mtime": 1788339997.4425702,
+    "ast_hash": "d07ac6cfd435adc1dc8c634deb7479ca",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/download-button.tsx": {
+    "mtime": 1788339997.4420698,
+    "ast_hash": "887592f9ac85e1fc3e7d934e6f8bd7c3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/assembleia-badge.tsx": {
+    "mtime": 1788339997.4417727,
+    "ast_hash": "ce7f992cb03556e4f886eb740a76b016",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/votacao-condomino.tsx": {
+    "mtime": 1788339997.4430392,
+    "ast_hash": "e2121ebdd4a803a5b7c2b324e4e19a6b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/recuperar-form.tsx": {
+    "mtime": 1788339997.4428062,
+    "ast_hash": "45dc323c43c7ca7c4bca2716ed308e6a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/reservas-cliente.tsx": {
+    "mtime": 1788339997.4429252,
+    "ast_hash": "a6e769d156c93ff44cd0a2251012a3dd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/documentos-filtro.tsx": {
+    "mtime": 1788339997.4420128,
+    "ast_hash": "379071dc011927046e06b48ecae63089",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/notificacoes-lista.tsx": {
+    "mtime": 1788339997.4423773,
+    "ast_hash": "2bf543a5bf694d04474c6fe833ff67e7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/ocorrencia-form.tsx": {
+    "mtime": 1788339997.4426854,
+    "ast_hash": "b856240370ecbafd6a3247683cc8efbe",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/login-form.tsx": {
+    "mtime": 1788375484.8916419,
+    "ast_hash": "ef5c59ec2cf8074e8191dd40b2bf69c3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/fotografia-form.tsx": {
+    "mtime": 1788339997.4421613,
+    "ast_hash": "5698ebe2b600c79213633914529c2eac",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/chat-sidebar.tsx": {
+    "mtime": 1788339997.4419498,
+    "ast_hash": "4b18976b3c1891b77dfd4b5e5361d005",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/ocorrencia-detalhe.tsx": {
+    "mtime": 1788339997.442511,
+    "ast_hash": "c72d5fe8500e12cdfacdb1a98a2b867a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/app/ocorrencia-timeline.tsx": {
+    "mtime": 1788339997.4427521,
+    "ast_hash": "bf222fcec60770e2ba5901f5c23f83a6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/layout/app-nav.tsx": {
+    "mtime": 1788339997.444243,
+    "ast_hash": "93cb2dab1184518a6920a40a14867e00",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/layout/pesquisa-global.tsx": {
+    "mtime": 1788339997.4443653,
+    "ast_hash": "796bcdd146e1ee4b5a9b82d470c2c07e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/layout/public-footer.tsx": {
+    "mtime": 1788375484.8930266,
+    "ast_hash": "6ff824e010e0da54f85835aa8977cb71",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/layout/public-header.tsx": {
+    "mtime": 1788339997.4445126,
+    "ast_hash": "035b3beeccd78b53152a4cd57fdf954a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/layout/notificacoes-badge.tsx": {
+    "mtime": 1788339997.444303,
+    "ast_hash": "5b1296b881b8be5db9feb9792be18712",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/espaco-form.tsx": {
+    "mtime": 1788339997.4391696,
+    "ast_hash": "3ba3c192384e9885212a9207796290fe",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/assembleia-editor.tsx": {
+    "mtime": 1788339997.4354832,
+    "ast_hash": "aa31704bf9cc4487a6088d212f6c7703",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/comunicacao-documento-form.tsx": {
+    "mtime": 1788339997.4361129,
+    "ast_hash": "268eee8685324bb5f4dcfb082a2f7fa2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/assembleia-nova-form.tsx": {
+    "mtime": 1788339997.4355607,
+    "ast_hash": "1f3a4b268331f9fa8517b5dceb55d5ad",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/biblioteca-documentos-administracao.tsx": {
+    "mtime": 1788339997.4359214,
+    "ast_hash": "793c4657cb13ae1157a50781f8fca946",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/calendario-administrativo.tsx": {
+    "mtime": 1788339997.436038,
+    "ast_hash": "2f983b8d937fad89b2ffa4b55cceb5c9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/relatorio-fornecedor-imprimir.tsx": {
+    "mtime": 1788339997.4411457,
+    "ast_hash": "19c5d7798dfddab88b8728c27b152203",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-actions.tsx": {
+    "mtime": 1788339997.4379866,
+    "ast_hash": "353d75110989fc64271eab8715774b8e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contribuicao-extraordinaria-form.tsx": {
+    "mtime": 1788339997.4371972,
+    "ast_hash": "1a8d2e778886d3a428c5ff740152eafd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/pesquisa-input.tsx": {
+    "mtime": 1788339997.4410887,
+    "ast_hash": "38f8546bcb9b161a3b8ff4f1abb5b408",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/fracao-form.tsx": {
+    "mtime": 1788339997.4398532,
+    "ast_hash": "f971caf4ae4b975ead89adeb6de3cb51",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contacto-form.tsx": {
+    "mtime": 1788339997.436632,
+    "ast_hash": "468e588c01c4a415a1bfb62e8013aab0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-administracao-lote-form.tsx": {
+    "mtime": 1788339997.4384139,
+    "ast_hash": "0f2abc4e6ee964349fc1775fc267868d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-administracao-form.tsx": {
+    "mtime": 1788339997.4382687,
+    "ast_hash": "a74ad423665e37b97e90fb617796f7d2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-administracao-download.tsx": {
+    "mtime": 1788339997.4380941,
+    "ast_hash": "738d06cf19776889ed935589ed392643",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/fracao-actions.tsx": {
+    "mtime": 1788339997.4397364,
+    "ast_hash": "e0be5cec868b8d916e0e681e814f5875",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contacto-actions.tsx": {
+    "mtime": 1788339997.436476,
+    "ast_hash": "10a57be13a59d41443d0a450d7b364e7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/evidencia-juntar.tsx": {
+    "mtime": 1788339997.4392807,
+    "ast_hash": "ec9170cc7b919581a27e5fbfcd161d0b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/dossier-arquivo.tsx": {
+    "mtime": 1788339997.438884,
+    "ast_hash": "6f4313b75524a00a7aa134aa24adb5a7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/exportar-blueprint.tsx": {
+    "mtime": 1788339997.4393606,
+    "ast_hash": "e666a4e70c9f8a65c06736e96175f5b1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/fornecedor-form.tsx": {
+    "mtime": 1788339997.439672,
+    "ast_hash": "a4c962be606d6ce4248804e987233394",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/assistente-documental-chat.tsx": {
+    "mtime": 1788339997.4356716,
+    "ast_hash": "2417a28d5149e125636fa001a721c64e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contrato-form.tsx": {
+    "mtime": 1788339997.4368646,
+    "ast_hash": "65eda7a693f3d36c964932c856ffd701",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/convite-form.tsx": {
+    "mtime": 1788339997.4376326,
+    "ast_hash": "a980280e3f5f390f64042fa699562cbb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/notificacoes-form.tsx": {
+    "mtime": 1788339997.4408343,
+    "ast_hash": "b930733910ffeade219805fb1b499631",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/despesas-obrigacoes-painel.tsx": {
+    "mtime": 1788339997.4377816,
+    "ast_hash": "5b0e0eb65bc17ad19594d0f3253409b1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/membro-actions.tsx": {
+    "mtime": 1788339997.440522,
+    "ast_hash": "95b20df08f25b9eb25a748476dfe2a98",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contrato-actions.tsx": {
+    "mtime": 1788339997.4367085,
+    "ast_hash": "1edd61631ccdd3d476fb1a12b3bb95bb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/votacoes-lista.tsx": {
+    "mtime": 1788339997.4416747,
+    "ast_hash": "6f75ed24550d5e187cc9ebfe5bb73f73",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/acontecimento-forms.tsx": {
+    "mtime": 1788375484.8903835,
+    "ast_hash": "54b21a9f9c258dd3648644329186b2bd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/contrato-memoria.tsx": {
+    "mtime": 1788339997.4370198,
+    "ast_hash": "9d7e721a001967d3ab1edf73733735ca",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/aviso-form.tsx": {
+    "mtime": 1788339997.435812,
+    "ast_hash": "895d15cf74b52fa99ee229460f6c211c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/financeiro-tabs.tsx": {
+    "mtime": 1788339997.4394464,
+    "ast_hash": "0f787a8114623f6596201d152db5f284",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/membro-fracao-select.tsx": {
+    "mtime": 1788339997.4405906,
+    "ast_hash": "589bbccae5811de67ae8e84adba6e9cc",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/fornecedor-arquivar.tsx": {
+    "mtime": 1788339997.4395528,
+    "ast_hash": "69cf16e90a09c4a186e7a305ee1267e5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/votacao-admin-actions.tsx": {
+    "mtime": 1788339997.4414804,
+    "ast_hash": "6520892270a622f13f21f9dbef1294a2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/conversa-nova-form.tsx": {
+    "mtime": 1788339997.4374218,
+    "ast_hash": "5e585484a0abe14b5e3d35a2d8dabef9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/recebimento-classificacao.tsx": {
+    "mtime": 1788379308.431354,
+    "ast_hash": "7d23ab51ad818d3a7fd6ba53d07148ae",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/conversa-mensagem-form.tsx": {
+    "mtime": 1788339997.4373095,
+    "ast_hash": "ac562601dfb480f8b862c5fe5c67a44c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/ia-documental-configuracao.tsx": {
+    "mtime": 1788339997.4399865,
+    "ast_hash": "cbec9496f180b78b22174f0ab63d18a0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/mapa-contas-anual.tsx": {
+    "mtime": 1788339997.4404495,
+    "ast_hash": "15fa0a24daf021e1b4a25f385b1e31cd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/comunicacao-form.tsx": {
+    "mtime": 1788384028.4720283,
+    "ast_hash": "c80c92192909ec782336a5460d9ce5c1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/importar-extrato-form.tsx": {
+    "mtime": 1788379308.4310818,
+    "ast_hash": "2f25d7a091113259d86619a914eeb120",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-administracao-preview.tsx": {
+    "mtime": 1788339997.438541,
+    "ast_hash": "7e95dce2608a2e36c63977ab06f2109a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/processo-movimento.tsx": {
+    "mtime": 1788375484.891231,
+    "ast_hash": "b412cbc5bfb2f6a3c7f26565a5ccfb80",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/importar-drive-administracao-form.tsx": {
+    "mtime": 1788339997.4400756,
+    "ast_hash": "12da63b249a05b0ebe5531ee7151b34c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-form.tsx": {
+    "mtime": 1788375484.890763,
+    "ast_hash": "5bd3ca95e0dd1ea7527080447933d447",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/template-editor.tsx": {
+    "mtime": 1788339997.441399,
+    "ast_hash": "bb864184b0ecf34be6463fa2a4ed23df",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/perfil-form.tsx": {
+    "mtime": 1788339997.4410288,
+    "ast_hash": "f0d5b21879c779839410acbeb07a8cf7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/movimento-atribuicao.tsx": {
+    "mtime": 1788339997.4407651,
+    "ast_hash": "4672b6d619ab5478946e0b6ebcc6cabb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/documento-upload-inline.tsx": {
+    "mtime": 1788339997.438744,
+    "ast_hash": "9b0ce5265e52ac0b616c81342c256a48",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/sugestao-ia.tsx": {
+    "mtime": 1788339997.4412825,
+    "ast_hash": "1de38c0026622efce6877b7f71a6e0ba",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/integracoes-view.tsx": {
+    "mtime": 1788339997.4402003,
+    "ast_hash": "fa345cf714ae3cf651f2810812321f09",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/regras-classificacao-form.tsx": {
+    "mtime": 1788379308.431558,
+    "ast_hash": "ec13231ef0237938d6bbf007711364f6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/rich-editor.tsx": {
+    "mtime": 1788339997.4412138,
+    "ast_hash": "5cba24bed4834a9819ceade40eecb1db",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/ocorrencia-admin-controls.tsx": {
+    "mtime": 1788339997.440912,
+    "ast_hash": "132cca6380cd741b8e2dde223efc18ee",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/migrar-quotas-historico.tsx": {
+    "mtime": 1788339997.4406586,
+    "ast_hash": "b163f0324f6f1c392d683a260c341854",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/pessoa-form.tsx": {
+    "mtime": 1788383977.0396292,
+    "ast_hash": "831c9cf27ed0946336b53cc278300ab7",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/conselheira-config.tsx": {
+    "mtime": 1788383548.4671476,
+    "ast_hash": "2a37a49f705b6b65b3ba35f8eb4bd75b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/editor-core.tsx": {
+    "mtime": 1788339997.4390104,
+    "ast_hash": "bd488a414b223dcc3834a96a48737b49",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/aviso-actions.tsx": {
+    "mtime": 1788339997.4357383,
+    "ast_hash": "58796aef6c0fd8a8011f36f3fa06a066",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/manutencao-preventiva-painel.tsx": {
+    "mtime": 1788339997.440336,
+    "ast_hash": "7adcceee2b0abd63087b226d3e1814d2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/admin/votacao-nova-form.tsx": {
+    "mtime": 1788339997.4415915,
+    "ast_hash": "f99081afc862d763ae8833d6711ecc7b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/condomino/mural.tsx": {
+    "mtime": 1788339997.4432561,
+    "ast_hash": "4276d27dbcc2a74648d416a5911a197a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/condomino/download-regulamento.tsx": {
+    "mtime": 1788339997.4431388,
+    "ast_hash": "227199bf4be2b5eeec2ac71ff85780a8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/relatorios/relatorio-ui.tsx": {
+    "mtime": 1788339997.4448442,
+    "ast_hash": "d0d55747912358df5faf3a778b379beb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/components/relatorios/relatorio-fornecedor.tsx": {
+    "mtime": 1788339997.4446733,
+    "ast_hash": "255e74c5dde0cd0bfbc0bd09a12182f5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/sanitize.ts": {
+    "mtime": 1788339997.4511566,
+    "ast_hash": "815a163578767c7a330df3a870c0cfce",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/integracoes.ts": {
+    "mtime": 1788339997.4501107,
+    "ast_hash": "b286929b34e58219234cd23a931161f1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/assembleias.ts": {
+    "mtime": 1788339997.449065,
+    "ast_hash": "b35353fe19a5da4c84411f06d64f6ee3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/inicio.ts": {
+    "mtime": 1788339997.4499972,
+    "ast_hash": "ed5fd30f1c747cdf9b95ac55455805ea",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/email.ts": {
+    "mtime": 1788339997.4494693,
+    "ast_hash": "dca4f7e13bf0463a89034f9eff5f53f9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/calendario.ts": {
+    "mtime": 1788339997.4492495,
+    "ast_hash": "fc34cfac6f6c9fac6b17e68e225b5125",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/fornecedores.ts": {
+    "mtime": 1788339997.4497826,
+    "ast_hash": "cafe5c27a535641e0d3b620185e83789",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/blueprints.ts": {
+    "mtime": 1788339997.4491744,
+    "ast_hash": "41d19bc9d0e4b64984c81816aaf0d22e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/emergencia.ts": {
+    "mtime": 1788339997.4495366,
+    "ast_hash": "a0fe952b198ab4fa61d1221eed2615c6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/pesquisa.ts": {
+    "mtime": 1788339997.450652,
+    "ast_hash": "91a76437180efaadd31ea69b55f90ac8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ocorrencias.ts": {
+    "mtime": 1788339997.4503224,
+    "ast_hash": "1f43cc765b2f6bfe54ce63649db16bba",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/contactos.ts": {
+    "mtime": 1788339997.4493334,
+    "ast_hash": "d4d4b3cc820e32be98fc726df6110277",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/timeline.ts": {
+    "mtime": 1788339997.4516091,
+    "ast_hash": "3f32d16bac36d459d85ff963be3693a9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/notificacoes.ts": {
+    "mtime": 1788339997.4502418,
+    "ast_hash": "03a306aa1ed1d97667a5ce1953c7df0b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/documentos.ts": {
+    "mtime": 1788339997.4494011,
+    "ast_hash": "2e06ddb7ea34762dec564d59ea33d35d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/fornecedores/fontes.ts": {
+    "mtime": 1788375484.8965065,
+    "ast_hash": "f83c33867cd6d6ce96b237acdafda717",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/fornecedores/processo.ts": {
+    "mtime": 1788375484.8967605,
+    "ast_hash": "8726a25fa8956ee540acc4381068f212",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/fornecedores/timeline.ts": {
+    "mtime": 1788339997.4499083,
+    "ast_hash": "9d392c36efe2684e298821ea472e2e90",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/pessoas/sincronizacao.ts": {
+    "mtime": 1788383815.8669028,
+    "ast_hash": "d8b10120d6f45808ebf08724e3d29f86",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/pdf/blueprint-pdf.tsx": {
+    "mtime": 1788339997.4504488,
+    "ast_hash": "feee9ebcfc0a6342b46a710e0b442509",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/pdf/documento-blueprint.ts": {
+    "mtime": 1788339997.4505773,
+    "ast_hash": "898acab3a5ead4d4c1325b2f8932eb2f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/utils/cn.ts": {
+    "mtime": 1788339997.4516962,
+    "ast_hash": "ad95ec3b1db490e0e0d58bfc62e6caa4",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/admin.ts": {
+    "mtime": 1788339997.4512515,
+    "ast_hash": "1f5e56ea714161b5babb416466bc97b2",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/client.ts": {
+    "mtime": 1788339997.4513078,
+    "ast_hash": "b33330f68f89b14d2fff3dc2ae3106ae",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/ocorrencias.ts": {
+    "mtime": 1788339997.4514241,
+    "ast_hash": "3cdaa62a65e0cd28982e6c395ccbe7c5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/env.ts": {
+    "mtime": 1788339997.4513638,
+    "ast_hash": "8a2a90c7b0b945e2e0824e23cd2c6217",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/tenant.ts": {
+    "mtime": 1788339997.4515467,
+    "ast_hash": "1e09c83f3d527e55f2fb6bd513cbb160",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/supabase/server.ts": {
+    "mtime": 1788339997.4514859,
+    "ast_hash": "b64c8dde64fee15bfe87b6f867f64063",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/financeiro/regras-classificacao.ts": {
+    "mtime": 1788379308.4331162,
+    "ast_hash": "f0610406c0c133afa3c80856327aaef3",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/financeiro/extrato-bcp.ts": {
+    "mtime": 1788375484.8961456,
+    "ast_hash": "79ea0505c4b91a6fa09e0d15519a93f5",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/financeiro/recebimentos.ts": {
+    "mtime": 1788379308.4329927,
+    "ast_hash": "b14ddb70707699b3523782836b0ff1b6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/financeiro/atribuicao-movimentos.ts": {
+    "mtime": 1788379308.4328253,
+    "ast_hash": "2ca05e9d0775e24f60bb1435cba2ba7e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/sugestoes.ts": {
+    "mtime": 1788339997.449008,
+    "ast_hash": "1231a5fa5af228dac4f8cc09a28b29d8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/legislacao.ts": {
+    "mtime": 1788339997.448888,
+    "ast_hash": "f9e74cd232bfee01a0e417b2775b7b11",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/deepseek.ts": {
+    "mtime": 1788383548.4803827,
+    "ast_hash": "d33cfdb79aeadd282674e7ca95b28579",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/openai.ts": {
+    "mtime": 1788383548.4829602,
+    "ast_hash": "f33a5a854f4a5502510308498242959a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/pdf-texto.ts": {
+    "mtime": 1788375484.8958619,
+    "ast_hash": "e81b48b10aba24c653903b2163095a53",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/conhecimento-consultas.ts": {
+    "mtime": 1788383548.478153,
+    "ast_hash": "38486f52e4fd0fa11ea109f38b61d37e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/ai/local.ts": {
+    "mtime": 1788383548.481543,
+    "ast_hash": "dedbc3fae8ab10714876ee61882c5482",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/mapa-contas.ts": {
+    "mtime": 1788339997.4478106,
+    "ast_hash": "f497649cd686b487129db469e06d0af0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/financeiro.ts": {
+    "mtime": 1788339997.4466047,
+    "ast_hash": "a6c447346bfcd65230757f71a0d5759a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/importar-drive-administracao.ts": {
+    "mtime": 1788339997.4474578,
+    "ast_hash": "4e8a130c54c4c6ed0cc6dc8fd27c168a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/regras-classificacao.ts": {
+    "mtime": 1788379308.432629,
+    "ast_hash": "f50975aaec72c20c08c5b23f7efc2853",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/perfil.ts": {
+    "mtime": 1788339997.448372,
+    "ast_hash": "cbd31911d0be798060158998c31216e9",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/ia-rag.ts": {
+    "mtime": 1788375484.8946908,
+    "ast_hash": "2e9cda7a5d905f3b9da0c75f1092dbad",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/extrair-contrato.ts": {
+    "mtime": 1788383548.4726412,
+    "ast_hash": "3bf99b9b302d27759bcfcecd70ca9c89",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/recebimentos.ts": {
+    "mtime": 1788379308.432425,
+    "ast_hash": "d6a768cf0679a4708a483b4b8575caa1",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/assembleias.ts": {
+    "mtime": 1788339997.445054,
+    "ast_hash": "2408ebc8c88e78e742237f0689bf1a33",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/dossier-imputacoes.ts": {
+    "mtime": 1788375484.894398,
+    "ast_hash": "51d9a4bb43f5cc461c8b8f623cc8793c",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/comunicacoes.ts": {
+    "mtime": 1788339997.4453983,
+    "ast_hash": "84856185323df8d42ce8c6c5fd584414",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/importar-extrato.ts": {
+    "mtime": 1788379308.431853,
+    "ast_hash": "3787fe265df4e5f160677011a9aedaaa",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/reservas.ts": {
+    "mtime": 1788339997.4484775,
+    "ast_hash": "0b273888bd30f3bde0e9fbd6b2dcc999",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/contratos.ts": {
+    "mtime": 1788339997.4456851,
+    "ast_hash": "33a401bdc7e185b4811df75ecc2b1759",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/conhecimento.ts": {
+    "mtime": 1788383548.4694247,
+    "ast_hash": "3665321f478a54bc491fda1c27ea6140",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/dossier-eventos.ts": {
+    "mtime": 1788375484.8937879,
+    "ast_hash": "06ca3091aadc44c84ee53181765c610b",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/fornecedores.ts": {
+    "mtime": 1788339997.4468415,
+    "ast_hash": "677d42602f7ce1e8d9372f41d2efabc6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/blueprints.ts": {
+    "mtime": 1788339997.4452927,
+    "ast_hash": "8028dcdc3f44de6ddced9d9c4c4db879",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/fracoes.ts": {
+    "mtime": 1788383864.503026,
+    "ast_hash": "f835be48e309f434d10557ea7c2d0a0e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/vista.ts": {
+    "mtime": 1788339997.4485352,
+    "ast_hash": "9d4065338adacedb70213ea932728968",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/ocorrencias.ts": {
+    "mtime": 1788339997.448247,
+    "ast_hash": "c05cf574c598a10ba7caf0adba3aa168",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/contactos.ts": {
+    "mtime": 1788339997.445589,
+    "ast_hash": "680fe487efe2e773e9a50e75fe492b5d",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/documentos-administracao.ts": {
+    "mtime": 1788339997.4460375,
+    "ast_hash": "ec85ceb8352a6f24a45aea113aa0eb82",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/pessoas.ts": {
+    "mtime": 1788383839.934939,
+    "ast_hash": "b649eefdd34b26f0892b887f9df6fdaf",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/ia-documental.ts": {
+    "mtime": 1788383548.476025,
+    "ast_hash": "89b1272ea2f670a7e21f63420edad5bf",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/contribuicoes-extraordinarias.ts": {
+    "mtime": 1788339997.44581,
+    "ast_hash": "ba51bf6ce89e204dc2eef1cb444a3773",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/movimentos-bancarios.ts": {
+    "mtime": 1788379308.4322283,
+    "ast_hash": "e6db26a0528b5190cf84a84cf33ea9bd",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/convites.ts": {
+    "mtime": 1788375484.89326,
+    "ast_hash": "3a5900dd3a761d45debf73df2c8afb1a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/membros.ts": {
+    "mtime": 1788375484.8952413,
+    "ast_hash": "45b097366948d9a9cbb7c5495b1548ec",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/votacoes.ts": {
+    "mtime": 1788339997.448601,
+    "ast_hash": "71d2f7fe61513d309868c0149a59c5b4",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/manutencao.ts": {
+    "mtime": 1788339997.4475737,
+    "ast_hash": "59f7415cb19b3c7f3daed7986e5011d0",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/notificacoes.ts": {
+    "mtime": 1788339997.4481242,
+    "ast_hash": "33bb8fb75536493e8b69036f0242f419",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/avisos.ts": {
+    "mtime": 1788339997.4451754,
+    "ast_hash": "7ac423b9fecfb17964d380eb824ccbaf",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/documentos.ts": {
+    "mtime": 1788375484.8935487,
+    "ast_hash": "ee3bad9900c0a73022b23e38df4afaff",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/conversas.ts": {
+    "mtime": 1788339997.445937,
+    "ast_hash": "5a45d625b5ac0c2a4eb0fcf5e0297f1e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/actions/dossier-evidencias.ts": {
+    "mtime": 1788375484.8941743,
+    "ast_hash": "7d3e307e5ac9b4287d52cef0105a608a",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/relatorios/valores-fornecedor.ts": {
+    "mtime": 1788339997.4510984,
+    "ast_hash": "a0c8ec2c82b31e5af55b944e382a3489",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/relatorios/imputacoes.ts": {
+    "mtime": 1788339997.4510329,
+    "ast_hash": "0450cf08482312c55ca437e07385370f",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/relatorios/evidencias.ts": {
+    "mtime": 1788339997.450907,
+    "ast_hash": "e253cf0948d82245791fbed96b565675",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/src/lib/relatorios/apuramentos.ts": {
+    "mtime": 1788339997.4507735,
+    "ast_hash": "7ad72d8438421a0aa2f7eefef3b65377",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/README.md": {
+    "mtime": 1788339997.416403,
+    "ast_hash": "f45c7df2bc095ea62a152c43ca95bfbb",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/AGENTS.md": {
+    "mtime": 1788339997.4162297,
+    "ast_hash": "1b83e451cf00654e25684f22eebe33a8",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/CLAUDE.md": {
+    "mtime": 1788339997.4163487,
+    "ast_hash": "253919ac7e0d2685c6fb9e54ced7fa9e",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/.agents/skills/graphify/SKILL.md": {
+    "mtime": 1788339997.4135609,
+    "ast_hash": "a3fbec2ddba8d0a35825c242671b3655",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/.github/workflows/ci.yml": {
+    "mtime": 1788375484.8814182,
+    "ast_hash": "aef35f7df1cb1f553f2f95c98f763215",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/README.md": {
+    "mtime": 1788339997.4168525,
+    "ast_hash": "05c5568e2fa79778e1285fd7d03fe7e6",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/tests/security/README.md": {
+    "mtime": 1788375484.9045298,
+    "ast_hash": "3e274fe154d896de8498c74f33ebd6fa",
+    "semantic_hash": ""
+  },
+  "/Users/ig/inesgavinho-byte/portaria/portaria/scripts/mlx-local/README.md": {
+    "mtime": 1788383548.4616563,
+    "ast_hash": "e98a5118066ea20fecce9ca0dd637b13",
+    "semantic_hash": ""
   }
 }
