@@ -39,8 +39,17 @@ import {
   EvidenciaRemover,
   type DocumentoEscolha,
 } from "@/components/admin/evidencia-juntar";
+import {
+  AcontecimentoCorrigir,
+  AcontecimentoRegistar,
+  type AcontecimentoActual,
+} from "@/components/admin/acontecimento-forms";
+import {
+  ProcessoMovimento,
+  type FacturaEscolha,
+} from "@/components/admin/processo-movimento";
 import { CATEGORIA_LABEL } from "@/lib/documentos";
-import type { Documento, Fornecedor } from "@/types/database";
+import type { Documento, Fornecedor, PosicaoImputacao } from "@/types/database";
 
 const TIPO_LABEL: Record<SupplierTimelineKind, string> = {
   contrato: "Contrato",
@@ -292,6 +301,21 @@ async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
     (movimentosPorDespesa ?? []) as MovimentoTimeline[],
   );
 
+  // Posições das partes sobre a imputação destes pagamentos — o que cada parte
+  // sustenta, ao lado da ligação movimento → factura, nunca dentro dela.
+  const movimentoIds = movimentos.map((movimento) => movimento.id);
+  const { data: posicoesData } = movimentoIds.length
+    ? await supabase
+        .from("imputacoes_posicoes")
+        .select(
+          "id,tenant_id,movimento_id,despesa_id,parte,parte_descricao,tipo,fundamento,estado,data_posicao,observacoes,criado_em,atualizado_em,imputacoes_posicoes_evidencias(id,localizador,citacao,ia_documental_fontes(id,titulo,referencia,url,documento_id))",
+        )
+        .eq("tenant_id", tenantId)
+        .in("movimento_id", movimentoIds)
+        .order("data_posicao", { ascending: true })
+    : { data: [] };
+  const posicoes = (posicoesData ?? []) as PosicaoImputacao[];
+
   const entrada = {
     fornecedorId: id,
     contratos: cts,
@@ -328,6 +352,24 @@ async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
     titulo: documento.titulo,
     categoria: CATEGORIA_LABEL[documento.categoria],
   }));
+
+  // Facturas (despesas registadas) do fornecedor, para imputar pagamentos e
+  // para as posições das partes dizerem a qual factura se referem.
+  const facturas: FacturaEscolha[] = ds.map((despesa) => ({
+    id: despesa.id,
+    numero: despesa.numero_documento ?? despesa.referencia ?? "",
+    descricao: despesa.descricao,
+    valor: formatCurrency(despesa.valor_cents),
+  }));
+  const movimentosPorId = new Map(movimentos.map((movimento) => [movimento.id, movimento]));
+  const posicoesPorMovimento = new Map<string, PosicaoImputacao[]>();
+  for (const posicao of posicoes) {
+    const lista = posicoesPorMovimento.get(posicao.movimento_id);
+    if (lista) lista.push(posicao);
+    else posicoesPorMovimento.set(posicao.movimento_id, [posicao]);
+  }
+  const memoriaPorId = new Map(eventosMemoria.map((evento) => [evento.id, evento]));
+  const contratosEscolha = cts.map((contrato) => ({ id: contrato.id, titulo: contrato.titulo }));
 
   const grupoAtivo = GRUPOS_TIMELINE.some((grupo) => grupo.valor === filtros.vista)
     ? (filtros.vista as SupplierTimelineGroup | "tudo")
@@ -522,10 +564,19 @@ async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
 
           <section className="portaria-panel overflow-hidden">
             <div className="border-b border-britishGreen/10 px-5 py-4 md:px-6">
-              <p className="font-body text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-britishGreen">
-                Histórico
-              </p>
-              <h2 className="mt-1 font-title text-h3 text-ink">Relação com o condomínio</h2>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-body text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-britishGreen">
+                    Histórico
+                  </p>
+                  <h2 className="mt-1 font-title text-h3 text-ink">Relação com o condomínio</h2>
+                </div>
+                <AcontecimentoRegistar
+                  contratos={contratosEscolha}
+                  redirectTo={rota}
+                  fornecedorId={id}
+                />
+              </div>
               {eventos.length > 0 && (
                 <form action={rota} className="mt-4 flex flex-wrap items-center gap-2">
                   {grupoAtivo !== "tudo" && <input type="hidden" name="vista" value={grupoAtivo} />}
@@ -649,6 +700,11 @@ async function CorpoFornecedor({ params, searchParams }: FornecedorProps) {
                           evento={evento}
                           escolhas={escolhas}
                           rota={rota}
+                          fornecedorId={id}
+                          facturas={facturas}
+                          movimentosPorId={movimentosPorId}
+                          posicoesPorMovimento={posicoesPorMovimento}
+                          memoriaPorId={memoriaPorId}
                         />
                       ))}
                     </div>
@@ -761,13 +817,49 @@ function Evento({
   evento,
   escolhas,
   rota,
+  fornecedorId,
+  facturas,
+  movimentosPorId,
+  posicoesPorMovimento,
+  memoriaPorId,
 }: {
   evento: SupplierTimelineEvent;
   escolhas: DocumentoEscolha[];
   rota: string;
+  fornecedorId: string;
+  facturas: FacturaEscolha[];
+  movimentosPorId: Map<string, MovimentoTimeline>;
+  posicoesPorMovimento: Map<string, PosicaoImputacao[]>;
+  memoriaPorId: Map<string, MemoriaEventoTimeline>;
 }) {
   const mostrarNatureza = evento.nature !== undefined && evento.nature !== "facto";
   const resumoCurto = evento.summary && evento.summary.length > 190;
+
+  // O processo do pagamento segue o acontecimento: no evento do próprio
+  // movimento, ou no acontecimento de memória que o absorveu (um pagamento
+  // documentado pela memória mantém o processo visível onde a cronologia o
+  // apresenta).
+  const movimentoId =
+    evento.sourceType === "movimento"
+      ? evento.sourceId
+      : evento.mergedFrom?.find((origem) => origem.sourceType === "movimento")?.sourceId;
+  const movimentoProcesso = movimentoId ? movimentosPorId.get(movimentoId) : undefined;
+  const posicoesDoMovimento = movimentoId ? (posicoesPorMovimento.get(movimentoId) ?? []) : [];
+
+  // Pré-preencher a correcção com o registo bruto da memória, não com a linha
+  // normalizada da cronologia.
+  const memoriaActual = evento.memoriaId ? memoriaPorId.get(evento.memoriaId) : undefined;
+  const actual: AcontecimentoActual | undefined = memoriaActual
+    ? {
+        id: memoriaActual.id,
+        data_evento: memoriaActual.data_evento,
+        tipo: memoriaActual.tipo,
+        natureza: memoriaActual.natureza,
+        titulo: memoriaActual.titulo,
+        resumo: memoriaActual.resumo,
+        valor_cents: memoriaActual.valor_cents,
+      }
+    : undefined;
 
   const conteudo = (
     <div className="grid grid-cols-[72px_28px_minmax(0,1fr)] gap-x-2 gap-y-1 py-3.5 sm:grid-cols-[86px_32px_minmax(0,1fr)_auto] md:grid-cols-[104px_34px_minmax(0,1fr)_auto] md:gap-x-3">
@@ -859,6 +951,27 @@ function Evento({
             </div>
           )}
         </details>
+
+        {actual && (
+          <AcontecimentoCorrigir actual={actual} redirectTo={rota} fornecedorId={fornecedorId} />
+        )}
+
+        {movimentoProcesso && (
+          <ProcessoMovimento
+            movimento={{
+              id: movimentoProcesso.id,
+              despesa_id: movimentoProcesso.despesa_id,
+              estado_reconciliacao: movimentoProcesso.estado_reconciliacao,
+              tipo: movimentoProcesso.tipo,
+              confirmado: movimentoProcesso.confirmado,
+            }}
+            facturas={facturas}
+            posicoes={posicoesDoMovimento}
+            documentos={escolhas}
+            redirectTo={rota}
+            fornecedorId={fornecedorId}
+          />
+        )}
       </div>
       <div className="col-start-3 font-body text-sm font-semibold tabular-nums text-ink sm:col-start-4 sm:pl-2 sm:text-right">
         {evento.amountCents !== undefined ? formatCurrency(evento.amountCents) : ""}

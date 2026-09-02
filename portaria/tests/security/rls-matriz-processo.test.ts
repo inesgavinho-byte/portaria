@@ -1,15 +1,19 @@
 /**
- * Suite de matriz RLS — PROCESSO (A2.2).
+ * Suite de matriz RLS — PROCESSO (A2.2 + Fase B do goal-portaria-1.0).
  *
  * Tabelas de processo/documental de 2026-08 e 0040-0043:
  *   • imputacoes_posicoes + imputacoes_posicoes_evidencias
- *     (grants mínimos de 20260826020000: authenticated só SELECT; RLS admin);
+ *     (20260826020000 + Fase B 20260902400000: authenticated com
+ *     SELECT/INSERT/UPDATE em posições e SELECT/INSERT em evidências —
+ *     é o writer da UI do dossiê; a fronteira real é a RLS `is_tenant_admin`,
+ *     que a suite prova recusando o condómino com grant na mão);
  *   • ia_documental_configuracoes / fontes / fonte_blocos / sessoes /
  *     mensagens (0040/0041, admin-only);
- *   • contrato_memoria_eventos / _evidencias — APENAS leitura: a tabela
- *     depende de `public.contratos`, que não existe na cadeia de migrações
- *     (ver tests/security/README.md); escrever em ambiente local é
- *     impossível, pelo que só se provam as negações de leitura;
+ *   • contrato_memoria_eventos / _evidencias — leitura provada; com a Fase B
+ *     (20260902400000) authenticated tem também INSERT/UPDATE em eventos
+ *     (SELECT/INSERT/DELETE em evidências desde A-5), gated pela RLS. A
+ *     escrita continua não exercível em ambiente local: a tabela depende de
+ *     `public.contratos`, que não existe na cadeia de migrações (G-1);
  *   • comunicacoes + comunicacao_destinatarios + comunicacao_documentos
  *     (0042/0043, admin-only).
  *
@@ -118,12 +122,69 @@ d("RLS matriz — processo (imputações, IA documental, contrato-memória, comu
   }, 60_000);
 
   // ---------------------------------------------- imputacoes_posicoes
-  describe("imputacoes_posicoes (grants mínimos 20260826020000)", () => {
+  // Fase B (20260902400000): a UI do dossiê escreve posições directamente
+  // (INSERT/UPDATE a authenticated). O que separa o admin do condómino deixa
+  // de ser o grant e passa a ser a RLS — é isso que os testes seguintes provam.
+  describe("imputacoes_posicoes (grants 20260826020000 + Fase B 20260902400000)", () => {
     it("POS: admin lê as posições do tenant", async () => {
       const c = userClient(fx.users.adminA.accessToken);
       const { data, error } = await c.from("imputacoes_posicoes").select("id").eq("id", posicaoA);
       expect(error).toBeNull();
       expect((data ?? []).length).toBe(1);
+    });
+
+    it("POS: admin insere posição via PostgREST — o writer da Fase B", async () => {
+      const c = userClient(fx.users.adminA.accessToken);
+      // Parte distinta da semeada para não colidir com a unique
+      // (tenant_id, movimento_id, parte, tipo, despesa_id).
+      const { data, error } = await c.from("imputacoes_posicoes")
+        .insert({
+          tenant_id: fx.tenantA, movimento_id: movimentoA, parte: "contraparte",
+          tipo: "reserva", fundamento: "reserva registada pela UI",
+          data_posicao: "2087-02-02T00:00:00Z", criado_por: fx.users.adminA.id,
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      expect(data).not.toBeNull();
+      // DELETE não é concedido a authenticated: a limpeza é do service role.
+      if (data) {
+        await serviceClient().from("imputacoes_posicoes").delete().eq("id", (data as { id: string }).id);
+      }
+    });
+
+    it("POS: admin muda o estado de uma posição (UPDATE) — histórico, nunca apagar", async () => {
+      const c = userClient(fx.users.adminA.accessToken);
+      const { data, error } = await c.from("imputacoes_posicoes")
+        .update({ estado: "retirada" })
+        .eq("id", posicaoA)
+        .select("estado")
+        .single();
+      expect(error).toBeNull();
+      expect((data as { estado: string } | null)?.estado).toBe("retirada");
+      // Repor o estado semeado.
+      await c.from("imputacoes_posicoes").update({ estado: "sustentada" }).eq("id", posicaoA);
+    });
+
+    it("NEG: condómino (com grant INSERT na mão) é recusado pela RLS — não pelo grant", async () => {
+      const c = userClient(fx.users.condoA.accessToken);
+      const { error } = await c.from("imputacoes_posicoes")
+        .insert({
+          tenant_id: fx.tenantA, movimento_id: movimentoA, parte: "terceiro",
+          tipo: "reserva", fundamento: "forjado pelo condómino",
+          data_posicao: "2087-02-03T00:00:00Z",
+        });
+      // WITH CHECK is_tenant_admin: violação de RLS, não falha de grant.
+      expect(error).not.toBeNull();
+    });
+
+    it("NEG: condómino não muda o estado de uma posição", async () => {
+      const c = userClient(fx.users.condoA.accessToken);
+      const r = await c.from("imputacoes_posicoes")
+        .update({ estado: "superada" })
+        .eq("id", posicaoA)
+        .select("id");
+      expect(semAcesso(r)).toBe(true);
     });
 
     it("NEG: condómino (com grant SELECT) não vê linhas — RLS admin-only", async () => {
@@ -144,14 +205,6 @@ d("RLS matriz — processo (imputações, IA documental, contrato-memória, comu
       expect(semAcesso(r)).toBe(true);
     });
 
-    it("NEG: nem o admin insere via API — authenticated não tem grant INSERT", async () => {
-      const { status } = await restInsert("imputacoes_posicoes", {
-        tenant_id: fx.tenantA, movimento_id: movimentoA, parte: "condominio",
-        tipo: "reserva", fundamento: "forjado", data_posicao: "2087-02-01T00:00:00Z",
-      }, { apikey: ANON_KEY, token: fx.users.adminA.accessToken });
-      expect(status).toBeGreaterThanOrEqual(400);
-    });
-
     it("NEG: anon não insere posições (grant revogado)", async () => {
       const { status } = await restInsert("imputacoes_posicoes", {
         tenant_id: fx.tenantA, movimento_id: movimentoA, parte: "condominio",
@@ -161,12 +214,42 @@ d("RLS matriz — processo (imputações, IA documental, contrato-memória, comu
     });
   });
 
-  describe("imputacoes_posicoes_evidencias (grants mínimos)", () => {
+  describe("imputacoes_posicoes_evidencias (grants mínimos + Fase B)", () => {
     it("POS: admin lê evidências do tenant", async () => {
       const c = userClient(fx.users.adminA.accessToken);
       const { data, error } = await c.from("imputacoes_posicoes_evidencias").select("id").eq("id", evidenciaA);
       expect(error).toBeNull();
       expect((data ?? []).length).toBe(1);
+    });
+
+    it("POS: admin anexa evidência a uma posição via PostgREST", async () => {
+      const c = userClient(fx.users.adminA.accessToken);
+      const { data, error } = await c.from("imputacoes_posicoes_evidencias")
+        .insert({
+          tenant_id: fx.tenantA, posicao_id: posicaoA, fonte_id: fonteA,
+          localizador: "pág. 2", citacao: "citação anexada pela UI",
+          criado_por: fx.users.adminA.id,
+        })
+        .select("id")
+        .single();
+      expect(error).toBeNull();
+      expect(data).not.toBeNull();
+      if (data) {
+        await serviceClient()
+          .from("imputacoes_posicoes_evidencias")
+          .delete()
+          .eq("id", (data as { id: string }).id);
+      }
+    });
+
+    it("NEG: condómino não anexa evidências — RLS recusa o INSERT", async () => {
+      const c = userClient(fx.users.condoA.accessToken);
+      const { error } = await c.from("imputacoes_posicoes_evidencias")
+        .insert({
+          tenant_id: fx.tenantA, posicao_id: posicaoA, fonte_id: fonteA,
+          citacao: "forjada pelo condómino",
+        });
+      expect(error).not.toBeNull();
     });
 
     it("NEG: condómino não vê evidências", async () => {
@@ -245,15 +328,23 @@ d("RLS matriz — processo (imputações, IA documental, contrato-memória, comu
     });
   });
 
-  // --------------------------------- contrato_memoria (SÓ LEITURA — ver topo)
-  describe("contrato_memoria_eventos / _evidencias (só leitura; contratos fora das migrações)", () => {
+  // --------------------------------- contrato_memoria (leitura provada; escrita via UI)
+  describe("contrato_memoria_eventos / _evidencias (leitura provada; escrita não exercível — G-1)", () => {
     // NOTA (achado A-5 — corrigido por 20260902330000): estas tabelas mantinham
     // os grants por omissão do Supabase (anon/authenticated com SELECT etc.).
     // O RLS (is_tenant_admin) continua a devolver 0 linhas a quem não é admin;
     // a migração de correção apertou a segunda camada (revoke a anon;
     // authenticated só com as operações que a app usa), no padrão que
-    // 20260826020000 aplicou a imputacoes_posicoes. Aqui prova-se a
-    // garantia RLS; os grants novos ficam verificados por SQL (has_table_privilege).
+    // 20260826020000 aplicou a imputacoes_posicoes.
+    //
+    // NOTA (Fase B — 20260902400000): a UI do dossiê passa a escrever
+    // acontecimentos (INSERT/UPDATE a authenticated, gated pela política
+    // `admins manage` FOR ALL, que já tinha USING e WITH CHECK
+    // is_tenant_admin). Os caminhos de escrita continuam não exercíveis aqui —
+    // a tabela depende de `public.contratos`, inexistente na cadeia de
+    // migrações (lacuna G-1 em tests/security/README.md). Aqui prova-se a
+    // garantia RLS de leitura; os grants novos ficam verificados por SQL
+    // (has_table_privilege) quando houver stack com a cadeia completa.
     it("NEG: anon não vê eventos (RLS: 0 linhas)", async () => {
       const c = anonClient();
       const r = await c.from("contrato_memoria_eventos").select("id").limit(1);

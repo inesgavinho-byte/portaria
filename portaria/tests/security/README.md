@@ -68,9 +68,9 @@ Legenda: C=condómino, I=inquilino, A=admin, A≠=admin de outro tenant, K=comis
 | RPC `user_tenant_ids` / `is_tenant_admin` / `user_tem_papel` | matriz-rpc | próprio OK; A≠/⊖ negados |
 | RPC `user_permilagem` | p0 (S8) | própria OK; A≠ null |
 | RPC `total_permilagem_tenant` | matriz-rpc | C OK; ⊖ negado; A≠ recebe 0 — **A-3 corrigido/reavaliado (20260902330000)** |
-| `imputacoes_posicoes` / `imputacoes_posicoes_evidencias` | matriz-processo | A SELECT; C sem linhas (RLS); ⊖ sem grant; ✎ sem grant INSERT (20260826020000); A≠ negado |
+| `imputacoes_posicoes` / `imputacoes_posicoes_evidencias` | matriz-processo | A SELECT+✎ (Fase B: INSERT/UPDATE, 20260902400000); C sem linhas e ✎ negados pela RLS (com grant na mão); ⊖ sem grant; A≠ negado |
 | `ia_documental_configuracoes` / `fontes` / `fonte_blocos` / `sessoes` / `mensagens` | matriz-processo | A; C/A≠/⊖ negados; ✎ C negado |
-| `contrato_memoria_eventos` / `_evidencias` (leitura) | matriz-processo | C/A≠/⊖ sem linhas; grants mínimos (A-5, 20260902330000) — escrita **não testável** (ver lacuna G-1) |
+| `contrato_memoria_eventos` / `_evidencias` (leitura) | matriz-processo | C/A≠/⊖ sem linhas; grants mínimos (A-5, 20260902330000) + ✎ INSERT/UPDATE em eventos (Fase B, 20260902400000) — escrita **não testável** (ver lacuna G-1) |
 | `comunicacoes` / `comunicacao_destinatarios` / `comunicacao_documentos` | matriz-processo | A; C/A≠/⊖ negados; ✎ C negado |
 | `email_caixas` / `email_mensagens` / `email_anexos` | matriz-operacoes | A; C/A≠/⊖ negados; ✎ C negado |
 | `ativos_manutencao` | matriz-operacoes | A; C/A≠/⊖ negados; ✎ C negado |
@@ -90,6 +90,18 @@ A-3 e A-5 ficaram tratados (detalhe em cada item). **A-4 permanece aberto**
 (hardening efectivo; alinhar a linha da matriz é decisão documental própria).
 Depois da correção, a suite completa corre verde contra o stack local
 (257/257, 10 ficheiros, 0 falhas).
+
+**Fase B do goal-portaria-1.0** (migração `20260902400000`): o dossiê de
+fornecedor passa a ser operado pela UI, pelo que `authenticated` recebe as
+escritas que a aplicação passa a fazer — INSERT/UPDATE em
+`contrato_memoria_eventos` (a política FOR ALL de 20260823175458 já cobria),
+INSERT/UPDATE em `imputacoes_posicoes` e INSERT em
+`imputacoes_posicoes_evidencias` (políticas novas FOR INSERT/UPDATE, TO
+authenticated, `is_tenant_admin` no USING e no WITH CHECK). A fronteira real
+deixa de ser o grant e passa a ser a RLS — a matriz-processo prova agora o
+condómino recusado **com** o grant na mão. Sem stack local aplicado depois
+desta migração, os testes POS/NEG novos ficam por executar (registar com
+evidência no primeiro `supabase db reset` local).
 
 Nota de reconstrução: numa reconstrução **pura** a partir da pasta (sem o
 stub local de tabelas de produção — ver G-1), duas migrações de dados do
@@ -134,13 +146,14 @@ segurança (tabelas, políticas, RPCs, grants) aplicam todos.
 
 ## Lacunas de cobertura conhecidas
 
-- **G-1 — `contrato_memoria_eventos`/`_evidencias`: só leitura.** As tabelas
-  referenciam `public.contratos`, que **não existe** na cadeia de migrações
-  (o schema de memória da contratação foi aplicado em produção fora do
-  histórico). Sem a tabela `contratos`, é impossível semear eventos num
-  ambiente reconstruído — os caminhos de escrita (política `admins manage`)
-  ficam por exercitar. Ações possíveis: миграção que crie `contratos`, ou
-  `NOT VALID`/remodelação da FK.
+- **G-1 — `contrato_memoria_eventos`/`_evidencias`: escrita por exercitar.**
+  As tabelas referenciam `public.contratos`, que **não existe** na cadeia de
+  migrações (o schema de memória da contratação foi aplicado em produção fora
+  do histórico). Sem a tabela `contratos`, é impossível semear eventos num
+  ambiente reconstruído — os caminhos de escrita ficam por exercitar, mesmo
+  depois de a Fase B (`20260902400000`) conceder INSERT/UPDATE a
+  `authenticated` (a política RLS já os cobria). Ações possíveis: миграção
+  que crie `contratos`, ou `NOT VALID`/remodelação da FK.
 - **G-2 — POS de `planos_manutencao`/`tarefas_manutencao`** — **FECHADO.** O
   bloqueio era o achado A-2; o trigger foi corrigido em `20260902320000`, o
   teste POS foi reactivado e passa (o seed via service_role também passa pelo

@@ -3,18 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { garantirFonte } from "@/lib/fornecedores/fontes";
 
 /**
- * Ligação entre o arquivo de ficheiros e a camada analítica do dossiê.
+ * Evidências do dossiê: juntar um documento do arquivo a um acontecimento,
+ * com localizador, citação e papel.
  *
- * Um ficheiro carregado vive em `documentos`. Uma afirmação do histórico cita
- * uma fonte em `ia_documental_fontes`. São camadas distintas de propósito: a
- * primeira guarda o original, a segunda guarda a leitura — o que o documento
- * diz, onde o diz e que papel desempenha na afirmação.
- *
- * Estas acções fazem a ponte, criando a fonte a partir do documento quando ela
- * ainda não existe. Nunca se duplica: um documento tem no máximo uma fonte,
- * garantido por índice único em (tenant_id, documento_id).
+ * A ponte para a fonte vive em `lib/fornecedores/fontes.ts`, partilhada com a
+ * ingestão e com as posições de imputação — é a mesma camada, um só arquivo
+ * de fontes.
  */
 
 export type EvidenciaFormState = {
@@ -28,64 +25,6 @@ type Papel = (typeof PAPEIS)[number];
 
 const CITACAO_MAX = 2000;
 const LOCALIZADOR_MAX = 240;
-
-/**
- * Devolve a fonte documental do documento indicado, criando-a se necessário.
- * A fonte herda o título, a data e o fornecedor do documento.
- */
-async function garantirFonte(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  tenantId: string,
-  userId: string,
-  documentoId: string,
-): Promise<{ fonteId?: string; error?: string }> {
-  const { data: existente, error: erroExistente } = await supabase
-    .from("ia_documental_fontes")
-    .select("id")
-    .eq("tenant_id", tenantId)
-    .eq("documento_id", documentoId)
-    .maybeSingle();
-
-  if (erroExistente) return { error: "Não foi possível verificar a fonte documental." };
-  if (existente) return { fonteId: existente.id };
-
-  const { data: documento, error: erroDocumento } = await supabase
-    .from("documentos")
-    .select("id, titulo, categoria, data_documento, contraparte, n_mensagens, checksum, fornecedor_id")
-    .eq("tenant_id", tenantId)
-    .eq("id", documentoId)
-    .maybeSingle();
-
-  if (erroDocumento || !documento) return { error: "Documento não encontrado no arquivo." };
-
-  const referencia = [
-    documento.contraparte,
-    documento.data_documento ? `de ${documento.data_documento}` : null,
-    documento.n_mensagens ? `${documento.n_mensagens} mensagens` : null,
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  const { data: criada, error: erroCriar } = await supabase
-    .from("ia_documental_fontes")
-    .insert({
-      tenant_id: tenantId,
-      titulo: documento.titulo,
-      referencia: referencia || documento.categoria,
-      jurisdicao: "PT",
-      ativa: true,
-      documento_id: documento.id,
-      fornecedor_id: documento.fornecedor_id,
-      data_documento: documento.data_documento,
-      checksum: documento.checksum,
-      criado_por: userId,
-    })
-    .select("id")
-    .single();
-
-  if (erroCriar || !criada) return { error: "Não foi possível criar a fonte documental." };
-  return { fonteId: criada.id };
-}
 
 /**
  * Junta um documento do arquivo a um acontecimento do histórico, como
