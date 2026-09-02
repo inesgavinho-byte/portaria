@@ -110,7 +110,7 @@ honestos — WRITTEN ≠ IMPLEMENTED ≠ TESTED ≠ APPLIED ≠ VERIFIED.)*
 | A1.6 afirmações da landing | IMPLEMENTED | `section-confianca.tsx` só afirma o demonstrável; comentário no ficheiro trava regressão |
 | A2.1 S11 convites | IMPLEMENTED + TESTED local | migração `20260902090000` exercitada em cluster descartável (16/16); suite `rls-s11` (9 testes); UI `/convite/pendentes`; `aceitar_convites()` removida |
 | A2.2 matriz RLS | IMPLEMENTED + TESTED | 58 tabelas + 20 RPCs cobertos; **262/262 testes a passar** contra stack local; prova de regressão registada e executada (`docs/security/rls-regression-proof.md`) |
-| A2.3 CI primeira execução | PENDENTE do PR | primeira execução real acontece com este branch |
+| A2.3 CI primeira execução | VERIFIED — CI VERDE | primeira execução real no PR #91; revelou e corrigiu: `ci.yml` fora da raiz do repo, cadeia de migrações não reprouzível, Node 20 sem WebSocket nativo |
 
 **Bónus da A2.2:** a matriz apanhou **duas regressões reais** na cadeia de
 migrações — A-1 (a `20260826030000` tinha perdido os filtros C2/S6 do
@@ -137,11 +137,27 @@ serve.
 | C1 extração de PDF | IMPLEMENTED + TESTED local | `unpdf` (extração 100% local, sem LLM); contrato de indexação `texto`/`metadados`; PDFs sem camada de texto ficam com estado explícito; 8 testes novos; limites: 80 páginas / 200k caracteres |
 | C2 pipeline | PRESERVADO | reindexação não-destrutiva mantida (A2); provedor de embeddings inalterado até decisão L-44 |
 
-### Verificação integrada (2026-09-02)
+### Verificação integrada (2026-09-02, actualizada no fim do dia)
 
 - `tsc --noEmit`: limpo. `next build`: verde (inclui `/privacidade`, `/termos`).
 - Unitários: 150/150 (11 ficheiros). Segurança: **262/262** contra stack
   Supabase local com a cadeia 0001→`20260902400000`.
+- **CI verde pela primeira vez** (PR #91, run 33667766965): type-check, lint,
+  build, `supabase start` (aplica a cadeia do zero) e suite de segurança —
+  tudo no runner GitHub. Consta ainda que o `ci.yml` vivia em
+  `portaria/.github/workflows/` (o Actions só lê da raiz do repo) e nunca
+  tinha corrido; movido para a raiz.
+- **Cadeia de migrações reprouzível do zero** (era o defeito que a primeira
+  execução do CI expôs): `0019_fornecedores_contratos_base.sql` versiona
+  `fornecedores`/`contratos` (nunca tinham entrado no histórico) e repõe a
+  postura de grants-padrão do Supabase; pgvector fixado em `extensions`;
+  `btree_gist` versionado na 0026; ambiguidade de `tenant_id` e UUID de
+  produção hardcoded reparados nas migrações de dados de agosto. Detalhe em
+  `supabase/migrations/README.md`. A suite de segurança corre verde contra a
+  reconstrução limpa — 262/262.
+- **Deploy Netlify**: a falha do preview era o `pnpm-lock.yaml` sem o `unpdf`
+  (Netlify deteta pnpm e congela o lockfile); reconciliado — previews
+  `ready` nos commits seguintes.
 
 ### Não feito / pendente de humano
 
