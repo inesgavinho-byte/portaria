@@ -21,7 +21,7 @@ export default async function ConselheiraConfigPage() {
       </div>
 
       <ConselheiraConfig
-        openai={estado.openai}
+        iaConfigurada={estado.iaConfigurada}
         legislacao={estado.legislacao}
         regulamento={estado.regulamento}
       />

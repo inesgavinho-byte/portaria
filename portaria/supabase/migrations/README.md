@@ -108,3 +108,19 @@ executável.
   `calcular_divida_fracao`, `obter_proximo_numero_recibo`) **sem** `revoke`/
   `grant` — mesmo padrão de S2, fora do âmbito 0023–0026. Fechar antes de o
   módulo financeiro entrar no Beta.
+
+## IA local (L-44) — branch `feat/ia-local`
+
+- **`20260902510000_embeddings_bge_m3.sql`** — os embeddings passam de OpenAI
+  `text-embedding-3-small` (vector(1536)) para o modelo local bge-m3
+  (1024 dims, decisão L-44 em `docs/legal/decisao-ia-l44.md`). Nulifica todos
+  os vetores antigos (outro espaço vetorial — não comparáveis), altera a
+  coluna para `extensions.vector(1024)` (o HNSW é reconstruído pelo ALTER
+  TYPE) e reafirma `buscar_chunks`/grants (corpo de 20260902310000 intacto:
+  S3+C2+S6). **Ainda não aplicada a produção.** Aplicação em produção exige,
+  por condomínio, reindexação total imediata a seguir (reindexarTenant +
+  semearLegislacao + carregarRegulamento) — sem ela a pesquisa semântica
+  devolve vazio (degradação graciosa). Nota: `conhecimento_base` (coluna
+  `embedding` da Conselheira) não consta desta cadeia (existe só em
+  produção, criado fora dela); se lá for `vector(1536)`, precisa do mesmo
+  tratamento, fora desta migração.

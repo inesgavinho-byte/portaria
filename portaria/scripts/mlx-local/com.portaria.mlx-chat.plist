@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template launchd — servidor de chat MLX da PORTARIA (Qwen3-8B-4bit, porta 8098).
+
+  NÃO editar este ficheiro directamente: os placeholders __UV_PATH__,
+  __LOG_DIR__, __MLX_CHAT_MODEL__, __MLX_HOST__ e __MLX_CHAT_PORT__ são
+  preenchidos por install.sh, que copia o resultado para
+  ~/Library/LaunchAgents/com.portaria.mlx-chat.plist.
+
+  Padrão inspirado no launchd do projeto DECIMA (com.decima.mlx-embeddings,
+  porta 8099).
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.portaria.mlx-chat</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>__UV_PATH__</string>
+    <string>run</string>
+    <string>--with</string>
+    <string>mlx-lm</string>
+    <string>python</string>
+    <string>-m</string>
+    <string>mlx_lm.server</string>
+    <string>--model</string><string>__MLX_CHAT_MODEL__</string>
+    <string>--host</string><string>__MLX_HOST__</string>
+    <string>--port</string><string>__MLX_CHAT_PORT__</string>
+    <!-- Qwen3: sem raciocínio no content (respostas RAG concisas; sem
+         isto, o modelo gasta tokens a pensar antes de responder). -->
+    <string>--chat-template-args</string>
+    <string>{"enable_thinking": false}</string>
+  </array>
+  <key>WorkingDirectory</key><string>__LOG_DIR__</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HF_HOME</key><string>__LOG_DIR__/hf-cache</string>
+  </dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key>
+  <dict><key>SuccessfulExit</key><false/></dict>
+  <key>StandardOutPath</key><string>__LOG_DIR__/server.log</string>
+  <key>StandardErrorPath</key><string>__LOG_DIR__/server.err.log</string>
+</dict>
+</plist>
