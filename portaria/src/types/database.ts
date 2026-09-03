@@ -101,6 +101,31 @@ export type Fracao = {
   criado_em: string;
 };
 
+export type PapelPessoa = "proprietario" | "inquilino" | "representante";
+
+export type Pessoa = {
+  id: string;
+  tenant_id: string;
+  nome: string;
+  email: string | null;
+  telefone: string | null;
+  notas: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+export type FracaoPessoa = {
+  id: string;
+  tenant_id: string;
+  fracao_id: string;
+  pessoa_id: string;
+  papel: PapelPessoa;
+  desde: string | null;
+  ate: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
 export type Aviso = {
   id: string;
   tenant_id: string;

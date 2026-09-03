@@ -32,7 +32,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
   if (!ctx) redirect("/avisos");
 
   const supabase = await createClient();
-  const [{ data: fracao }, { data: entregas }, { data: quotas }, { data: pagamentos }, { data: recibos }, { data: ocorrencias }, { data: contribuicoes }] = await Promise.all([
+  const [{ data: fracao }, { data: entregas }, { data: quotas }, { data: pagamentos }, { data: recibos }, { data: ocorrencias }, { data: contribuicoes }, { data: pessoas }] = await Promise.all([
     supabase.from("fracoes").select("*").eq("id", id).eq("tenant_id", ctx.tenant.id).maybeSingle(),
     supabase.from("comunicacao_destinatarios").select("*, comunicacao:comunicacoes(*)")
       .eq("fracao_id", id).eq("tenant_id", ctx.tenant.id).order("criado_em", { ascending: false }),
@@ -46,8 +46,16 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       .order("atualizado_em", { ascending: false }),
     supabase.from("contribuicao_prestacao_fracoes").select("*, prestacao:contribuicao_prestacoes(*, contribuicao:contribuicoes_extraordinarias(*))")
       .eq("fracao_id", id).eq("tenant_id", ctx.tenant.id).order("criado_em", { ascending: false }),
+    supabase.from("pessoas").select("id, nome").eq("tenant_id", ctx.tenant.id),
   ]);
   if (!fracao) notFound();
+
+  // Ficha do condómino correspondente ao proprietário registado (a
+  // sincronização garante que o nome coincide com o guardado em pessoas).
+  const nomeProprietario = fracao.proprietario_nome?.trim();
+  const pessoaProprietario = nomeProprietario
+    ? (pessoas ?? []).find((p) => p.nome.trim().toLowerCase() === nomeProprietario.toLowerCase())
+    : undefined;
 
   const f = fracao as Fracao;
   const listaEntregas = (entregas ?? []) as EntregaHistorico[];
@@ -136,8 +144,25 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
         <section className="bg-paper border border-warmBeige/20 p-5 md:p-6">
           <div className="flex items-center gap-2 mb-4"><UserRound className="w-4 h-4 text-warmBeige" /><h2 className="font-title text-xl text-ink">Intervenientes e contacto</h2></div>
           <div className="grid gap-4 sm:grid-cols-2 font-body text-sm">
-            <div><p className="text-xs tracking-widest uppercase text-oliveGray mb-1">Proprietário</p><p className="text-ink">{f.proprietario_nome ?? "Não registado"}</p><p className="text-oliveGray mt-1">{f.proprietario_email ?? "Sem e-mail"}</p><p className="text-oliveGray">{f.proprietario_telefone ?? "Sem telefone"}</p></div>
-            <div><p className="text-xs tracking-widest uppercase text-oliveGray mb-1">Inquilino</p><p className="text-ink">{f.inquilino_nome ?? "Não registado"}</p><p className="text-oliveGray mt-1">O contacto de inquilino pode ser completado na ficha da fração.</p></div>
+            <div>
+              <p className="text-xs tracking-widest uppercase text-oliveGray mb-1">Proprietário</p>
+              {pessoaProprietario ? (
+                <Link href={`/condominos/${pessoaProprietario.id}`} className="text-ink underline decoration-warmBeige/50 hover:text-oliveGray">{f.proprietario_nome}</Link>
+              ) : (
+                <p className="text-ink">{f.proprietario_nome ?? "Não registado"}</p>
+              )}
+              <p className="text-oliveGray mt-1">{f.proprietario_email ?? "Sem e-mail"}</p>
+              <p className="text-oliveGray">{f.proprietario_telefone ?? "Sem telefone"}</p>
+              {pessoaProprietario && <Link href={`/condominos/${pessoaProprietario.id}`} className="inline-block mt-2 text-xs tracking-widest uppercase text-ink hover:text-oliveGray">Ficha do condómino</Link>}
+            </div>
+            <div>
+              <p className="text-xs tracking-widest uppercase text-oliveGray mb-1">Inquilino</p>
+              <p className="text-ink">{f.inquilino_nome ?? "Não registado"}</p>
+              <p className="text-oliveGray mt-1">O contacto de inquilino pode ser completado na ficha da fração.</p>
+            </div>
+            <div className="sm:col-span-2">
+              <Link href={`/comunicacoes/nova?fracao=${f.id}`} className="inline-block text-xs tracking-widest uppercase text-ink hover:text-oliveGray">Registrar comunicação a esta fração</Link>
+            </div>
           </div>
         </section>
         <section className="bg-paper border border-warmBeige/20 p-5 md:p-6">

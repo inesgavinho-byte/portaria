@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { sincronizarPessoasDaFracao } from "@/lib/actions/pessoas";
 
 export type FracaoFormState = {
   error?: string;
@@ -70,19 +71,28 @@ export async function criarFracao(
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data: novaFracao, error } = await supabase
     .from("fracoes")
-    .insert({ tenant_id: ctx.tenant.id, ...valores });
+    .insert({ tenant_id: ctx.tenant.id, ...valores })
+    .select("id")
+    .single();
 
-  if (error) {
-    if (error.code === "23505") {
+  if (error || !novaFracao) {
+    if (error?.code === "23505") {
       return { fieldErrors: { codigo: "Já existe uma fração com esta identificação." } };
     }
     console.error("Erro insert fração:", error);
     return { error: "Erro ao criar a fração. Tente novamente." };
   }
 
+  try {
+    await sincronizarPessoasDaFracao(ctx.tenant.id, novaFracao.id);
+  } catch (erroSincronizacao) {
+    console.error("Sincronização de pessoas falhou (não bloqueia a fração):", erroSincronizacao);
+  }
+
   revalidatePath("/fracoes");
+  revalidatePath("/condominos");
   redirect("/fracoes");
 }
 
@@ -119,7 +129,14 @@ export async function atualizarFracao(
     .eq("fracao_id", id)
     .eq("tenant_id", ctx.tenant.id);
 
+  try {
+    await sincronizarPessoasDaFracao(ctx.tenant.id, id);
+  } catch (erroSincronizacao) {
+    console.error("Sincronização de pessoas falhou (não bloqueia a fração):", erroSincronizacao);
+  }
+
   revalidatePath("/fracoes");
+  revalidatePath("/condominos");
   revalidatePath("/configuracao/membros");
   redirect("/fracoes");
 }

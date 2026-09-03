@@ -29,6 +29,7 @@ const GRUPOS_ADMIN: NavGrupo[] = [
         href: "/fracoes",
         label: "Pessoas e frações",
         filhos: [
+          { href: "/condominos", label: "Condóminos" },
           { href: "/contactos", label: "Contactos" },
         ],
       },
