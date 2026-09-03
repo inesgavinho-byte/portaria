@@ -280,24 +280,9 @@ export async function anularPagamento(
 
   const supabase = await createClient();
 
-  // Marcar quotas como pendentes novamente
-  const { data: pagamento } = await supabase
-    .from("pagamentos")
-    .select("quota_ids")
-    .eq("id", pagamentoId)
-    .eq("tenant_id", ctx.tenant.id)
-    .single();
-
-  if (pagamento?.quota_ids && Array.isArray(pagamento.quota_ids)) {
-    for (const quotaId of pagamento.quota_ids) {
-      await supabase
-        .from("quotas_mensais")
-        .update({ estado: "pendente" })
-        .eq("id", quotaId)
-        .eq("tenant_id", ctx.tenant.id);
-    }
-  }
-
+  // O trigger trg_desalocar_pagamento (20260903010000) recalcula pago_cents
+  // e estado das quotas no DELETE — a reposição manual do estado antigo era
+  // feita aqui e ficava errada quando outras quotas pagavam as mesmas quotas.
   const { error } = await supabase
     .from("pagamentos")
     .delete()

@@ -34,17 +34,21 @@ export default async function CondominosPage() {
       .order("criado_em", { ascending: true }),
     supabase
       .from("quotas_mensais")
-      .select("fracao_id, valor_cents")
+      .select("fracao_id, valor_cents, pago_cents, estado")
       .eq("tenant_id", ctx.tenant.id)
       .in("estado", ["pendente", "parcial"]),
   ]);
 
+  // Saldo real: o que falta da quota depois das alocações de pagamentos.
   const dividaPorFracao = new Map<string, number>();
   for (const quota of quotas ?? []) {
-    dividaPorFracao.set(
-      quota.fracao_id,
-      (dividaPorFracao.get(quota.fracao_id) ?? 0) + quota.valor_cents,
-    );
+    const saldo = Math.max(0, quota.valor_cents - quota.pago_cents);
+    if (saldo > 0) {
+      dividaPorFracao.set(
+        quota.fracao_id,
+        (dividaPorFracao.get(quota.fracao_id) ?? 0) + saldo,
+      );
+    }
   }
 
   type Linha = {
@@ -138,8 +142,8 @@ export default async function CondominosPage() {
 
           <div className="p-4 font-body text-xs text-oliveGray">
             {lista.length} {lista.length === 1 ? "condómino" : "condóminos"} ·
-            dívida somada por fração; quotas parciais contam pelo valor integral
-            até haver alocação por quota.
+            dívida somada por fração, ao saldo real de cada quota (devida menos
+            alocação de pagamentos).
           </div>
         </div>
       )}

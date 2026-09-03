@@ -3,6 +3,8 @@ import { ChevronLeft, FileText, ReceiptText, CircleAlert, Mail, WalletCards, Use
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { saldoQuota } from "@/lib/financeiro/alocacao";
+import { ContaCorrente } from "@/components/admin/conta-corrente";
 import type { Comunicacao, ComunicacaoDestinatario, ContribuicaoExtraordinaria, ContribuicaoPrestacao, ContribuicaoPrestacaoFracao, Fracao, Ocorrencia, Pagamento, QuotaMensal, Recibo } from "@/types/database";
 
 type EntregaHistorico = ComunicacaoDestinatario & { comunicacao: Comunicacao | null };
@@ -64,8 +66,10 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
   const listaRecibos = (recibos ?? []) as Recibo[];
   const listaOcorrencias = (ocorrencias ?? []) as Ocorrencia[];
   const listaContribuicoes = (contribuicoes ?? []) as PosicaoExtraordinariaHistorico[];
-  const pendentes = listaQuotas.filter((quota) => quota.estado === "pendente" || quota.estado === "parcial");
-  const totalPendente = pendentes.reduce((soma, quota) => soma + quota.valor_cents, 0);
+  // Saldo real: valor da quota menos o que as alocações de pagamentos já
+  // cobriram (pago_cents, mantido pelo trigger de alocação).
+  const pendentes = listaQuotas.filter((quota) => saldoQuota(quota) > 0 && quota.estado !== "isento");
+  const totalPendente = pendentes.reduce((soma, quota) => soma + saldoQuota(quota), 0);
 
   const eventos: Evento[] = [
     ...listaEntregas.flatMap((entrega) => entrega.comunicacao ? [{
@@ -79,7 +83,7 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       data: quota.vencimento ?? `${quota.ano}-${String(quota.mes).padStart(2, "0")}-01`,
       tipo: "quota" as const,
       titulo: `Quota — ${String(quota.mes).padStart(2, "0")}/${quota.ano}`,
-      detalhe: `${EURO.format(quota.valor_cents / 100)} · ${quota.estado}`,
+      detalhe: `${EURO.format(quota.valor_cents / 100)} · pago ${EURO.format(Math.min(quota.pago_cents, quota.valor_cents) / 100)} · ${quota.estado}`,
       href: `/configuracao/financeiro?tab=quotas&ano=${quota.ano}&mes=${quota.mes}`,
     })),
     ...listaPagamentos.map((pagamento) => ({
@@ -171,6 +175,10 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
           <p className="font-body text-sm text-oliveGray mt-2">{pendentes.length} {pendentes.length === 1 ? "quota pendente ou parcial" : "quotas pendentes ou parciais"}</p>
           <Link href="/configuracao/financeiro" className="inline-block mt-4 font-body text-xs tracking-widest uppercase text-ink hover:text-oliveGray">Abrir financeiro</Link>
         </section>
+      </div>
+
+      <div className="mb-8">
+        <ContaCorrente quotas={listaQuotas} titulo="Conta corrente — quotas" />
       </div>
 
       <section className="bg-paper border border-warmBeige/20">
