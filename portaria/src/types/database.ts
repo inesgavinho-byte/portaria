@@ -773,6 +773,9 @@ export type Recibo = {
   periodo_fim: string | null;
   pdf_url: string | null;
   estado: "emitido" | "anulado";
+  /** Quando chegou ao condómino. Null = ainda por enviar. */
+  enviado_em: string | null;
+  canal_envio: string | null;
   emitido_em: string;
   anulado_em: string | null;
   anulado_por: string | null;

@@ -980,3 +980,52 @@ export async function associarDocumentoDespesa(
   revalidatePath("/configuracao/financeiro");
   return { success: true };
 }
+
+// ============================================================================
+// RECIBOS — CICLO DE ENVIO (fase 3)
+// ============================================================================
+
+export type ReciboEnvioFormState = {
+  error?: string;
+  sucesso?: boolean;
+};
+
+/**
+ * Regista que o recibo chegou ao condómino — canal + data. Acto humano:
+ * nada marca o envio automaticamente, porque o sistema não envia recibos
+ * por si (mesma doutrina das comunicações).
+ */
+export async function marcarReciboEnviado(
+  _prev: ReciboEnvioFormState,
+  formData: FormData
+): Promise<ReciboEnvioFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões." };
+
+  const reciboId = String(formData.get("recibo_id") ?? "").trim();
+  const canal = String(formData.get("canal_envio") ?? "").trim();
+  const dataEnvio = String(formData.get("data_envio") ?? "").trim();
+
+  if (!reciboId) return { error: "Recibo em falta." };
+  const canaisValidos = ["email", "correio_simples", "correio_registado", "entrega_em_mao", "portal", "outro"];
+  if (!canaisValidos.includes(canal)) return { error: "Canal inválido." };
+
+  const quando = dataEnvio ? new Date(`${dataEnvio}T12:00:00`) : new Date();
+  if (isNaN(quando.getTime())) return { error: "Data de envio inválida." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("recibos")
+    .update({ enviado_em: quando.toISOString(), canal_envio: canal })
+    .eq("id", reciboId)
+    .eq("tenant_id", ctx.tenant.id)
+    .eq("estado", "emitido");
+
+  if (error) {
+    console.error("Erro a marcar envio de recibo:", error);
+    return { error: "Erro ao registar o envio." };
+  }
+
+  revalidatePath("/configuracao/financeiro");
+  return { sucesso: true };
+}
