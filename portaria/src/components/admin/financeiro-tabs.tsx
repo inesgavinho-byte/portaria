@@ -3,9 +3,7 @@
 import {
   useRouter,
 } from "next/navigation";
-import {
-  useTransition,
-} from "react";
+import { Fragment, useActionState, useState, useTransition } from "react";
 import {
   BarChart3,
   Receipt,
@@ -31,7 +29,8 @@ import {
   Despesa,
   ObrigacaoRecorrente,
 } from "@/types/database";
-import { CalendarioAdministrativo as CalendarioAdministrativoDados, DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo } from "@/lib/actions/financeiro";
+import { CalendarioAdministrativo as CalendarioAdministrativoDados, DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo, type QuotaAberta } from "@/lib/actions/financeiro";
+import { associarQuotasAPagamento, type AssociacaoFormState } from "@/lib/actions/recebimentos";
 import { DespesasObrigacoesPainel } from "@/components/admin/despesas-obrigacoes-painel";
 import { CalendarioAdministrativo } from "@/components/admin/calendario-administrativo";
 
@@ -90,6 +89,7 @@ export function FinanceiroTabs({
   dashboard,
   quotas,
   pagamentos,
+  quotasAbertas,
   recibos,
   configuracao,
   despesas,
@@ -106,6 +106,7 @@ export function FinanceiroTabs({
   dashboard: DashboardFinanceiro;
   quotas: QuotaMensal[];
   pagamentos: Pagamento[];
+  quotasAbertas: QuotaAberta[];
   recibos: Recibo[];
   configuracao: ConfiguracaoFinanceira | null;
   despesas: Despesa[];
@@ -156,7 +157,7 @@ export function FinanceiroTabs({
 
       {tab === "dashboard" && <TabDashboard dashboard={dashboard} ano={ano} mes={mes} />}
       {tab === "quotas" && <TabQuotas quotas={quotas} ano={ano} mes={mes} />}
-      {tab === "pagamentos" && <TabPagamentos pagamentos={pagamentos} />}
+      {tab === "pagamentos" && <TabPagamentos pagamentos={pagamentos} quotasAbertas={quotasAbertas} />}
       {tab === "recibos" && <TabRecibos recibos={recibos} />}
       {tab === "calendario" && (
         <CalendarioAdministrativo eventos={calendario.eventos} alertas={calendario.alertasAbertos} />
@@ -365,13 +366,19 @@ function TabQuotas({ quotas, ano, mes }: { quotas: QuotaMensal[]; ano: number; m
 // TAB PAGAMENTOS
 // ============================================================================
 
-function TabPagamentos({ pagamentos }: { pagamentos: Pagamento[] }) {
+function TabPagamentos({ pagamentos, quotasAbertas }: { pagamentos: Pagamento[]; quotasAbertas: QuotaAberta[] }) {
+  const [abertoId, setAbertoId] = useState<string | null>(null);
+  const semQuotas = pagamentos.filter((p) => !p.quota_ids || p.quota_ids.length === 0);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-title text-lg text-ink">Pagamentos</h2>
-          <p className="font-body text-sm text-oliveGray">{pagamentos.length} pagamentos registados</p>
+          <p className="font-body text-sm text-oliveGray">
+            {pagamentos.length} pagamentos registados
+            {semQuotas.length > 0 && ` · ${semQuotas.length} sem quotas associadas`}
+          </p>
         </div>
       </div>
 
@@ -389,21 +396,52 @@ function TabPagamentos({ pagamentos }: { pagamentos: Pagamento[] }) {
                 <th className="text-left px-3 py-2 font-body text-xs tracking-widest uppercase text-oliveGray">Valor</th>
                 <th className="text-left px-3 py-2 font-body text-xs tracking-widest uppercase text-oliveGray">Método</th>
                 <th className="text-left px-3 py-2 font-body text-xs tracking-widest uppercase text-oliveGray">Data</th>
-                <th className="text-left px-3 py-2 font-body text-xs tracking-widest uppercase text-oliveGray">Referência</th>
+                <th className="text-left px-3 py-2 font-body text-xs tracking-widest uppercase text-oliveGray">Quotas</th>
+                <th className="px-3 py-2" />
               </tr>
             </thead>
             <tbody>
-              {pagamentos.map((p) => (
-                <tr key={p.id} className="border-t border-warmBeige/20">
-                  <td className="px-3 py-2 font-body text-ink">
-                    {(p as unknown as { fracoes?: { codigo: string; proprietario_nome: string } }).fracoes?.codigo ?? p.fracao_id.slice(0, 8)}
-                  </td>
-                  <td className="px-3 py-2 font-body text-ink font-medium">{centsToEuro(p.valor_cents)}</td>
-                  <td className="px-3 py-2 font-body text-oliveGray capitalize">{p.metodo.replace("_", " ")}</td>
-                  <td className="px-3 py-2 font-body text-oliveGray">{p.data_pagamento}</td>
-                  <td className="px-3 py-2 font-body text-oliveGray text-xs">{p.referencia ?? "—"}</td>
-                </tr>
-              ))}
+              {pagamentos.map((p) => {
+                const codigo = (p as unknown as { fracoes?: { codigo: string } }).fracoes?.codigo ?? p.fracao_id.slice(0, 8);
+                const aberto = abertoId === p.id;
+                return (
+                  <Fragment key={p.id}>
+                    <tr className="border-t border-warmBeige/20">
+                      <td className="px-3 py-2 font-body text-ink">{codigo}</td>
+                      <td className="px-3 py-2 font-body text-ink font-medium">{centsToEuro(p.valor_cents)}</td>
+                      <td className="px-3 py-2 font-body text-oliveGray capitalize">{p.metodo.replace("_", " ")}</td>
+                      <td className="px-3 py-2 font-body text-oliveGray">{p.data_pagamento}</td>
+                      <td className="px-3 py-2 font-body">
+                        {!p.quota_ids || p.quota_ids.length === 0 ? (
+                          <span className="text-alert text-xs tracking-widest uppercase">Por associar</span>
+                        ) : (
+                          <span className="text-oliveGray text-xs">{p.quota_ids.length} quota{p.quota_ids.length === 1 ? "" : "s"}</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setAbertoId(aberto ? null : p.id)}
+                          className="px-3 py-1.5 border border-warmBeige/40 font-body text-[11px] tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors"
+                        >
+                          {aberto ? "Fechar" : "Associar quotas"}
+                        </button>
+                      </td>
+                    </tr>
+                    {aberto && (
+                      <tr className="border-t border-warmBeige/10 bg-softCream/30">
+                        <td colSpan={6} className="px-3 py-4">
+                          <AssociarQuotasForm
+                            pagamentoId={p.id}
+                            valorCents={p.valor_cents}
+                            quotas={quotasAbertas.filter((q) => q.fracao_id === p.fracao_id)}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -656,5 +694,102 @@ function MesSelector({ ano, mes }: { ano: number; mes: number }) {
         ))}
       </select>
     </div>
+  );
+}
+
+
+// ============================================================================
+// ASSOCIAR QUOTAS A UM PAGAMENTO
+// ============================================================================
+
+const MESES_CURTOS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+function AssociarQuotasForm({
+  pagamentoId,
+  valorCents,
+  quotas,
+}: {
+  pagamentoId: string;
+  valorCents: number;
+  quotas: QuotaAberta[];
+}) {
+  const [state, formAction, pending] = useActionState<AssociacaoFormState, FormData>(
+    associarQuotasAPagamento,
+    {}
+  );
+  const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
+  const router = useRouter();
+  const [pending2, startTransition] = useTransition();
+
+  const somaSelecionada = quotas
+    .filter((q) => selecionadas.has(q.id))
+    .reduce((soma, q) => soma + Math.max(0, q.valor_cents - q.pago_cents), 0);
+
+  if (quotas.length === 0) {
+    return (
+      <p className="font-body text-sm text-oliveGray">
+        Esta fração não tem quotas com saldo em aberto — nada para associar.
+      </p>
+    );
+  }
+
+  return (
+    <form
+      action={(formData) => {
+        startTransition(() => {
+          formAction(formData);
+          router.refresh();
+        });
+      }}
+      className="space-y-3 max-w-2xl"
+    >
+      <input type="hidden" name="pagamento_id" value={pagamentoId} />
+      <input type="hidden" name="quota_ids" value={JSON.stringify([...selecionadas])} />
+      <p className="font-body text-xs text-oliveGray">
+        O valor do pagamento distribui-se pelas quotas escolhidas, por ordem
+        cronológica, enchendo cada uma até fechar. Sobra fica como crédito.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 max-h-56 overflow-y-auto border border-warmBeige/20 p-3">
+        {quotas.map((quota) => {
+          const remanescente = Math.max(0, quota.valor_cents - quota.pago_cents);
+          return (
+            <label key={quota.id} className="flex items-center gap-2 p-1.5 hover:bg-softCream/50 cursor-pointer font-body text-xs">
+              <input
+                type="checkbox"
+                className="accent-ink"
+                checked={selecionadas.has(quota.id)}
+                onChange={(event) => {
+                  setSelecionadas((atual) => {
+                    const proximo = new Set(atual);
+                    if (event.target.checked) proximo.add(quota.id);
+                    else proximo.delete(quota.id);
+                    return proximo;
+                  });
+                }}
+              />
+              <span className="text-ink">
+                {String(quota.mes).padStart(2, "0")}/{quota.ano}
+              </span>
+              <span className="text-oliveGray">
+                falta {centsToEuro(remanescente)} · {quota.estado}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="submit"
+          disabled={pending || pending2 || selecionadas.size === 0}
+          className="px-4 py-2 bg-ink text-paper font-body text-[11px] tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-60"
+        >
+          {(pending || pending2) ? "A associar…" : `Associar ${selecionadas.size} quota${selecionadas.size === 1 ? "" : "s"}`}
+        </button>
+        <span className="font-body text-xs text-oliveGray">
+          Pagamento: {centsToEuro(valorCents)} · saldo das selecionadas: {centsToEuro(somaSelecionada)}
+        </span>
+        {state.error && <span className="font-body text-xs text-alert">{state.error}</span>}
+      </div>
+    </form>
   );
 }

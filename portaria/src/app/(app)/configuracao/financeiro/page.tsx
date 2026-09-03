@@ -4,6 +4,7 @@ import {
   dashboardFinanceiro,
   listarQuotas,
   listarPagamentos,
+  listarQuotasAbertas,
   listarRecibos,
   obterConfiguracaoFinanceira,
   listarDespesas,
@@ -35,6 +36,7 @@ export default async function FinanceiroPage({
     dashboard,
     quotas,
     pagamentos,
+    quotasAbertas,
     recibos,
     configuracao,
     despesas,
@@ -48,6 +50,7 @@ export default async function FinanceiroPage({
     dashboardFinanceiro(ano, mes),
     listarQuotas(ano, mes),
     listarPagamentos(),
+    listarQuotasAbertas(),
     listarRecibos(),
     obterConfiguracaoFinanceira(),
     listarDespesas(),
@@ -73,6 +76,7 @@ export default async function FinanceiroPage({
         dashboard={dashboard}
         quotas={quotas}
         pagamentos={pagamentos}
+        quotasAbertas={quotasAbertas}
         recibos={recibos}
         configuracao={configuracao}
         despesas={despesas}

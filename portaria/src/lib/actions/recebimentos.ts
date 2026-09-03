@@ -307,3 +307,82 @@ async function anularPagamentoProvisorio(
 
   return null;
 }
+
+// ============================================================================
+// ASSOCIAR QUOTAS A UM PAGAMENTO EXISTENTE (fase 2, follow-up)
+// ============================================================================
+
+export type AssociacaoFormState = {
+  error?: string;
+  sucesso?: boolean;
+};
+
+/**
+ * Define quais quotas um pagamento existente cobre. Para o caso dos
+ * pagamentos registados com quota_ids vazios: escolhe-se as quotas e o
+ * trigger trg_alocar_pagamento (20260903010000) distribui o valor no
+ * UPDATE — enche remanescentes por ordem cronológica e o que sobra fica
+ * sem alocação. Re-associar substitui a seleção anterior (re-alocação
+ * limpa, sem duplicar).
+ */
+export async function associarQuotasAPagamento(
+  _prev: AssociacaoFormState,
+  formData: FormData
+): Promise<AssociacaoFormState> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { error: "Sem permissões para esta operação." };
+
+  const pagamentoId = String(formData.get("pagamento_id") ?? "").trim();
+  if (!pagamentoId) return { error: "Pagamento em falta." };
+
+  let quotaIds: string[] = [];
+  try {
+    const bruto = JSON.parse(String(formData.get("quota_ids") ?? "[]"));
+    if (Array.isArray(bruto)) quotaIds = bruto.map(String).filter(Boolean);
+  } catch {
+    return { error: "Formato de quotas inválido." };
+  }
+  if (quotaIds.length === 0) return { error: "Escolhe pelo menos uma quota." };
+
+  const supabase = await createClient();
+
+  const { data: pagamento } = await supabase
+    .from("pagamentos")
+    .select("id, fracao_id")
+    .eq("id", pagamentoId)
+    .eq("tenant_id", ctx.tenant.id)
+    .maybeSingle();
+  if (!pagamento) return { error: "Pagamento não encontrado neste condomínio." };
+
+  const { data: quotas } = await supabase
+    .from("quotas_mensais")
+    .select("id, fracao_id, estado")
+    .eq("tenant_id", ctx.tenant.id)
+    .in("id", quotaIds);
+  if (!quotas || quotas.length !== quotaIds.length) {
+    return { error: "Uma ou mais quotas não foram encontradas neste condomínio." };
+  }
+  if (quotas.some((quota) => quota.fracao_id !== pagamento.fracao_id)) {
+    return { error: "Todas as quotas têm de pertencer à fração do pagamento." };
+  }
+  if (quotas.some((quota) => quota.estado === "isento")) {
+    return { error: "Quotas isentas não recebem pagamentos — remove-as da seleção." };
+  }
+
+  // O UPDATE dispara a re-alocação no trigger; quota_ids fica como registo
+  // da intenção, pagamento_quotas fica com a distribuição real.
+  const { error } = await supabase
+    .from("pagamentos")
+    .update({ quota_ids: quotaIds })
+    .eq("id", pagamentoId)
+    .eq("tenant_id", ctx.tenant.id);
+
+  if (error) {
+    console.error("Erro a associar quotas:", error);
+    return { error: "Erro ao associar quotas ao pagamento." };
+  }
+
+  revalidatePath("/configuracao/financeiro");
+  revalidatePath("/condominos");
+  return { sucesso: true };
+}

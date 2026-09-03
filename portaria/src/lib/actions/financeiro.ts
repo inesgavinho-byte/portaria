@@ -982,6 +982,39 @@ export async function associarDocumentoDespesa(
 }
 
 // ============================================================================
+// QUOTAS ABERTAS (helper de associação a pagamentos)
+// ============================================================================
+
+export type QuotaAberta = {
+  id: string;
+  fracao_id: string;
+  ano: number;
+  mes: number;
+  valor_cents: number;
+  pago_cents: number;
+  estado: "pendente" | "parcial";
+  fracoes: { codigo: string } | null;
+};
+
+/** Quotas com saldo, de todas as épocas — matéria-prima do helper
+ * "associar quotas a pagamento". */
+export async function listarQuotasAbertas(): Promise<QuotaAberta[]> {
+  const ctx = await requireAdmin();
+  if (!ctx) return [];
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("quotas_mensais")
+    .select("id, fracao_id, ano, mes, valor_cents, pago_cents, estado, fracoes(codigo)")
+    .eq("tenant_id", ctx.tenant.id)
+    .in("estado", ["pendente", "parcial"])
+    .order("ano", { ascending: false })
+    .order("mes", { ascending: false });
+
+  return (data ?? []) as unknown as QuotaAberta[];
+}
+
+// ============================================================================
 // RECIBOS — CICLO DE ENVIO (fase 3)
 // ============================================================================
 
