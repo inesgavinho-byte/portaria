@@ -728,12 +728,23 @@ export type QuotaMensal = {
   ano: number;
   mes: number;
   valor_cents: number;
+  /** Soma das alocações vigentes (pagamento_quotas). Verdade do saldo. */
+  pago_cents: number;
   estado: "pendente" | "pago" | "parcial" | "isento";
   vencimento: string | null;
   notas: string | null;
   criado_por: string | null;
   criado_em: string;
   atualizado_em: string;
+};
+
+export type PagamentoQuota = {
+  id: string;
+  tenant_id: string;
+  pagamento_id: string;
+  quota_id: string;
+  valor_cents: number;
+  criado_em: string;
 };
 
 export type Pagamento = {

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
-  ChevronLeft, FileText, Landmark, Mail, Pencil, Phone, ReceiptText,
+  ChevronLeft, FileText, Mail, Pencil, Phone, ReceiptText,
   CircleAlert, UserRound, WalletCards,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
+import { saldoQuota } from "@/lib/financeiro/alocacao";
+import { ContaCorrente } from "@/components/admin/conta-corrente";
 import type {
   Comunicacao, ComunicacaoDestinatario, FracaoPessoa, Ocorrencia,
   Pagamento, Pessoa, QuotaMensal, Recibo,
@@ -93,15 +95,19 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
   const listaEntregas = (entregasRes.data ?? []) as Entrega[];
   const listaOcorrencias = (ocorrenciasRes.data ?? []) as Ocorrencia[];
 
-  const emDivida = listaQuotas.filter((q) => q.estado === "pendente" || q.estado === "parcial");
-  const dividaCents = emDivida.reduce((soma, q) => soma + q.valor_cents, 0);
+  // Saldo real por quota: valor devido menos alocações de pagamentos (pago_cents).
+  const emDivida = listaQuotas.filter((q) => saldoQuota(q) > 0 && q.estado !== "isento");
+  const dividaCents = emDivida.reduce((soma, q) => soma + saldoQuota(q), 0);
   const dividaPorFracao = new Map<string, number>();
   for (const quota of emDivida) {
-    dividaPorFracao.set(quota.fracao_id, (dividaPorFracao.get(quota.fracao_id) ?? 0) + quota.valor_cents);
+    dividaPorFracao.set(
+      quota.fracao_id,
+      (dividaPorFracao.get(quota.fracao_id) ?? 0) + saldoQuota(quota),
+    );
   }
   const pagoAnoCorrente = listaQuotas
-    .filter((q) => q.estado === "pago" && q.ano === new Date().getFullYear())
-    .reduce((soma, q) => soma + q.valor_cents, 0);
+    .filter((q) => q.ano === new Date().getFullYear())
+    .reduce((soma, q) => soma + Math.min(q.pago_cents, q.valor_cents), 0);
 
   const destinoComunicacao = fracoesIds.map(encodeURIComponent).join(",");
 
@@ -145,14 +151,14 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
           </p>
           <p className="font-body text-sm text-oliveGray mt-2">
             {emDivida.length === 0
-              ? "Sem quotas pendentes nem parciais"
-              : `${emDivida.length} ${emDivida.length === 1 ? "quota em aberto" : "quotas em aberto"}`}
+              ? "Sem saldo em aberto"
+              : `${emDivida.length} ${emDivida.length === 1 ? "quota com saldo" : "quotas com saldo"}`}
           </p>
         </section>
         <section className="bg-paper border border-warmBeige/20 p-5 md:p-6">
-          <p className="font-body text-xs tracking-widest uppercase text-oliveGray">Quotas pagas em {new Date().getFullYear()}</p>
+          <p className="font-body text-xs tracking-widest uppercase text-oliveGray">Pago em {new Date().getFullYear()}</p>
           <p className="font-title text-3xl text-ink mt-2">{EURO.format(pagoAnoCorrente / 100)}</p>
-          <p className="font-body text-sm text-oliveGray mt-2">Valor integral das quotas liquidadas</p>
+          <p className="font-body text-sm text-oliveGray mt-2">Alocação de pagamentos nas quotas do ano</p>
         </section>
         <section className="bg-paper border border-warmBeige/20 p-5 md:p-6">
           <div className="flex items-center gap-2 mb-3"><UserRound className="w-4 h-4 text-warmBeige" /><h2 className="font-title text-xl text-ink">Frações</h2></div>
@@ -208,6 +214,19 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
           )}
         </div>
       </section>
+
+      {/* Conta corrente consolidada de todas as frações */}
+      <div className="mb-8">
+        <ContaCorrente
+          quotas={listaQuotas.map((quota) => ({
+            ...quota,
+            fracao_codigo:
+              ((ligacoes ?? []) as Ligacao[]).find((l) => l.fracao?.id === quota.fracao_id)?.fracao?.codigo ?? null,
+          }))}
+          titulo="Conta corrente — todas as frações"
+          comFracoes
+        />
+      </div>
 
       {/* Recibos */}
       <section className="bg-paper border border-warmBeige/20 mb-8">
@@ -315,12 +334,6 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
         )}
       </section>
 
-      {/* Nota de rodapé: quotas parciais contam pelo integral até à fase de alocação */}
-      <p className="font-body text-xs text-oliveGray mt-6 flex items-start gap-1.5">
-        <Landmark className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-        Quotas parciais contam pelo valor integral no total em dívida, enquanto
-        não houver alocação por quota dos pagamentos.
-      </p>
     </div>
   );
 }

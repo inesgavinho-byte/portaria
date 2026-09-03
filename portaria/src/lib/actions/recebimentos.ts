@@ -146,11 +146,10 @@ const COMPRIMENTO_REFERENCIA = 80;
  * condicional com rollback compensatório preserva exactamente a intenção
  * (nunca duplicar, nunca órfão) dentro do que a FK permite.
  *
- * Estados das quotas: este código não as altera POR SI — mas o trigger da BD
- * `trg_atualizar_quota_pagamento` (0027_financeiro.sql) marca as quotas como
- * 'pago'/'parcial' no INSERT de pagamentos, e o DELETE não as repõe. Por isso
- * a compensação (anularPagamentoProvisorio) repõe 'pendente' antes de apagar,
- * replicando o `anularPagamento` do financeiro.
+ * Estados das quotas: este código não as altera POR SI — o trigger da BD
+ * trg_alocar_pagamento (20260903010000) aloca o valor por quota (quota_ids,
+ * ordem cronológica) e mantém pago_cents/estado; o trg_desalocar_pagamento
+ * repõe tudo no DELETE — a compensação apaga e o trigger trata do resto.
  *
  * NÃO emite recibo — mesma semântica de `registarPagamento` no financeiro.
  */
@@ -280,10 +279,11 @@ export async function registarPagamentoDeMovimento(formData: FormData): Promise<
 
 /**
  * Acção compensatória: anula um pagamento acabado de inserir porque o passo 2
- * não correu. O trigger da BD `trg_atualizar_quota_pagamento` (0027) já marcou
- * as quotas como 'pago'/'parcial' no INSERT e o DELETE não as repõe — por isso
- * as quotas voltam a 'pendente' ANTES do delete, replicando o `anularPagamento`
- * do financeiro.
+ * não correu. O trigger trg_desalocar_pagamento (20260903010000) des-aloca e
+ * recalcula pago_cents/estado das quotas no próprio DELETE — já não há
+ * reposição manual de estados aqui (a versão antiga repunha 'pendente' à mão
+ * e ficava errada quando outro pagamento cobria parcialmente as mesmas
+ * quotas).
  *
  * Devolve null em sucesso; em falha devolve uma mensagem explícita com o id —
  * quem chama NUNCA devolve "nada ficou a meio" quando a compensação falhou.
@@ -293,27 +293,8 @@ async function anularPagamentoProvisorio(
   tenantId: string,
   pagamentoId: string,
 ): Promise<string | null> {
-  // 1. Repor as quotas que o trigger marcou no insert.
-  const { data: pagamento, error: leituraError } = await supabase
-    .from("pagamentos")
-    .select("quota_ids")
-    .eq("id", pagamentoId)
-    .eq("tenant_id", tenantId)
-    .maybeSingle();
-  if (leituraError) {
-    console.error("Erro ao ler quotas do pagamento provisório:", leituraError);
-  } else if (pagamento?.quota_ids && pagamento.quota_ids.length > 0) {
-    const { error: quotasError } = await supabase
-      .from("quotas_mensais")
-      .update({ estado: "pendente" })
-      .eq("tenant_id", tenantId)
-      .in("id", pagamento.quota_ids);
-    if (quotasError) {
-      console.error("Erro ao repor quotas do pagamento provisório:", quotasError);
-    }
-  }
-
-  // 2. Apagar o pagamento provisório (temos o id nas mãos — não há órfão).
+  // Apagar o pagamento provisório (temos o id nas mãos — não há órfão); o
+  // trigger da BD repõe as quotas no DELETE.
   const { error: deleteError } = await supabase
     .from("pagamentos")
     .delete()
@@ -324,10 +305,5 @@ async function anularPagamentoProvisorio(
     return `Não foi possível anular o pagamento provisório (id ${pagamentoId}) — anula-o manualmente em Financeiro → Pagamentos.`;
   }
 
-  // O pagamento foi anulado, mas se as quotas não foram repostas ficaram
-  // 'pago' sem pagamento — também tem de ser visível para quem opera.
-  if (leituraError) {
-    return `Pagamento provisório (id ${pagamentoId}) anulado, mas não foi possível confirmar a reposição das quotas — confirma-as manualmente em Financeiro → Quotas.`;
-  }
   return null;
 }
