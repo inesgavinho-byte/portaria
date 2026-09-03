@@ -94,10 +94,10 @@ export default async function FracaoDossiePage({ params }: { params: Promise<{ i
       href: "/configuracao/financeiro?tab=pagamentos",
     })),
     ...listaRecibos.map((recibo) => ({
-      data: recibo.emitido_em,
+      data: recibo.enviado_em ?? recibo.emitido_em,
       tipo: "recibo" as const,
       titulo: `Recibo ${recibo.numero}`,
-      detalhe: `${EURO.format(recibo.valor_cents / 100)} · ${recibo.estado}`,
+      detalhe: `${EURO.format(recibo.valor_cents / 100)} · ${recibo.estado === "anulado" ? "anulado" : recibo.enviado_em ? `enviado (${recibo.canal_envio?.replaceAll("_", " ") ?? "canal não registado"})` : "por enviar"}`,
       href: "/configuracao/financeiro?tab=recibos",
     })),
     ...listaContribuicoes.flatMap((posicao) => {

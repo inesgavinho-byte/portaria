@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { saldoQuota } from "@/lib/financeiro/alocacao";
 import { ContaCorrente } from "@/components/admin/conta-corrente";
+import { RecibosFicha } from "@/components/admin/recibos-ficha";
 import type {
   Comunicacao, ComunicacaoDestinatario, FracaoPessoa, Ocorrencia,
   Pagamento, Pessoa, QuotaMensal, Recibo,
@@ -72,11 +73,11 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
       : Promise.resolve({ data: [] } as { data: QuotaMensal[] | null }),
     temFracoes
       ? supabase.from("pagamentos").select("*").eq("tenant_id", ctx.tenant.id)
-          .in("fracao_id", fracoesIds).order("data_pagamento", { ascending: false }).limit(8)
+          .in("fracao_id", fracoesIds).order("data_pagamento", { ascending: false }).limit(50)
       : Promise.resolve({ data: [] } as { data: Pagamento[] | null }),
     temFracoes
       ? supabase.from("recibos").select("*").eq("tenant_id", ctx.tenant.id)
-          .in("fracao_id", fracoesIds).order("emitido_em", { ascending: false }).limit(8)
+          .in("fracao_id", fracoesIds).order("emitido_em", { ascending: false }).limit(50)
       : Promise.resolve({ data: [] } as { data: Recibo[] | null }),
     temFracoes
       ? supabase.from("comunicacao_destinatarios").select("*, comunicacao:comunicacoes(*)")
@@ -228,30 +229,23 @@ export default async function CondominoFichaPage({ params }: { params: Promise<{
         />
       </div>
 
-      {/* Recibos */}
+      {/* Recibos — emitidos, com estado de envio ao condómino */}
       <section className="bg-paper border border-warmBeige/20 mb-8">
         <div className="p-5 md:p-6 border-b border-warmBeige/15 flex items-center gap-2">
           <ReceiptText className="w-4 h-4 text-warmBeige" />
           <h2 className="font-title text-xl text-ink">Recibos</h2>
+          <p className="font-body text-sm text-oliveGray">emissão e envio ao condómino</p>
         </div>
-        {listaRecibos.length === 0 ? (
-          <div className="p-8 text-center"><p className="font-body text-sm text-oliveGray">Ainda não há recibos emitidos para as frações desta pessoa.</p></div>
-        ) : (
-          <div className="divide-y divide-warmBeige/10">
-            {listaRecibos.map((recibo) => (
-              <div key={recibo.id} className="p-5 flex items-center gap-4">
-                <div className="flex-1">
-                  <h3 className="font-body text-sm text-ink">Recibo {recibo.numero}</h3>
-                  <p className="font-body text-xs text-oliveGray mt-0.5">Emitido a {formatarData(recibo.emitido_em)}</p>
-                </div>
-                <span className={`font-body text-xs tracking-widest uppercase px-2 py-1 border ${recibo.estado === "anulado" ? "text-alert border-alert/40" : "text-oliveGray border-warmBeige/40"}`}>
-                  {recibo.estado}
-                </span>
-                <p className="font-body text-sm text-ink w-24 text-right">{EURO.format(recibo.valor_cents / 100)}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <RecibosFicha
+          recibos={listaRecibos}
+          pagamentosSemRecibo={listaPagamentos
+            .filter((pagamento) => !listaRecibos.some((recibo) => recibo.pagamento_id === pagamento.id))
+            .map((pagamento) => ({
+              id: pagamento.id,
+              valor_cents: pagamento.valor_cents,
+              data_pagamento: pagamento.data_pagamento,
+            }))}
+        />
       </section>
 
       {/* Pagamentos */}
