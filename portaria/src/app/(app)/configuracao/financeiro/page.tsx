@@ -17,7 +17,7 @@ import {
 } from "@/lib/actions/financeiro";
 import { FinanceiroTabs } from "@/components/admin/financeiro-tabs";
 
-export const metadata = { title: "Financeiro — Portaria" };
+export const metadata = { title: "Financeiro — The DoorKeeper" };
 
 export default async function FinanceiroPage({
   searchParams,

@@ -4,7 +4,7 @@
  *
  * Configuração (variáveis de ambiente):
  *   RESEND_API_KEY  — chave da API Resend (re_...)
- *   EMAIL_FROM      — remetente verificado, ex.: "Portaria <avisos@portaria.pt>"
+ *   EMAIL_FROM      — remetente verificado, ex.: "The DoorKeeper <avisos@portaria.pt>"
  *
  * Se as variáveis não estiverem definidas, o envio degrada para um
  * no-op com aviso no log — a aplicação nunca quebra por causa de email.
@@ -71,7 +71,7 @@ export async function enviarEmail(email: Email): Promise<boolean> {
 }
 
 /**
- * Molde HTML sóbrio, alinhado com a linguagem visual da Portaria.
+ * Molde HTML sóbrio, alinhado com a linguagem visual do The DoorKeeper.
  * Mantemos estilos inline porque os clientes de email ignoram CSS externo.
  */
 export function molde({
@@ -94,7 +94,7 @@ export function molde({
     <h1 style="font-size:22px;font-weight:normal;margin:0 0 20px;color:#2b2a27">${titulo}</h1>
     <div style="font-size:15px;line-height:1.65;color:#4a4741">${corpo}</div>
     ${botao}
-    <p style="margin:36px 0 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9a9384">Portaria</p>
+    <p style="margin:36px 0 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9a9384">The DoorKeeper</p>
   </div>
 </body></html>`;
 }

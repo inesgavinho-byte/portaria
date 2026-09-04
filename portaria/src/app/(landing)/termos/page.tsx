@@ -5,16 +5,16 @@ import {
 } from "@/components/landing/legal-page";
 
 export const metadata: Metadata = {
-  title: { absolute: "Termos de Serviço — Portaria" },
+  title: { absolute: "Termos de Serviço — The DoorKeeper" },
   description:
-    "Termos de utilização da plataforma Portaria de administração de condomínios.",
+    "Termos de utilização da plataforma The DoorKeeper de administração de condomínios.",
 };
 
 const SECOES: LegalSection[] = [
   {
     titulo: "1. O que é a plataforma",
     paragrafos: [
-      "A Portaria é um serviço de administração de condomínios: gestão de membros e frações, ocorrências, documentos, assembleias, financeiro, reservas, comunicações e ferramentas de apoio, incluindo funcionalidades de inteligência artificial quando ativas. Cada condomínio é um espaço isolado; o que lhe diz respeito só é visível dentro do seu condomínio.",
+      "O The DoorKeeper é um serviço de administração de condomínios: gestão de membros e frações, ocorrências, documentos, assembleias, financeiro, reservas, comunicações e ferramentas de apoio, incluindo funcionalidades de inteligência artificial quando ativas. Cada condomínio é um espaço isolado; o que lhe diz respeito só é visível dentro do seu condomínio.",
     ],
   },
   {
@@ -34,13 +34,13 @@ const SECOES: LegalSection[] = [
   {
     titulo: "4. Conteúdo submetido",
     paragrafos: [
-      "Os documentos, fotografias, ocorrências e textos que submete pertencem a quem os submeteu ou a quem este representa. Ao carregá-los, autoriza a Portaria a armazená-los e tratá-los para prestar o serviço ao seu condomínio — nada mais. A Portaria não utiliza o conteúdo de um condomínio para servir outro condomínio. A administração responde pela licitude dos documentos que publica internamente (ex.: ter autorização para publicar uma ata ou um contrato).",
+      "Os documentos, fotografias, ocorrências e textos que submete pertencem a quem os submeteu ou a quem este representa. Ao carregá-los, autoriza o The DoorKeeper a armazená-los e tratá-los para prestar o serviço ao seu condomínio — nada mais. O The DoorKeeper não utiliza o conteúdo de um condomínio para servir outro condomínio. A administração responde pela licitude dos documentos que publica internamente (ex.: ter autorização para publicar uma ata ou um contrato).",
     ],
   },
   {
     titulo: "5. Inteligência artificial",
     paragrafos: [
-      "As funcionalidades de IA (assistente, Conselheira, pesquisa semântica, extração de dados de contratos), quando ativas:",
+      "As funcionalidades de IA (assistente do edifício, pesquisa semântica, extração de dados de contratos), quando ativas:",
     ],
     lista: [
       "respondem com base nos documentos e informações do seu condomínio e citam as fontes quando existem;",
@@ -52,7 +52,7 @@ const SECOES: LegalSection[] = [
   {
     titulo: "6. Dados pessoais",
     paragrafos: [
-      "O tratamento de dados pessoais rege-se pela Política de Privacidade publicada em /privacidade, pelo contrato de subcontratação entre a Portaria e o condomínio e pelos documentos aí referidos (retenção, direitos, subcontratantes).",
+      "O tratamento de dados pessoais rege-se pela Política de Privacidade publicada em /privacidade, pelo contrato de subcontratação entre o The DoorKeeper e o condomínio e pelos documentos aí referidos (retenção, direitos, subcontratantes).",
     ],
   },
   {
@@ -64,19 +64,19 @@ const SECOES: LegalSection[] = [
   {
     titulo: "8. Propriedade intelectual da plataforma",
     paragrafos: [
-      "O software, o desenho e a marca da Portaria pertencem à sua autora. Estes termos não transferem qualquer direito sobre a plataforma; concedem-lhe apenas o direito de a usar enquanto membro de um condomínio cliente.",
+      "O software, o desenho e a marca do The DoorKeeper pertencem à sua autora. Estes termos não transferem qualquer direito sobre a plataforma; concedem-lhe apenas o direito de a usar enquanto membro de um condomínio cliente.",
     ],
   },
   {
     titulo: "9. Limitação de responsabilidade",
     paragrafos: [
-      "Na máxima extensão permitida por lei, a Portaria não responde por danos indiretos, perda de dados imputável à administração do condomínio, nem por decisões tomadas com base nas informações apresentadas pela plataforma (incluindo respostas de IA). A responsabilidade da Portaria perante o condomínio encontra-se regulada no contrato de prestação de serviços.",
+      "Na máxima extensão permitida por lei, o The DoorKeeper não responde por danos indiretos, perda de dados imputável à administração do condomínio, nem por decisões tomadas com base nas informações apresentadas pela plataforma (incluindo respostas de IA). A responsabilidade do The DoorKeeper perante o condomínio encontra-se regulada no contrato de prestação de serviços.",
     ],
   },
   {
     titulo: "10. Cessação",
     paragrafos: [
-      "A administração do condomínio pode remover um membro a qualquer momento, e o próprio membro pode deixar de ter acesso a pedido da administração. No fim do contrato entre a Portaria e o condomínio, os dados são devolvidos ou eliminados nos termos contratuais.",
+      "A administração do condomínio pode remover um membro a qualquer momento, e o próprio membro pode deixar de ter acesso a pedido da administração. No fim do contrato entre o The DoorKeeper e o condomínio, os dados são devolvidos ou eliminados nos termos contratuais.",
     ],
   },
   {
@@ -88,7 +88,7 @@ const SECOES: LegalSection[] = [
   {
     titulo: "12. Lei aplicável",
     paragrafos: [
-      "Aplica-se a lei portuguesa. Contacto: [nome e email de contacto da Portaria — a indicar].",
+      "Aplica-se a lei portuguesa. Contacto: [nome e email de contacto do The DoorKeeper — a indicar].",
     ],
   },
 ];
@@ -97,7 +97,7 @@ export default function TermosPage() {
   return (
     <LegalPage
       titulo="Termos de Serviço"
-      intro="Versão de 2 de setembro de 2026. Estes termos regem a utilização da plataforma Portaria («Plataforma»), explorada por GAVINHO — Arq.ª Inês Gavinho [NIPC e morada — a indicar] («Portaria»). O contrato de prestação de serviços e o contrato de subcontratação de tratamento de dados entre a Portaria e cada condomínio prevalecem sobre estes termos em caso de conflito."
+      intro="Versão de 2 de setembro de 2026. Estes termos regem a utilização da plataforma The DoorKeeper («Plataforma»), explorada por GAVINHO — Arq.ª Inês Gavinho [NIPC e morada — a indicar] («The DoorKeeper»). O contrato de prestação de serviços e o contrato de subcontratação de tratamento de dados entre o The DoorKeeper e cada condomínio prevalecem sobre estes termos em caso de conflito."
       secoes={SECOES}
     />
   );

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { listarRegras } from "@/lib/actions/regras-classificacao";
 import { RegrasClassificacaoForm, type FornecedorOpcao } from "@/components/admin/regras-classificacao-form";
 
-export const metadata = { title: "Regras de triagem — Portaria" };
+export const metadata = { title: "Regras de triagem — The DoorKeeper" };
 
 /**
  * Regras de classificação movimento → fornecedor. Uma regra criada aqui é a

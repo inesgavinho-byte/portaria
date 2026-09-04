@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/supabase/tenant";
 import { ImportarExtratoForm } from "@/components/admin/importar-extrato-form";
 
-export const metadata = { title: "Importar extrato — Portaria" };
+export const metadata = { title: "Importar extrato — The DoorKeeper" };
 
 export default async function ImportarExtratoPage() {
   const ctx = await requireAdmin();

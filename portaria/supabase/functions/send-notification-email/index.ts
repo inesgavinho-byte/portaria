@@ -94,7 +94,7 @@ Deno.serve(async (req: Request) => {
     sistema: "Notificação",
   };
 
-  const subject = `[Portaria] ${tipoLabel[n.tipo] ?? n.tipo}: ${n.titulo}`;
+  const subject = `[The DoorKeeper] ${tipoLabel[n.tipo] ?? n.tipo}: ${n.titulo}`;
   const bodyHtml = `
     <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px;">
       <h2 style="font-size:18px;color:#1a1a1a;margin-bottom:8px;">${n.titulo}</h2>
@@ -115,7 +115,7 @@ Deno.serve(async (req: Request) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Portaria <notificacoes@portaria.app>",
+      from: "The DoorKeeper <notificacoes@portaria.app>",
       to: userEmail,
       subject,
       html: bodyHtml,

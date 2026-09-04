@@ -1,4 +1,5 @@
 import { getCurrentTenant } from "@/lib/supabase/tenant";
+import { DoorKeeperWordmark } from "@/components/brand/doorkeeper-marks";
 
 export async function PublicFooter() {
   const tenant = await getCurrentTenant();
@@ -9,9 +10,8 @@ export async function PublicFooter() {
       <div className="container-page py-12">
         <div className="grid md:grid-cols-2 gap-8">
           <div>
-            <p className="font-title text-lg text-ink mb-2">
-              {tenant?.nome ?? "Portaria"}
-            </p>
+            <DoorKeeperWordmark tone="light" className="mb-3 h-20 w-32 object-contain object-left" />
+            {tenant?.nome && <p className="mb-2 font-title text-lg text-ink">{tenant.nome}</p>}
             {tenant?.morada && (
               <p className="font-body text-sm text-oliveGray">{tenant.morada}</p>
             )}
@@ -24,7 +24,7 @@ export async function PublicFooter() {
               Termos
             </a>
             <span>
-              © {year} {tenant?.nome ?? "Portaria"}. Plataforma desenvolvida em portaria.
+              © {year} {tenant?.nome ?? "The DoorKeeper"}. Plataforma The DoorKeeper.
             </span>
           </div>
         </div>

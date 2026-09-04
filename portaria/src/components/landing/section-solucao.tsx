@@ -30,7 +30,7 @@ const ASSUNTOS = [
 ];
 
 /**
- * Secção 02 — A Portaria coloca tudo no lugar.
+ * Secção 02 — The DoorKeeper coloca tudo no lugar.
  * Fundo escuro; mockup glass do dashboard com anel de luz atrás.
  */
 export function SectionSolucao() {
@@ -48,7 +48,7 @@ export function SectionSolucao() {
           escuro
           titulo={
             <>
-              A Portaria coloca
+              The DoorKeeper coloca
               <br />
               tudo no lugar.
             </>
@@ -101,7 +101,7 @@ export function SectionSolucao() {
               {/* Campo de pergunta */}
               <div className="mt-6 rounded-full border border-white/10 bg-night/60 px-5 py-3 flex items-center justify-between gap-4">
                 <span className="font-body text-sm text-paper/40">
-                  Perguntar à Portaria…
+                  Perguntar ao The DoorKeeper…
                 </span>
                 <ArrowRight className="w-4 h-4 text-warmBeige/70" />
               </div>

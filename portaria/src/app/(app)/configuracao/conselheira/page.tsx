@@ -12,10 +12,10 @@ export default async function ConselheiraConfigPage() {
   return (
     <div className="max-w-3xl">
       <div className="mb-8">
-        <h1 className="font-title text-h1 text-ink mb-2">Conselheira</h1>
+        <h1 className="font-title text-h1 text-ink mb-2">Assistente do edifício</h1>
         <p className="font-body text-oliveGray">
-          A base de conhecimento da Conselheira: a legislação incorporada e o
-          regulamento do {ctx.tenant.nome}. É com isto que ela responde — e
+          A base de conhecimento do assistente: a legislação incorporada e o
+          regulamento do {ctx.tenant.nome}. É com isto que responde — e
           cita sempre a fonte.
         </p>
       </div>

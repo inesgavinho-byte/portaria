@@ -33,7 +33,7 @@ export function ConselheiraConfig({
           <p className="font-body text-sm text-alert">
             A IA está indisponível: falta configurar o servidor local
             (<code>MLX_EMBEDDINGS_URL</code>) ou, em alternativa, a variável{" "}
-            <code>OPENAI_API_KEY</code>. A Conselheira fica indisponível até
+            <code>OPENAI_API_KEY</code>. O assistente fica indisponível até
             isso estar feito.
           </p>
         </div>
@@ -80,7 +80,7 @@ export function ConselheiraConfig({
         <div>
           <h2 className="font-title text-h3 text-warmBeige">Regulamento do condomínio</h2>
           <p className="font-body text-sm text-oliveGray mt-1">
-            Carregue o PDF do regulamento. A Conselheira passa a citá-lo em
+            Carregue o PDF do regulamento. O assistente passa a citá-lo em
             conjunto com a legislação.
           </p>
         </div>

@@ -14,7 +14,7 @@ import {
 } from "@/lib/financeiro/atribuicao-movimentos";
 import { normalizarPadrao } from "@/lib/financeiro/regras-classificacao";
 
-export const metadata = { title: "Atribuição de movimentos — Portaria" };
+export const metadata = { title: "Atribuição de movimentos — The DoorKeeper" };
 
 const VISTAS: { valor: EstadoAtribuicao | "todos"; label: string }[] = [
   { valor: "pendente", label: "Por triar" },

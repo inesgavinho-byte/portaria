@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/supabase/tenant";
 import { listarAtivosManutencao, listarOpcoesManutencao, listarPlanosManutencao, listarTarefasManutencao } from "@/lib/actions/manutencao";
 import { ManutencaoPreventivaPainel } from "@/components/admin/manutencao-preventiva-painel";
 
-export const metadata = { title: "Manutenção preventiva — Portaria" };
+export const metadata = { title: "Manutenção preventiva — The DoorKeeper" };
 
 export default async function ManutencaoPage() {
   const ctx = await requireAdmin();
