@@ -22,10 +22,10 @@ export function FracaoActions({ fracaoId }: { fracaoId: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 shrink-0">
+    <div className="flex shrink-0 items-center gap-1">
       <Link
         href={`/fracoes/${fracaoId}/editar`}
-        className="p-2 text-oliveGray hover:text-ink hover:bg-softCream/50 rounded transition-colors"
+        className="rounded-full p-2 text-oliveGray transition-colors hover:bg-britishGreenSoft hover:text-doorkeeperTurquoise"
         title="Editar"
         aria-label="Editar"
       >
@@ -34,10 +34,10 @@ export function FracaoActions({ fracaoId }: { fracaoId: string }) {
       <button
         onClick={handleDelete}
         disabled={isPending}
-        className={`p-2 rounded transition-colors disabled:opacity-50 ${
+        className={`rounded-full p-2 transition-colors disabled:opacity-50 ${
           confirming
             ? "bg-alert text-paper"
-            : "text-oliveGray hover:text-ink hover:bg-softCream/50"
+            : "text-oliveGray hover:bg-doorkeeperTerracotta/10 hover:text-doorkeeperTerracotta"
         }`}
         title={confirming ? "Confirmar eliminação" : "Apagar"}
         aria-label="Apagar"
