@@ -59,7 +59,7 @@ export function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
+          className="w-full rounded-xl border border-black/[0.1] bg-white px-4 py-3 font-body text-ink outline-none transition-colors focus:border-doorkeeperTurquoise focus:ring-2 focus:ring-doorkeeperTurquoise/10"
         />
       </div>
 
@@ -76,7 +76,7 @@ export function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-3 border border-warmBeige/40 bg-paper font-body text-ink focus:outline-none focus:border-warmBeige"
+          className="w-full rounded-xl border border-black/[0.1] bg-white px-4 py-3 font-body text-ink outline-none transition-colors focus:border-doorkeeperTurquoise focus:ring-2 focus:ring-doorkeeperTurquoise/10"
         />
       </div>
 
@@ -85,7 +85,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50"
+        className="w-full rounded-xl bg-doorkeeperTerracotta py-3.5 font-body text-sm font-semibold text-white transition-colors hover:bg-doorkeeperBrown disabled:opacity-50"
       >
         {loading ? "A entrar..." : "Entrar"}
       </button>

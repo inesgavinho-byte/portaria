@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/supabase/tenant";
 import { obterMapaContasAnual } from "@/lib/actions/mapa-contas";
 import { MapaContasAnualView } from "@/components/admin/mapa-contas-anual";
 
-export const metadata = { title: "Mapa de contas — Portaria" };
+export const metadata = { title: "Mapa de contas — The DoorKeeper" };
 
 export default async function MapaContasPage({
   searchParams,

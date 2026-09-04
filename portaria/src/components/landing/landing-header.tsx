@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { DoorKeeperWordmark } from "@/components/brand/doorkeeper-marks";
 
 /**
  * Header discreto da landing — flutua sobre o hero escuro.
@@ -10,12 +11,9 @@ export function LandingHeader() {
       <div className="container-page flex items-center justify-between py-6">
         <Link
           href="/"
-          className="flex items-center gap-3 text-paper hover:opacity-80 transition-opacity"
+          className="transition-opacity hover:opacity-80"
         >
-          <ArchMark />
-          <span className="font-body text-sm tracking-[0.35em] uppercase">
-            Portaria
-          </span>
+          <DoorKeeperWordmark tone="charcoal" priority className="h-16 w-28 object-contain object-left" />
         </Link>
 
         <nav className="flex items-center gap-8">
@@ -39,7 +37,7 @@ export function LandingHeader() {
           </Link>
           <Link
             href="/contactos"
-            className="group inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2 font-body text-sm text-paper hover:bg-white/10 transition-colors"
+            className="group inline-flex items-center gap-2 rounded-full bg-doorkeeperTerracotta px-5 py-2.5 font-body text-sm font-semibold text-white transition-colors hover:bg-white hover:text-ink"
           >
             Ver demonstração
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -47,15 +45,5 @@ export function LandingHeader() {
         </nav>
       </div>
     </header>
-  );
-}
-
-/** Marca: arco de portaria desenhado em CSS. */
-function ArchMark() {
-  return (
-    <span
-      aria-hidden
-      className="block w-5 h-6 border border-paper/80 rounded-t-full"
-    />
   );
 }

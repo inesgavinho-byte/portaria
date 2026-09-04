@@ -2,12 +2,9 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
-  BellRing,
-  Building2,
   CalendarDays,
   CircleCheck,
   FileClock,
-  Landmark,
   MessageSquareText,
   ReceiptText,
   ShieldCheck,
@@ -309,142 +306,167 @@ export default async function HojePage() {
     .sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
     .slice(0, 5);
 
+  const nomePerfil = [
+    ctx.user.user_metadata?.nome,
+    ctx.user.user_metadata?.full_name,
+    ctx.user.email?.split("@")[0]?.replace(/[._-]+/g, " "),
+  ].find((valor): valor is string => typeof valor === "string" && valor.trim().length > 0);
+  const nome = nomePerfil
+    ? nomePerfil.trim().split(/\s+/)[0].replace(/^./, (letra) => letra.toUpperCase())
+    : null;
+
   return (
-    <div className="space-y-4 pb-8">
-      <header className="mb-1">
-        <h1 className="font-title text-h1 text-ink">Hoje</h1>
-        <p className="mt-1 font-body text-sm text-oliveGray">{dataHoje()}</p>
+    <div className="pb-12">
+      <header className="mb-12 grid gap-6 border-b border-black/[0.07] pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div>
+          <p className="doorkeeper-eyebrow mb-5">{dataHoje()}</p>
+          <h1 className="max-w-3xl font-title text-[clamp(3.2rem,6vw,5.8rem)] font-normal leading-[0.95] text-ink">
+            Bom dia{nome ? `, ${nome}` : ""}.
+          </h1>
+          <p className="mt-6 font-body text-base text-oliveGray md:text-lg">
+            {atencao.length > 0
+              ? `${atencao.length === 1 ? "Há um assunto" : `Há ${atencao.length} assuntos`} que precisa${atencao.length === 1 ? "" : "m"} de ti.`
+              : "Não há assuntos prioritários neste momento."}
+          </p>
+        </div>
+        <Link
+          href="/configuracao"
+          className="doorkeeper-link inline-flex items-center gap-2 lg:pb-1"
+        >
+          {ctx.tenant.nome}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </header>
 
-      {atencao.length > 0 ? (
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {atencao.slice(0, 4).map((item, index) => (
-            <Link
-              key={`${item.titulo}-${index}`}
-              href={item.href}
-              className={`group flex min-h-[180px] flex-col rounded-2xl border p-5 shadow-glass transition-all hover:-translate-y-0.5 hover:shadow-float ${
-                item.tom === "dark"
-                  ? "border-britishGreen bg-britishGreen text-white"
-                  : item.tom === "soft"
-                    ? "border-britishGreen/10 bg-britishGreenSoft/80 text-ink"
-                    : "border-white/80 bg-white/80 text-ink"
-              }`}
-            >
-              <div className="mb-5 flex items-start justify-between gap-3">
-                <span
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border ${
-                    item.tom === "dark"
-                      ? "border-white/40 bg-white text-britishGreen"
-                      : "border-britishGreen/10 bg-white/70 text-britishGreen"
-                  }`}
-                >
-                  {item.icon}
-                </span>
-                <ArrowRight className={`h-4 w-4 transition-transform group-hover:translate-x-1 ${item.tom === "dark" ? "text-white/70" : "text-britishGreen"}`} />
+      <div className="grid gap-14 xl:grid-cols-[minmax(0,1.55fr)_minmax(19rem,0.65fr)] xl:gap-16">
+        <section>
+          <p className="doorkeeper-eyebrow mb-4">As tuas prioridades</p>
+          {atencao.length > 0 ? (
+            <ol className="doorkeeper-list">
+              {atencao.slice(0, 4).map((item, index) => (
+                <li key={`${item.titulo}-${index}`}>
+                  <Link
+                    href={item.href}
+                    className="group grid min-h-[7.25rem] grid-cols-[3.25rem_1fr_auto] items-center gap-4 py-5 transition-colors hover:bg-white/55 sm:grid-cols-[4.25rem_1fr_auto] sm:px-3"
+                  >
+                    <span className="font-title text-3xl font-normal text-doorkeeperTurquoise sm:text-4xl">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-title text-xl font-normal text-ink sm:text-2xl">
+                        {item.titulo}
+                      </span>
+                      <span className="mt-1 block font-body text-sm text-oliveGray">
+                        {item.subtitulo}
+                        {item.valor ? ` · ${item.valor}` : ""}
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-3 pl-2">
+                      <span className="hidden font-body text-xs font-medium text-doorkeeperTerracotta sm:block">
+                        {item.detalhe}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-ink transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <div className="flex min-h-40 items-center gap-4 border-y border-black/[0.07] py-8">
+              <CircleCheck className="h-5 w-5 text-doorkeeperTurquoise" />
+              <div>
+                <p className="font-title text-2xl text-ink">Tudo tratado.</p>
+                <p className="mt-1 font-body text-sm text-oliveGray">
+                  O edifício não precisa da tua atenção neste momento.
+                </p>
               </div>
-              <p className={`font-body text-sm font-semibold ${item.tom === "dark" ? "text-white" : "text-ink"}`}>{item.titulo}</p>
-              <p className={`mt-1 font-body text-xs ${item.tom === "dark" ? "text-white/70" : "text-oliveGray"}`}>{item.subtitulo}</p>
-              {item.valor && <p className={`mt-3 font-body text-2xl font-semibold tracking-[-0.03em] ${item.tom === "dark" ? "text-white" : "text-ink"}`}>{item.valor}</p>}
-              <p className={`mt-auto pt-4 font-body text-xs ${item.tom === "dark" ? "text-white/75" : "text-britishGreen"}`}>{item.detalhe}</p>
-            </Link>
-          ))}
+            </div>
+          )}
         </section>
-      ) : (
-        <div className="flex items-center gap-3 rounded-2xl border border-britishGreen/10 bg-britishGreenSoft/80 p-5">
-          <CircleCheck className="h-5 w-5 text-britishGreen" />
-          <p className="font-body text-sm text-ink">Não há assuntos prioritários neste momento.</p>
-        </div>
-      )}
 
-      <section className="grid gap-4 xl:grid-cols-[0.72fr_1.28fr]">
-        <Painel titulo="Hoje no condomínio" href="/timeline" link="Ver histórico">
-          {atividade.length === 0 ? (
-            <Vazio texto="Ainda não há actividade registada." />
-          ) : (
-            <div className="divide-y divide-britishGreen/10">
-              {atividade.slice(0, 4).map((a, index) => (
-                <Link key={`${a.titulo}-${index}`} href={a.href} className="grid grid-cols-[54px_1fr] gap-3 py-3 first:pt-0 last:pb-0">
-                  <span className="font-body text-xs font-semibold text-britishGreen">
-                    {new Intl.DateTimeFormat("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).format(new Date(a.data))}
-                  </span>
-                  <span>
-                    <span className="block font-body text-sm font-medium text-ink">{a.titulo}</span>
-                    <span className="mt-0.5 block font-body text-xs text-oliveGray">{a.detalhe}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </Painel>
-
-        <Painel titulo={`Financeiro ${hoje.slice(0, 4)}`} href="/configuracao/financeiro/mapa" link="Ver mapa de contas">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Metrica label="Recebido este mês" valor={euro(recebidoMes)} />
-            <Metrica label="Pago no banco este mês" valor={euro(pagoBancoMes)} />
-            <Metrica label="Por reconciliar" valor={euro(valorPorReconciliar)} alerta={valorPorReconciliar > 0} />
-            <Metrica label="Recebido no ano" valor={euro(recebidoAno)} />
-          </div>
-          {valorPorReconciliar > 0 && (
-            <Link href="/configuracao/financeiro" className="mt-4 flex items-center justify-between gap-4 rounded-xl bg-britishGreenSoft/80 px-4 py-3 text-britishGreen">
-              <span className="flex items-center gap-2 font-body text-xs font-medium">
-                <BellRing className="h-4 w-4" />
-                {porReconciliar.length} despesas ainda precisam de reconciliação.
-              </span>
-              <ArrowRight className="h-4 w-4 shrink-0" />
+        <aside className="border-black/[0.08] xl:border-l xl:pl-10">
+          <section className="border-b border-black/[0.07] pb-8">
+            <p className="doorkeeper-eyebrow">Edifício em foco</p>
+            <h2 className="mt-4 font-title text-3xl font-normal text-ink">
+              {ctx.tenant.nome}
+            </h2>
+            <p className="mt-2 font-body text-sm text-oliveGray">
+              Centro operacional do condomínio
+            </p>
+            <Link href="/configuracao" className="doorkeeper-link mt-5 inline-flex items-center gap-2">
+              Ver detalhes <ArrowRight className="h-3.5 w-3.5" />
             </Link>
-          )}
-        </Painel>
-      </section>
+          </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Painel titulo="Próximos 7 dias" href="/calendario" link="Ver calendário">
-          {proximos.length === 0 ? (
-            <Vazio texto="Sem eventos ou vencimentos nos próximos 7 dias." />
-          ) : (
-            <div className="divide-y divide-britishGreen/10">
-              {proximos.map((evento, index) => (
-                <Link key={`${evento.titulo}-${index}`} href={evento.href ?? "/calendario"} className="grid grid-cols-[58px_1fr] gap-3 py-3 first:pt-0 last:pb-0">
-                  <span className="rounded-lg bg-britishGreenSoft px-2 py-2 text-center font-body text-xs font-semibold text-britishGreen">
-                    {new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", timeZone: "Europe/Lisbon" }).format(new Date(evento.data))}
-                  </span>
-                  <span>
-                    <span className="block font-body text-sm font-medium text-ink">{evento.titulo}</span>
-                    <span className="mt-0.5 block font-body text-xs text-oliveGray">{evento.detalhe}</span>
-                  </span>
-                </Link>
-              ))}
+          <section className="border-b border-black/[0.07] py-8">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-title text-2xl font-normal text-ink">Próximos 7 dias</h2>
+              <Link href="/calendario" className="doorkeeper-link text-xs">Calendário</Link>
             </div>
-          )}
-        </Painel>
+            {proximos.length === 0 ? (
+              <p className="mt-5 font-body text-sm text-oliveGray">Sem eventos próximos.</p>
+            ) : (
+              <div className="mt-5 divide-y divide-black/[0.07]">
+                {proximos.slice(0, 3).map((evento, index) => (
+                  <Link key={`${evento.titulo}-${index}`} href={evento.href ?? "/calendario"} className="grid grid-cols-[4rem_1fr] gap-3 py-3">
+                    <span className="font-body text-xs font-semibold uppercase text-oliveGray">
+                      {new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", timeZone: "Europe/Lisbon" }).format(new Date(evento.data))}
+                    </span>
+                    <span>
+                      <span className="block font-body text-sm font-medium text-ink">{evento.titulo}</span>
+                      <span className="mt-0.5 block font-body text-xs text-oliveGray">{evento.detalhe}</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </section>
 
+          <section className="pt-8">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="font-title text-2xl font-normal text-ink">Resumo financeiro</h2>
+              <Link href="/configuracao/financeiro" className="doorkeeper-link text-xs">Abrir</Link>
+            </div>
+            <dl className="mt-5 space-y-3">
+              <LinhaFinanceira label="Recebido este mês" valor={euro(recebidoMes)} />
+              <LinhaFinanceira label="Pago este mês" valor={euro(pagoBancoMes)} />
+              <LinhaFinanceira label="Por reconciliar" valor={euro(valorPorReconciliar)} alerta={valorPorReconciliar > 0} />
+              <LinhaFinanceira label="Recebido no ano" valor={euro(recebidoAno)} destaque />
+            </dl>
+          </section>
+        </aside>
+      </div>
+
+      <section className="mt-16 grid gap-12 border-t border-black/[0.07] pt-10 lg:grid-cols-2">
         <Painel titulo="Em aberto">
-          <div className="divide-y divide-britishGreen/10">
+          <div className="divide-y divide-black/[0.07]">
             <LinhaAberto icon={<Wrench className="h-4 w-4" />} label="Ocorrências" valor={ocorrenciasList.length} href="/configuracao/ocorrencias" />
             <LinhaAberto icon={<ReceiptText className="h-4 w-4" />} label="Despesas por reconciliar" valor={porReconciliar.length} href="/configuracao/financeiro" />
             <LinhaAberto icon={<FileClock className="h-4 w-4" />} label="Obrigações activas" valor={obrigacoesList.length} href="/configuracao/financeiro" />
             <LinhaAberto icon={<MessageSquareText className="h-4 w-4" />} label="Comunicações por tratar" valor={comunicacoesAbertas.length} href="/comunicacoes" />
           </div>
         </Painel>
-      </section>
 
-      <Painel titulo="Últimas alterações" href="/timeline" link="Ver histórico completo">
-        {atividade.length === 0 ? (
-          <Vazio texto="Ainda não existem alterações recentes." />
-        ) : (
-          <div className="divide-y divide-britishGreen/10">
-            {atividade.map((a, index) => (
-              <Link key={`${a.titulo}-footer-${index}`} href={a.href} className="grid gap-2 py-3 first:pt-0 last:pb-0 md:grid-cols-[110px_190px_1fr_auto] md:items-center">
-                <span className="font-body text-xs text-oliveGray">
-                  {new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).format(new Date(a.data))}
-                </span>
-                <span className="font-body text-xs font-semibold text-britishGreen">{a.titulo}</span>
-                <span className="truncate font-body text-sm text-ink">{a.detalhe}</span>
-                <ArrowRight className="hidden h-4 w-4 text-britishGreen md:block" />
-              </Link>
-            ))}
-          </div>
-        )}
-      </Painel>
+        <Painel titulo="Últimas alterações" href="/timeline" link="Ver histórico">
+          {atividade.length === 0 ? (
+            <Vazio texto="Ainda não existem alterações recentes." />
+          ) : (
+            <div className="divide-y divide-black/[0.07]">
+              {atividade.slice(0, 4).map((item, index) => (
+                <Link key={`${item.titulo}-footer-${index}`} href={item.href} className="grid grid-cols-[5.5rem_1fr] gap-3 py-3">
+                  <span className="font-body text-xs text-oliveGray">
+                    {new Intl.DateTimeFormat("pt-PT", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Lisbon" }).format(new Date(item.data))}
+                  </span>
+                  <span>
+                    <span className="block font-body text-sm font-medium text-ink">{item.titulo}</span>
+                    <span className="mt-0.5 block truncate font-body text-xs text-oliveGray">{item.detalhe}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </Painel>
+      </section>
     </div>
   );
 }
@@ -461,9 +483,9 @@ function Painel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-white/80 bg-white/80 p-5 shadow-glass backdrop-blur-glass">
+    <section>
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 className="font-title text-lg font-semibold text-ink">{titulo}</h2>
+        <h2 className="font-title text-2xl font-normal text-ink">{titulo}</h2>
         {href && link && (
           <Link href={href} className="inline-flex items-center gap-1 font-body text-xs font-medium text-britishGreen hover:text-britishGreenDeep">
             {link} <ArrowRight className="h-3.5 w-3.5" />
@@ -475,11 +497,11 @@ function Painel({
   );
 }
 
-function Metrica({ label, valor, alerta = false }: { label: string; valor: string; alerta?: boolean }) {
+function LinhaFinanceira({ label, valor, alerta = false, destaque = false }: { label: string; valor: string; alerta?: boolean; destaque?: boolean }) {
   return (
-    <div className="rounded-xl border border-britishGreen/10 bg-white/70 p-4">
-      <p className="font-body text-xs text-oliveGray">{label}</p>
-      <p className={`mt-2 font-body text-xl font-semibold tracking-[-0.03em] ${alerta ? "text-alert" : "text-ink"}`}>{valor}</p>
+    <div className={`flex items-center justify-between gap-4 font-body text-sm ${destaque ? "border-t border-black/[0.07] pt-4" : ""}`}>
+      <dt className="text-oliveGray">{label}</dt>
+      <dd className={`${alerta ? "text-alert" : "text-ink"} ${destaque ? "font-semibold" : "font-medium"}`}>{valor}</dd>
     </div>
   );
 }
@@ -488,11 +510,11 @@ function LinhaAberto({ icon, label, valor, href }: { icon: React.ReactNode; labe
   return (
     <Link href={href} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
       <span className="flex items-center gap-3 font-body text-sm text-ink">
-        <span className="text-britishGreen">{icon}</span>
+        <span className="text-doorkeeperTurquoise">{icon}</span>
         {label}
       </span>
       <span className="flex items-center gap-3">
-        <span className="min-w-7 rounded-full bg-britishGreenSoft px-2 py-1 text-center font-body text-xs font-semibold text-britishGreen">{valor}</span>
+        <span className="min-w-7 font-body text-xs font-semibold text-doorkeeperTurquoise">{valor}</span>
         <ArrowRight className="h-4 w-4 text-oliveGray" />
       </span>
     </Link>
@@ -501,8 +523,8 @@ function LinhaAberto({ icon, label, valor, href }: { icon: React.ReactNode; labe
 
 function Vazio({ texto }: { texto: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-britishGreenSoft/70 px-4 py-4">
-      <CircleCheck className="h-4 w-4 text-britishGreen" />
+    <div className="flex items-center gap-3 py-4">
+      <CircleCheck className="h-4 w-4 text-doorkeeperTurquoise" />
       <p className="font-body text-sm text-oliveGray">{texto}</p>
     </div>
   );

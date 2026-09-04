@@ -9,25 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // PORTARIA — fresco, digital, institucional. British green como cor de presença.
-        britishGreen: "#0B4A35",
-        britishGreenDeep: "#073829",
-        britishGreenSoft: "#E7F0EC",
-        // Aliases mantidos para compatibilidade enquanto os módulos transitam para o novo sistema.
-        warmBeige: "#BFCBC5",
-        softCream: "#F3F7F5",
-        oliveGray: "#65746D",
-        ink: "#17201C",
+        // THE DOORKEEPER — cores do manual de identidade.
+        doorkeeperGreen: "#3B433A",
+        doorkeeperTurquoise: "#00A29B",
+        doorkeeperTerracotta: "#AC4735",
+        doorkeeperBrown: "#543B31",
+        graphite: "#2E2D2C",
+        // Aliases mantidos para a migração visual dos módulos existentes.
+        britishGreen: "#3B433A",
+        britishGreenDeep: "#2E2D2C",
+        britishGreenSoft: "#E9F5F4",
+        warmBeige: "#D8D5CF",
+        softCream: "#F6F6F3",
+        oliveGray: "#6D706B",
+        ink: "#2E2D2C",
         paper: "#FFFFFF",
-        night: "#09110E",
-        nightSoft: "#101B17",
-        success: "#187653",
-        alert: "#B04444",
+        night: "#343332",
+        nightSoft: "#3B433A",
+        success: "#3B6E60",
+        alert: "#AC4735",
       },
       fontFamily: {
-        // Linguagem de produto: sans neutra, próxima do sistema Apple, sem herança editorial GAVINHO.
-        title: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", "sans-serif"],
-        body: ["-apple-system", "BlinkMacSystemFont", "SF Pro Text", "Inter", "Segoe UI", "sans-serif"],
+        // A marca usa Silvalyn; esta pilha mantém o desenho editorial até os
+        // ficheiros licenciados da fonte serem adicionados ao projecto.
+        title: ["Bodoni 72", "Didot", "Bodoni MT", "Times New Roman", "serif"],
+        body: ["Avenir Next", "Inter", "SF Pro Text", "Segoe UI", "sans-serif"],
       },
       fontSize: {
         display: ["3rem", { lineHeight: "1.04", letterSpacing: "-0.04em" }],
@@ -36,8 +42,8 @@ const config: Config = {
         h3: ["1.25rem", { lineHeight: "1.25", letterSpacing: "-0.015em" }],
       },
       boxShadow: {
-        glass: "0 18px 55px rgba(23, 32, 28, 0.08)",
-        float: "0 8px 30px rgba(23, 32, 28, 0.10)",
+        glass: "0 22px 60px rgba(46, 45, 44, 0.055)",
+        float: "0 12px 34px rgba(46, 45, 44, 0.09)",
       },
       backdropBlur: {
         glass: "22px",

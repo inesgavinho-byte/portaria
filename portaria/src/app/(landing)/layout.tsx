@@ -3,13 +3,13 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingFooter } from "@/components/landing/landing-footer";
 
 export const metadata: Metadata = {
-  title: { absolute: "Portaria — Clareza. Memória. Tranquilidade." },
+  title: { absolute: "The DoorKeeper — O edifício, finalmente em ordem." },
   description:
-    "A Portaria organiza o presente, guarda o passado e prepara o futuro do seu condomínio.",
+    "Operação diária, arquivo e comunicação do seu condomínio num único lugar.",
 };
 
 /**
- * Layout da landing pública da Portaria (produto).
+ * Layout da landing pública do The DoorKeeper (produto).
  * Não depende de tenant: é a montra do produto, igual em qualquer domínio.
  */
 export default function LandingLayout({

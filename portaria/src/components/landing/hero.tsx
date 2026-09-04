@@ -1,65 +1,41 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { DoorKeeperWordmark } from "@/components/brand/doorkeeper-marks";
 
 /**
- * Hero full-viewport: fundo escuro arquitectónico construído em CSS
- * (arco de luz quente, parede e chão em gradiente), texto à esquerda,
- * marca iluminada à direita, indicação de scroll.
+ * Hero editorial, construído a partir da identidade The DoorKeeper.
  */
 export function LandingHero() {
   return (
-    <section className="relative min-h-svh overflow-hidden bg-night flex items-center">
-      {/* --- Cenário arquitectónico --- */}
+    <section className="relative flex min-h-svh items-center overflow-hidden bg-night">
       <div aria-hidden className="absolute inset-0">
-        {/* Penumbra de base — parede */}
-        <div className="absolute inset-0 bg-gradient-to-b from-night via-[#101014] to-[#16161a]" />
-
-        {/* Arco de luz quente — o elemento central, com deriva lenta */}
-        <div className="glow-drift absolute top-[8%] right-[-10%] w-[70vmin] h-[70vmin] md:right-[8%]">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_50%,rgba(173,170,150,0.45),rgba(173,170,150,0.12)_45%,transparent_72%)] blur-2xl" />
-          <div className="absolute inset-[6%] rounded-full border border-warmBeige/40 [mask-image:linear-gradient(115deg,transparent_40%,black_70%)]" />
-        </div>
-
-        {/* Feixe de luz que corta a parede na diagonal */}
-        <div className="absolute inset-y-0 right-[18%] w-[38%] bg-gradient-to-b from-warmBeige/[0.12] via-transparent to-transparent [transform:skewX(-12deg)]" />
-
-        {/* Chão — reflexo suave em baixo */}
-        <div className="absolute bottom-0 inset-x-0 h-[28%] bg-gradient-to-t from-[#1b1b20] to-transparent" />
-        <div className="absolute bottom-0 right-[10%] w-[50vmin] h-px bg-gradient-to-r from-transparent via-warmBeige/30 to-transparent" />
+        <div className="absolute inset-y-0 right-0 hidden w-[43%] bg-doorkeeperGreen lg:block" />
+        <div className="absolute bottom-0 right-[43%] hidden h-44 w-44 translate-x-1/2 translate-y-1/2 rounded-full bg-doorkeeperTurquoise lg:block" />
       </div>
 
-      {/* --- Marca iluminada na parede, à direita --- */}
       <div
-        aria-hidden
-        className="hero-enter absolute right-[10%] top-[34%] hidden lg:flex flex-col items-center gap-4 [animation-delay:600ms]"
+        className="hero-enter absolute right-[5%] top-1/2 hidden w-[34%] -translate-y-1/2 lg:block [animation-delay:600ms]"
       >
-        <span className="block w-10 h-12 border border-warmBeige/70 rounded-t-full" />
-        <span className="font-body text-xs tracking-[0.5em] uppercase text-warmBeige/90">
-          Portaria
-        </span>
+        <DoorKeeperWordmark tone="green" priority className="h-auto w-full object-contain" />
       </div>
 
-      {/* --- Conteúdo --- */}
       <div className="container-page relative z-10 w-full pt-28 pb-24">
-        <div className="max-w-2xl">
-          <p className="hero-enter font-body text-xs tracking-[0.35em] uppercase text-paper/50 mb-8">
-            Gestão inteligente de condomínios
+        <div className="max-w-3xl lg:max-w-[52%]">
+          <p className="hero-enter mb-8 font-body text-xs font-semibold uppercase tracking-[0.28em] text-doorkeeperTurquoise">
+            Gestão operacional de condomínios
           </p>
-          <h1 className="hero-enter font-title text-[clamp(3rem,9vw,5.5rem)] leading-[1.05] text-paper [animation-delay:120ms]">
-            Clareza.
-            <br />
-            Memória.
-            <br />
-            Tranquilidade.
+          <h1 className="hero-enter font-title text-[clamp(3.6rem,8vw,7.5rem)] font-normal leading-[0.88] text-paper [animation-delay:120ms]">
+            O edifício,
+            <br /> finalmente
+            <br /> em ordem.
           </h1>
-          <p className="hero-enter font-body text-base md:text-lg text-paper/60 max-w-md mt-10 [animation-delay:280ms]">
-            A Portaria organiza o presente, guarda o passado e prepara o
-            futuro do seu condomínio.
+          <p className="hero-enter mt-10 max-w-md font-body text-base leading-relaxed text-paper/62 md:text-lg [animation-delay:280ms]">
+            Operação diária, arquivo e comunicação num único lugar — para quem administra e para quem vive no condomínio.
           </p>
           <div className="hero-enter mt-12 [animation-delay:420ms]">
             <Link
               href="/contactos"
-              className="group inline-flex items-center gap-3 rounded-full bg-paper text-night px-8 py-4 font-body text-sm tracking-wide hover:bg-warmBeige hover:text-night transition-colors"
+              className="group inline-flex items-center gap-3 rounded-full bg-doorkeeperTerracotta px-8 py-4 font-body text-sm font-semibold text-white transition-colors hover:bg-paper hover:text-night"
             >
               Ver demonstração
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -68,7 +44,6 @@ export function LandingHero() {
         </div>
       </div>
 
-      {/* --- Indicação de scroll --- */}
       <div
         aria-hidden
         className="absolute bottom-8 left-6 md:left-[max(1.5rem,calc((100vw-72rem)/2))] flex items-center gap-4"

@@ -4,34 +4,32 @@
 
 @layer base {
   :root {
-    --font-title: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, "Segoe UI", sans-serif;
-    --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, "Segoe UI", sans-serif;
+    --font-title: "Bodoni 72", Didot, "Bodoni MT", "Times New Roman", serif;
+    --font-body: "Avenir Next", Inter, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
 
-    --color-primary: #0B4A35;
-    --color-secondary: #F3F7F5;
-    --color-accent: #187653;
+    --color-primary: #3B433A;
+    --color-secondary: #F6F6F3;
+    --color-accent: #00A29B;
+    --color-action: #AC4735;
   }
 
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: #edf3f0;
+    background: #f6f6f3;
   }
 
   body {
     @apply text-ink font-body;
-    background:
-      radial-gradient(circle at 18% 0%, rgba(11, 74, 53, 0.12), transparent 34rem),
-      radial-gradient(circle at 92% 16%, rgba(24, 118, 83, 0.08), transparent 30rem),
-      linear-gradient(180deg, #f7faf8 0%, #edf3f0 100%);
+    background: #f6f6f3;
     min-height: 100vh;
     font-feature-settings: 'kern', 'liga', 'calt';
   }
 
   h1, h2, h3, h4 {
     @apply font-title text-ink;
-    font-weight: 600;
-    letter-spacing: -0.035em;
+    font-weight: 400;
+    letter-spacing: -0.04em;
   }
 
   h1 { @apply text-h1 md:text-display; }
@@ -39,7 +37,7 @@
   h3 { @apply text-h3 md:text-h2; }
 
   ::selection {
-    background: rgba(11, 74, 53, 0.18);
+    background: rgba(0, 162, 155, 0.22);
   }
 }
 
@@ -88,23 +86,35 @@
   }
 
   .glass-surface {
-    @apply border border-white/70 bg-white/70 backdrop-blur-glass shadow-glass;
+    @apply border border-black/[0.06] bg-white/80 backdrop-blur-glass shadow-glass;
   }
 
   .glass-surface-strong {
-    @apply border border-white/80 bg-white/80 backdrop-blur-glass shadow-float;
+    @apply border border-black/[0.06] bg-white/90 backdrop-blur-glass shadow-float;
   }
 
   .portaria-panel {
-    @apply rounded-3xl border border-white/75 bg-white/75 backdrop-blur-glass shadow-glass;
+    @apply rounded-2xl border border-black/[0.07] bg-white/90 shadow-glass;
   }
 
   .portaria-button-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-britishGreen px-4 py-2.5 font-body text-sm font-medium text-white transition-all hover:bg-britishGreenDeep hover:shadow-float active:scale-[0.99];
+    @apply inline-flex items-center justify-center rounded-xl bg-doorkeeperTerracotta px-4 py-2.5 font-body text-sm font-medium text-white transition-all hover:bg-doorkeeperBrown hover:shadow-float active:scale-[0.99];
   }
 
   .portaria-button-secondary {
-    @apply inline-flex items-center justify-center rounded-xl border border-britishGreen/20 bg-white/70 px-4 py-2.5 font-body text-sm font-medium text-britishGreen backdrop-blur-md transition-all hover:bg-white hover:border-britishGreen/25;
+    @apply inline-flex items-center justify-center rounded-xl border border-black/10 bg-white/70 px-4 py-2.5 font-body text-sm font-medium text-ink backdrop-blur-md transition-all hover:border-doorkeeperTurquoise/40 hover:text-doorkeeperTurquoise;
+  }
+
+  .doorkeeper-eyebrow {
+    @apply font-body text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-oliveGray;
+  }
+
+  .doorkeeper-list {
+    @apply divide-y divide-black/[0.07] border-y border-black/[0.07];
+  }
+
+  .doorkeeper-link {
+    @apply font-body text-sm font-medium text-doorkeeperTurquoise transition-colors hover:text-doorkeeperGreen;
   }
 
   .prose table {

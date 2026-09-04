@@ -93,7 +93,7 @@ export function Conselheira() {
                 <div>
                   <h2 className="font-title text-lg text-ink leading-none">Conselheira</h2>
                   <p className="font-body text-[11px] tracking-widest uppercase text-oliveGray mt-1">
-                    Portaria
+                    The DoorKeeper
                   </p>
                 </div>
               </div>

@@ -10,7 +10,7 @@ const PERGUNTAS = [
 ];
 
 /**
- * Secção 03 — Pergunte. A Portaria responde.
+ * Secção 03 — Pergunte. The DoorKeeper responde.
  * Fundo claro; perguntas em lista limpa, estilo command palette.
  */
 export function SectionIa() {
@@ -22,7 +22,7 @@ export function SectionIa() {
           titulo={
             <>
               Pergunte.
-              <br />A Portaria responde.
+              <br />The DoorKeeper responde.
             </>
           }
           linhas={["A inteligência que conhece o seu condomínio."]}

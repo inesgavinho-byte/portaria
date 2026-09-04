@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/supabase/tenant";
 import { listarMovimentosRecebimento } from "@/lib/actions/recebimentos";
 import { RecebimentoClassificacao } from "@/components/admin/recebimento-classificacao";
 
-export const metadata = { title: "Recebimentos por classificar — Portaria" };
+export const metadata = { title: "Recebimentos por classificar — The DoorKeeper" };
 
 const euro = (cents: number) =>
   new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(cents / 100);

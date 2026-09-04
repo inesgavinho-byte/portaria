@@ -11,12 +11,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const tenant = await getCurrentTenant();
   return {
     title: {
-      default: tenant?.nome ?? "Portaria",
-      template: `%s · ${tenant?.nome ?? "Portaria"}`,
+      default: tenant?.nome ?? "The DoorKeeper",
+      template: `%s · ${tenant?.nome ?? "The DoorKeeper"}`,
     },
     description: tenant
       ? `Plataforma digital do ${tenant.nome}`
-      : "Plataforma digital de gestão de condomínios",
+      : "Gestão operacional e memória digital de condomínios",
   };
 }
 

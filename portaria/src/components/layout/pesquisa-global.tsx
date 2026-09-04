@@ -24,18 +24,18 @@ export function PesquisaGlobal() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto w-full max-w-6xl" role="search">
+    <form onSubmit={submit} className="w-full max-w-sm" role="search">
       <div className="relative">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-oliveGray" />
         <input
           type="search"
           value={valor}
           onChange={(event) => setValor(event.target.value)}
-          placeholder="Pesquisar no condomínio…"
-          aria-label="Pesquisar no condomínio"
-          className="h-11 w-full rounded-2xl border border-white/80 bg-white/70 pl-11 pr-4 font-body text-sm text-ink shadow-sm outline-none backdrop-blur-xl transition-all placeholder:text-oliveGray/70 focus:border-britishGreen/25 focus:bg-white focus:ring-4 focus:ring-britishGreen/5"
+          placeholder="Pesquisar ou perguntar"
+          aria-label="Pesquisar ou perguntar"
+          className="h-11 w-full rounded-xl border border-black/[0.07] bg-white/80 pl-11 pr-4 font-body text-sm text-ink shadow-glass outline-none backdrop-blur-xl transition-all placeholder:text-oliveGray/70 focus:border-doorkeeperTurquoise/35 focus:bg-white focus:ring-4 focus:ring-doorkeeperTurquoise/5"
         />
-        {isPending && <span className="absolute right-4 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-britishGreen animate-pulse" />}
+        {isPending && <span className="absolute right-4 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-doorkeeperTurquoise" />}
       </div>
     </form>
   );

@@ -1,6 +1,6 @@
-# portaria
+# THE DOORKEEPER
 
-Plataforma digital multi-tenant para administração de condomínios.
+Escritório operacional multi-tenant para administração de condomínios.
 
 Stack: **Next.js 15** (App Router, TypeScript) + **Supabase** (Postgres, Auth, Storage) + **Tailwind CSS** + **Netlify** (hosting).
 

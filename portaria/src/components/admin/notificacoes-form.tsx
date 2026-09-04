@@ -25,12 +25,12 @@ export function NotificacoesForm({ inicial }: { inicial: boolean }) {
         </div>
       )}
 
-      <label className="flex items-start gap-3 font-body text-ink cursor-pointer border border-warmBeige/30 p-5">
+      <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-black/[0.07] bg-white p-5 font-body text-ink">
         <input
           type="checkbox"
           name="notificacoes_email"
           defaultChecked={inicial}
-          className="w-4 h-4 accent-warmBeige mt-0.5"
+          className="mt-0.5 h-4 w-4 accent-doorkeeperTurquoise"
         />
         <span>
           <span className="block text-ink">Receber notificações por email</span>
@@ -44,7 +44,7 @@ export function NotificacoesForm({ inicial }: { inicial: boolean }) {
       <button
         type="submit"
         disabled={pending}
-        className="px-8 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors disabled:opacity-50"
+        className="rounded-xl bg-doorkeeperTerracotta px-7 py-3 font-body text-sm font-semibold text-white transition-colors hover:bg-doorkeeperBrown disabled:opacity-50"
       >
         {pending ? "A guardar..." : "Guardar preferência"}
       </button>
