@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Plus, UserPlus, FolderOpen } from "lucide-react";
+import { Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { FracaoActions } from "@/components/admin/fracao-actions";
+import { FracoesDirectory } from "@/components/admin/fracoes-directory";
 import type { Fracao } from "@/types/database";
 
 export default async function FracoesPage() {
@@ -18,98 +18,82 @@ export default async function FracoesPage() {
     .order("codigo", { ascending: true });
 
   const lista: Fracao[] = fracoes ?? [];
-  const totalPermilagem = lista.reduce((s, f) => s + (f.permilagem ?? 0), 0);
+  const totalPermilagem = lista.reduce(
+    (soma, fracao) => soma + Number(fracao.permilagem ?? 0),
+    0,
+  );
+  const arrendadas = lista.filter((fracao) => fracao.inquilino_nome).length;
+  const incompletas = lista.filter(
+    (fracao) =>
+      !fracao.proprietario_nome ||
+      (!fracao.proprietario_email && !fracao.proprietario_telefone) ||
+      fracao.permilagem == null,
+  ).length;
+  const permilagemCompleta = Math.abs(totalPermilagem - 1000) < 0.01;
 
   return (
-    <div>
-      <div className="flex items-start justify-between mb-8">
+    <div className="pb-12">
+      <header className="flex flex-col gap-8 border-b border-black/[0.07] pb-9 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="font-title text-h1 text-ink mb-2">Frações</h1>
-          <p className="font-body text-oliveGray">
-            As frações do {ctx.tenant.nome}, respetivos proprietários e
-            permilagens.
+          <p className="doorkeeper-eyebrow mb-5">Edifício · Pessoas e propriedade</p>
+          <h1 className="font-title text-[clamp(3.4rem,7vw,6.2rem)] font-normal leading-[0.88] text-ink">
+            {lista.length} {lista.length === 1 ? "fração" : "frações"}.
+          </h1>
+          <p className="mt-6 max-w-xl font-body text-base leading-relaxed text-oliveGray">
+            O registo central de proprietários, inquilinos e dados de cada unidade do {ctx.tenant.nome}.
           </p>
         </div>
         <Link
           href="/fracoes/nova"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-ink text-paper font-body text-sm tracking-widest uppercase hover:bg-oliveGray transition-colors"
+          className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 self-start rounded-full bg-doorkeeperTerracotta px-6 font-body text-sm font-semibold text-white transition-colors hover:bg-doorkeeperBrown md:self-auto"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           Nova fração
         </Link>
-      </div>
+      </header>
 
-      {lista.length === 0 ? (
-        <div className="bg-paper border border-warmBeige/20 p-12 text-center">
-          <p className="font-body text-oliveGray mb-4">
-            Ainda não há frações registadas.
-          </p>
-          <Link
-            href="/fracoes/nova"
-            className="font-body text-sm text-warmBeige hover:text-oliveGray transition-colors tracking-widest uppercase"
-          >
-            Criar a primeira
-          </Link>
-        </div>
-      ) : (
-        <>
-          <div className="bg-paper border border-warmBeige/20 divide-y divide-warmBeige/10">
-            {lista.map((f) => (
-              <div key={f.id} className="p-4 flex items-center gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-3">
-                    <h2 className="font-title text-lg text-ink">{f.codigo}</h2>
-                    {f.tipologia && (
-                      <span className="font-body text-xs text-oliveGray">
-                        {f.tipologia}
-                      </span>
-                    )}
-                    {f.permilagem != null && (
-                      <span className="font-body text-xs text-oliveGray">
-                        · {f.permilagem}‰
-                      </span>
-                    )}
-                  </div>
-                  <p className="font-body text-sm text-oliveGray mt-1 truncate">
-                    {f.proprietario_nome ?? "Sem proprietário registado"}
-                    {f.inquilino_nome && ` · inquilino: ${f.inquilino_nome}`}
-                  </p>
-                </div>
-                <Link
-                  href={`/fracoes/${f.id}`}
-                  title="Abrir dossiê administrativo da fração"
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 border border-warmBeige/40 font-body text-[11px] tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors"
-                >
-                  <FolderOpen className="w-3.5 h-3.5" /> Dossiê
-                </Link>
-                <Link
-                  href={`/configuracao/membros/novo?role=inquilino&fracao=${encodeURIComponent(f.codigo)}`}
-                  title="Convidar inquilino para esta fração"
-                  className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 border border-warmBeige/40 font-body text-[11px] tracking-widest uppercase text-oliveGray hover:text-ink hover:border-warmBeige transition-colors"
-                >
-                  <UserPlus className="w-3.5 h-3.5" /> Inquilino
-                </Link>
-                <FracaoActions fracaoId={f.id} />
-              </div>
-            ))}
-          </div>
+      <dl className="grid grid-cols-2 border-b border-black/[0.07] lg:grid-cols-4">
+        <Resumo label="Registadas" valor={String(lista.length)} />
+        <Resumo label="Arrendadas" valor={String(arrendadas)} />
+        <Resumo
+          label="A completar"
+          valor={String(incompletas)}
+          alerta={incompletas > 0}
+        />
+        <Resumo
+          label="Permilagem"
+          valor={`${totalPermilagem.toLocaleString("pt-PT", { maximumFractionDigits: 2 })}‰`}
+          detalhe={permilagemCompleta ? "Completa" : "Deve somar 1 000‰"}
+          alerta={!permilagemCompleta}
+        />
+      </dl>
 
-          <div className="mt-4 flex items-center justify-between font-body text-sm">
-            <span className="text-oliveGray">
-              {lista.length} {lista.length === 1 ? "fração" : "frações"}
-            </span>
-            <span
-              className={
-                Math.abs(totalPermilagem - 1000) < 0.01
-                  ? "text-success"
-                  : "text-oliveGray"
-              }
-            >
-              Permilagem total: {totalPermilagem.toFixed(2)}‰
-              {Math.abs(totalPermilagem - 1000) >= 0.01 && " (deve somar 1000)"}
-            </span>
-          </div>
-        </>
+      <FracoesDirectory fracoes={lista} />
+    </div>
+  );
+}
+
+function Resumo({
+  label,
+  valor,
+  detalhe,
+  alerta = false,
+}: {
+  label: string;
+  valor: string;
+  detalhe?: string;
+  alerta?: boolean;
+}) {
+  return (
+    <div className="border-r border-black/[0.07] px-1 py-6 last:border-r-0 sm:px-5 lg:py-7">
+      <dt className="doorkeeper-eyebrow">{label}</dt>
+      <dd className={`mt-2 font-title text-3xl font-normal ${alerta ? "text-doorkeeperTerracotta" : "text-ink"}`}>
+        {valor}
+      </dd>
+      {detalhe && (
+        <p className={`mt-1 font-body text-xs ${alerta ? "text-doorkeeperTerracotta" : "text-oliveGray"}`}>
+          {detalhe}
+        </p>
       )}
     </div>
   );
