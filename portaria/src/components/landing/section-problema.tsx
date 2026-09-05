@@ -1,74 +1,50 @@
-import { X } from "lucide-react";
 import { Reveal } from "./reveal";
 import { SectionIntro } from "./section-intro";
 
 const FRAGMENTOS = [
   {
-    label: "Documentos por todo o lado",
-    tom: "bg-[linear-gradient(160deg,#26262c,#17171b_65%)]",
+    titulo: "Documentos",
+    texto: "Atas, contratos e comprovativos espalhados por pastas e emails.",
   },
   {
-    label: "Conversas que se perdem",
-    tom: "bg-[linear-gradient(200deg,#222228,#141418_60%)]",
+    titulo: "Conversas",
+    texto: "Decisões importantes perdidas entre mensagens sem histórico comum.",
   },
   {
-    label: "Prazos que falham",
-    tom: "bg-[linear-gradient(150deg,#2a2822,#18170f_70%)]",
+    titulo: "Prazos",
+    texto: "Seguros, inspeções e tarefas que só aparecem quando já são urgentes.",
   },
   {
-    label: "Histórico sem ligação",
-    tom: "bg-[linear-gradient(190deg,#242424,#101012_65%)]",
+    titulo: "Contexto",
+    texto: "Informação que depende da memória de uma única pessoa.",
   },
 ];
 
-/**
- * Secção 01 — O problema é o caos.
- * Fundo claro; fragmentos escuros e dispersos representam o ruído.
- */
 export function SectionProblema() {
   return (
-    <section className="bg-softCream">
-      <div className="container-page py-24 md:py-36 grid lg:grid-cols-[1fr_1.4fr] gap-16 items-center">
+    <section className="bg-graphite">
+      <div className="container-page grid gap-16 py-24 md:py-36 lg:grid-cols-[0.85fr_1.15fr] lg:gap-24">
         <SectionIntro
           numero="01"
+          escuro
           titulo={
             <>
-              O problema
-              <br />é o caos.
+              O trabalho acontece.
+              <br />O contexto perde-se.
             </>
           }
-          linhas={[
-            "Informação espalhada.",
-            "Decisões sem contexto.",
-            "Tempo perdido.",
-          ]}
+          linhas={["A gestão fragmentada cria urgência onde devia existir continuidade."]}
         />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="border-t border-white/20">
           {FRAGMENTOS.map((fragmento, i) => (
-            <Reveal key={fragmento.label} delay={i * 120}>
-              <div
-                className={`${fragmento.tom} group relative aspect-[3/4] border border-ink/10 p-4 flex flex-col justify-end transition-transform duration-500 hover:-translate-y-1.5 ${
-                  i % 2 === 1 ? "md:translate-y-6" : ""
-                }`}
-              >
-                <span
-                  aria-hidden
-                  className="absolute top-3 right-3 w-6 h-6 rounded-full border border-white/15 text-white/40 flex items-center justify-center"
-                >
-                  <X className="w-3 h-3" />
+            <Reveal key={fragmento.titulo} delay={i * 80}>
+              <div className="grid gap-3 border-b border-white/20 py-6 transition-colors hover:border-doorkeeperTurquoise sm:grid-cols-[3.5rem_10rem_1fr] sm:gap-5">
+                <span className="font-body text-[0.65rem] font-semibold tracking-[0.16em] text-doorkeeperTurquoise">
+                  0{i + 1}
                 </span>
-                <span
-                  aria-hidden
-                  className="absolute inset-x-4 top-1/3 space-y-2 opacity-30"
-                >
-                  <span className="block h-px bg-white/40 w-4/5" />
-                  <span className="block h-px bg-white/40 w-3/5" />
-                  <span className="block h-px bg-white/40 w-2/3" />
-                </span>
-                <p className="font-body text-sm text-paper/90 leading-snug">
-                  {fragmento.label}
-                </p>
+                <h3 className="font-title text-2xl text-white">{fragmento.titulo}</h3>
+                <p className="max-w-md font-body text-sm leading-6 text-white/55">{fragmento.texto}</p>
               </div>
             </Reveal>
           ))}

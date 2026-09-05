@@ -2,29 +2,23 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Reveal } from "./reveal";
 
-/**
- * Fecho da landing — convite silencioso, sem densidade.
- */
 export function SectionCta() {
   return (
-    <section className="relative bg-night overflow-hidden">
-      <div
-        aria-hidden
-        className="absolute -bottom-1/2 left-1/2 -translate-x-1/2 w-[90vmin] h-[90vmin] rounded-full bg-[radial-gradient(circle,rgba(173,170,150,0.14),transparent_65%)]"
-      />
-      <div className="container-page relative py-28 md:py-40 text-center">
-        <Reveal>
-          <h2 className="font-title text-[clamp(2.2rem,5vw,3.4rem)] leading-[1.15] text-paper mb-10">
-            O seu condomínio,
-            <br />
-            finalmente em ordem.
-          </h2>
+    <section className="bg-doorkeeperTerracotta">
+      <div className="container-page py-24 md:py-32">
+        <Reveal className="grid items-end gap-10 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="mb-6 font-body text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-white/60">Próximo passo</p>
+            <h2 className="max-w-4xl font-title text-[clamp(3rem,6.5vw,6rem)] leading-[0.9] text-white">
+              Vamos pôr o seu condomínio em ordem?
+            </h2>
+          </div>
           <Link
             href="/contactos"
-            className="group inline-flex items-center gap-3 rounded-full bg-paper text-night px-8 py-4 font-body text-sm tracking-wide hover:bg-warmBeige transition-colors"
+            className="group inline-flex w-fit items-center gap-3 bg-night px-7 py-4 font-body text-sm font-semibold text-white transition-colors hover:bg-doorkeeperGreen"
           >
             Ver demonstração
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </Reveal>
       </div>

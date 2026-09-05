@@ -1,34 +1,62 @@
-import Image from "next/image";
+type BrandTone = "green" | "charcoal" | "light" | "turquoise" | "terracotta";
 
-type WordmarkProps = {
-  tone?: "green" | "charcoal" | "light";
+type BrandMarkProps = {
+  tone?: BrandTone;
   className?: string;
   priority?: boolean;
 };
 
+const TONE_CLASS: Record<BrandTone, string> = {
+  green: "text-doorkeeperTurquoise",
+  charcoal: "text-white",
+  light: "text-ink",
+  turquoise: "text-doorkeeperTurquoise",
+  terracotta: "text-doorkeeperTerracotta",
+};
+
+function BrandMask({
+  src,
+  label,
+  tone,
+  className,
+  priority,
+}: BrandMarkProps & { src: string; label: string }) {
+  const mask = `url(${src})`;
+
+  return (
+    <span
+      role="img"
+      aria-label={label}
+      data-priority={priority || undefined}
+      className={`inline-block shrink-0 bg-current ${TONE_CLASS[tone ?? "light"]} ${className ?? ""}`}
+      style={{
+        maskImage: mask,
+        WebkitMaskImage: mask,
+        maskPosition: "center",
+        WebkitMaskPosition: "center",
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+      }}
+    />
+  );
+}
+
 /**
- * Marcas extraídas do manual original. Mantêm o desenho e as proporções
- * aprovadas; não são uma reconstrução tipográfica do logótipo.
+ * Marca oficial vetorizada a partir do original aprovado. O SVG é usado como
+ * máscara para manter a mesma geometria em qualquer escala e em todas as cores.
  */
 export function DoorKeeperWordmark({
-  tone = "green",
+  tone = "light",
   className = "",
   priority = false,
-}: WordmarkProps) {
-  const green = tone === "green";
-  const light = tone === "light";
+}: BrandMarkProps) {
   return (
-    <Image
-      src={
-        green
-          ? "/brand/doorkeeper-wordmark-green.png"
-          : light
-            ? "/brand/doorkeeper-wordmark-light.png"
-            : "/brand/doorkeeper-wordmark-charcoal.png"
-      }
-      alt="The DoorKeeper"
-      width={green ? 220 : 480}
-      height={green ? 140 : 300}
+    <BrandMask
+      src="/brand/doorkeeper-wordmark.svg"
+      label="The DoorKeeper"
+      tone={tone}
       priority={priority}
       className={className}
     />
@@ -36,18 +64,15 @@ export function DoorKeeperWordmark({
 }
 
 export function DoorKeeperMonogram({
+  tone = "light",
   className = "",
   priority = false,
-}: {
-  className?: string;
-  priority?: boolean;
-}) {
+}: BrandMarkProps) {
   return (
-    <Image
-      src="/brand/doorkeeper-monogram.png"
-      alt="The DoorKeeper"
-      width={360}
-      height={360}
+    <BrandMask
+      src="/brand/doorkeeper-monogram.svg"
+      label="The DoorKeeper"
+      tone={tone}
       priority={priority}
       className={className}
     />
