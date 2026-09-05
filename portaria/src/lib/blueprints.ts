@@ -67,6 +67,53 @@ const ATA = `<h2>Ata da Assembleia de Condóminos n.º {{assembleia.numero}}</h2
 <ol><li>&nbsp;</li><li>&nbsp;</li></ol>
 <p>Nada mais havendo a tratar, foi encerrada a reunião, da qual se lavrou a presente ata que vai ser assinada.</p>`;
 
+const CIRCULAR_QUOTAS_ATRASO = `<p><strong>ASSUNTO:</strong> {{circular.assunto}}</p>
+<p>Exmos. Senhores Condóminos,</p>
+<p>Verificámos que se encontram em atraso as quotas de algumas fracções, cujo pagamento é indispensável à manutenção corrente do edifício.</p>
+<p><strong>Situação de quotas em atraso</strong></p>
+<table><tbody><tr><th>Fracção</th><th>Período em atraso</th><th>Valor em dívida</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>
+<p><strong>Pagamento</strong></p>
+<p>IBAN: {{condominio.iban}}<br>Titular: {{condominio.nome}}<br>NIF: {{condominio.nif}}</p>
+<p>Solicita-se a regularização até ao fim do mês corrente. Para combinar um plano de pagamento, os condóminos interessados deverão contactar a administração — é sempre preferível a um incumprimento prolongado. Se a situação já se encontrar regularizada, pedimos que ignorem esta comunicação.</p>
+<p>Com os melhores cumprimentos,</p>`;
+
+const CIRCULAR_OBRAS = `<p><strong>ASSUNTO:</strong> {{circular.assunto}}</p>
+<p>Exmos. Senhores Condóminos,</p>
+<p>Vimos informar que vão realizar-se trabalhos nas partes comuns do edifício, na sequência de deliberação da assembleia / nos termos do regulamento do condomínio:</p>
+<table><tbody><tr><th>Trabalhos</th><th>Período previsto</th><th>Horário</th><th>Empresa</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>
+<p>Pede-se que durante os trabalhos fiquem livres os acessos indicados pela empresa e que sejam adoptadas as precauções habituais. Eventuais alterações ao previsto serão comunicadas atempadamente.</p>
+<p>Agradecemos a compreensão e colaboração de todos.</p>`;
+
+const CIRCULAR_INFORMATIVA = `<p><strong>ASSUNTO:</strong> {{circular.assunto}}</p>
+<p>Exmos. Senhores Condóminos,</p>
+<p>Vimos informar o seguinte:</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>Agradecemos a atenção de todos. Para qualquer esclarecimento, contacte a administração.</p>
+<p>Com os melhores cumprimentos,</p>`;
+
+const CONVOCATORIA_EXTRAORDINARIA = `<h2>Convocatória — Assembleia de Condóminos Extraordinária n.º {{assembleia.numero}}</h2>
+<p>Nos termos da lei e do regulamento do condomínio, convocam-se os Exmos. Senhores Condóminos para a Assembleia Extraordinária a realizar no dia {{assembleia.data}}, no local habitual, com a seguinte ordem de trabalhos:</p>
+<p><strong>Ordem de trabalhos</strong></p>
+<ol><li>&nbsp;</li><li>&nbsp;</li><li>Outros assuntos de interesse para o condomínio.</li></ol>
+<p>Não se verificando quórum à hora marcada, a Assembleia reunirá trinta minutos depois, no mesmo local, com qualquer número de condóminos presentes.</p>
+<p>Com os melhores cumprimentos,</p>`;
+
+const PEDIDO_ORCAMENTO = `<p>Exmos. Senhores,</p>
+<p>A administração do {{condominio.nome}}, sito em {{condominio.morada}} (NIF {{condominio.nif}}), solicita a apresentação de orçamento para a seguinte intervenção nas partes comuns do edifício:</p>
+<table><tbody><tr><th>Descrição dos trabalhos</th><th>Local</th><th>Prazo pretendido</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>
+<p>Agradecemos que o orçamento indique o preço total e discriminado (materiais, mão de obra e IVA à taxa em vigor), o prazo de execução após adjudicação e a garantia oferecida.</p>
+<p>A adjudicação carece de aprovação do condomínio e não gera, por si, obrigação de contratação. Contactos para esclarecimentos: {{condominio.email}}.</p>
+<p>Com os melhores cumprimentos,</p>`;
+
+const COMUNICACAO_DIVIDA = `<p>Ex.mo(a) Senhor(a),</p>
+<p>Proprietário(a) da fracção n.º ____</p>
+<p>Apesar da comunicação anterior, permanece por regularizar a dívida de quotas deste condomínio no valor de ____ , assim discriminada:</p>
+<table><tbody><tr><th>Período</th><th>Quota</th><th>Valor em dívida</th></tr><tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table>
+<p>O pagamento das quotas destinadas às despesas comuns constitui obrigação de todo o condómino. Solicita-se a regularização integral até ____ , por transferência bancária para o IBAN {{condominio.iban}} (Titular: {{condominio.nome}}; NIF: {{condominio.nif}}).</p>
+<p>Decorrido o prazo sem pagamento nem acordo escrito, a administração ver-se-á obrigada a promover a cobrança coerciva da dívida, com acréscimo de juros de mora e encargos associados.</p>
+<p>Com os melhores cumprimentos,</p>`;
+
 export const BLUEPRINTS_BASE: BlueprintBase[] = [
   {
     tipo: "circular",
@@ -110,10 +157,58 @@ export const BLUEPRINTS_BASE: BlueprintBase[] = [
       "assembleia.data",
     ],
   },
+  {
+    tipo: "circular",
+    nome: "Circular de Quotas em Atraso",
+    conteudo_template: CIRCULAR_QUOTAS_ATRASO,
+    variaveis: ["circular.assunto", "condominio.nome", "condominio.nif", "condominio.iban"],
+  },
+  {
+    tipo: "circular",
+    nome: "Circular de Aviso de Obras",
+    conteudo_template: CIRCULAR_OBRAS,
+    variaveis: ["circular.assunto"],
+  },
+  {
+    tipo: "circular",
+    nome: "Circular Informativa",
+    conteudo_template: CIRCULAR_INFORMATIVA,
+    variaveis: ["circular.assunto"],
+  },
+  {
+    tipo: "convocatoria",
+    nome: "Convocatória — Assembleia Extraordinária",
+    conteudo_template: CONVOCATORIA_EXTRAORDINARIA,
+    variaveis: ["assembleia.numero", "assembleia.data"],
+  },
+  {
+    tipo: "outro",
+    nome: "Pedido de Orçamento",
+    conteudo_template: PEDIDO_ORCAMENTO,
+    variaveis: ["condominio.nome", "condominio.morada", "condominio.nif", "condominio.email"],
+  },
+  {
+    tipo: "outro",
+    nome: "Comunicação de Dívida de Quotas",
+    conteudo_template: COMUNICACAO_DIVIDA,
+    variaveis: ["condominio.nome", "condominio.nif", "condominio.iban"],
+  },
 ];
 
 export type DadosAssembleia = { numero?: string | null; data?: string | null };
 export type DadosCircular = { numero?: string | null; assunto?: string | null };
+
+/** Tokens {{...}} do corpo que existem em VARIAVEIS_DISPONIVEIS, sem repetidos. */
+export function variaveisUsadas(conteudo: string): string[] {
+  const validos = new Set(VARIAVEIS_DISPONIVEIS.map((v) => v.token));
+  return [
+    ...new Set(
+      [...conteudo.matchAll(/\{\{\s*([\w.]+)\s*\}\}/g)]
+        .map((m) => m[1])
+        .filter((t) => validos.has(t))
+    ),
+  ];
+}
 
 /** Linha em branco para o utilizador completar (nunca deixamos {{token}}). */
 const POR_PREENCHER = "____________";
