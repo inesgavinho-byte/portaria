@@ -5,11 +5,7 @@ import { SectionIa } from "@/components/landing/section-ia";
 import { SectionConfianca } from "@/components/landing/section-confianca";
 import { SectionCta } from "@/components/landing/section-cta";
 
-/**
- * Landing do The DoorKeeper — narrativa em scroll:
- * hero (sombra) → problema (luz) → solução (sombra) →
- * IA (luz) → confiança (sombra) → convite final.
- */
+/** Landing editorial do The DoorKeeper. */
 export default function LandingPage() {
   return (
     <>

@@ -1,46 +1,41 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { DoorKeeperWordmark } from "@/components/brand/doorkeeper-marks";
 
-/**
- * Header discreto da landing — flutua sobre o hero escuro.
- */
 export function LandingHeader() {
   return (
-    <header className="absolute top-0 inset-x-0 z-50">
-      <div className="container-page flex items-center justify-between py-6">
-        <Link
-          href="/"
-          className="transition-opacity hover:opacity-80"
-        >
-          <DoorKeeperWordmark tone="charcoal" priority className="h-16 w-28 object-contain object-left" />
+    <header className="absolute inset-x-0 top-0 z-50">
+      <div className="container-page flex items-center justify-between py-6 md:py-8">
+        <Link href="/" aria-label="The DoorKeeper — início" className="transition-opacity hover:opacity-65">
+          <DoorKeeperWordmark tone="light" priority className="h-11 w-28 sm:h-12 sm:w-[8.5rem]" />
         </Link>
 
-        <nav className="flex items-center gap-8">
+        <nav className="flex items-center gap-6 md:gap-9" aria-label="Navegação principal">
           <a
             href="#produto"
-            className="hidden md:inline font-body text-sm text-paper/60 hover:text-paper transition-colors"
+            className="hidden font-body text-xs font-semibold uppercase tracking-[0.14em] text-ink/65 transition-colors hover:text-ink md:inline"
           >
             Produto
           </a>
           <a
             href="#confianca"
-            className="hidden md:inline font-body text-sm text-paper/60 hover:text-paper transition-colors"
+            className="hidden font-body text-xs font-semibold uppercase tracking-[0.14em] text-ink/65 transition-colors hover:text-ink md:inline"
           >
             Segurança
           </a>
           <Link
             href="/login"
-            className="hidden sm:inline font-body text-sm text-paper/60 hover:text-paper transition-colors"
+            className="hidden font-body text-xs font-semibold uppercase tracking-[0.14em] text-ink/65 transition-colors hover:text-ink sm:inline"
           >
             Entrar
           </Link>
           <Link
             href="/contactos"
-            className="group inline-flex items-center gap-2 rounded-full bg-doorkeeperTerracotta px-5 py-2.5 font-body text-sm font-semibold text-white transition-colors hover:bg-white hover:text-ink"
+            className="group inline-flex items-center gap-2 bg-doorkeeperTerracotta px-4 py-3 font-body text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-doorkeeperBrown sm:px-5"
           >
-            Ver demonstração
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            <span className="sm:hidden">Demo</span>
+            <span className="hidden sm:inline">Demonstração</span>
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </nav>
       </div>
