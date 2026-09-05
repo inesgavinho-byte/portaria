@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/tenant";
-import { TIPOS_BLUEPRINT } from "@/lib/blueprints";
+import { TIPOS_BLUEPRINT, variaveisUsadas } from "@/lib/blueprints";
 import { renderBlueprintPdf } from "@/lib/pdf/blueprint-pdf";
 import {
   montarDocumentoHtml,
@@ -207,7 +207,8 @@ export async function criarBlueprint(
       nome,
       tipo,
       conteudo_template: sanitizarHtml(conteudo),
-      variaveis: [],
+      // Variáveis efetivamente usadas no corpo, para as mostrar no catálogo.
+      variaveis: variaveisUsadas(conteudo),
     })
     .select("id")
     .single();
