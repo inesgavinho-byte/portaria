@@ -718,6 +718,8 @@ export type ConfiguracaoFinanceira = {
   moeda: string;
   taxa_juros_mora: number | null;
   ultimo_numero_recibo: number;
+  /** Emissão + envio automáticos de recibo quando um pagamento é confirmado. */
+  recibo_auto_email: boolean;
   atualizado_em: string;
 };
 
@@ -772,6 +774,8 @@ export type Recibo = {
   periodo_inicio: string | null;
   periodo_fim: string | null;
   pdf_url: string | null;
+  /** Path do PDF no bucket "documentos". Null = ainda sem PDF gerado. */
+  pdf_path: string | null;
   estado: "emitido" | "anulado";
   /** Quando chegou ao condómino. Null = ainda por enviar. */
   enviado_em: string | null;

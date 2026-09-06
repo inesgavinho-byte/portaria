@@ -31,6 +31,7 @@ import {
 } from "@/types/database";
 import { CalendarioAdministrativo as CalendarioAdministrativoDados, DashboardFinanceiro, DespesaResumo, OpcaoFinanceira, gerarQuotasMensais, emitirRecibo, anularRecibo, type QuotaAberta } from "@/lib/actions/financeiro";
 import { associarQuotasAPagamento, type AssociacaoFormState } from "@/lib/actions/recebimentos";
+import { enviarReciboPorEmail, verReciboPdf } from "@/lib/actions/recibo-automatico";
 import { DespesasObrigacoesPainel } from "@/components/admin/despesas-obrigacoes-painel";
 import { CalendarioAdministrativo } from "@/components/admin/calendario-administrativo";
 
@@ -467,6 +468,20 @@ function TabRecibos({ recibos }: { recibos: Recibo[] }) {
     });
   }
 
+  async function handlePdf(reciboId: string) {
+    const res = await verReciboPdf(reciboId);
+    if (res.url) window.open(res.url, "_blank");
+    else alert(res.error ?? "Erro a gerar o PDF.");
+  }
+
+  function handleEnviar(reciboId: string) {
+    startTransition(async () => {
+      const res = await enviarReciboPorEmail(reciboId);
+      if (res.error) alert(res.error);
+      router.refresh();
+    });
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -510,18 +525,41 @@ function TabRecibos({ recibos }: { recibos: Recibo[] }) {
                       ? `${r.periodo_inicio.slice(0, 7)} → ${r.periodo_fim.slice(0, 7)}`
                       : "—"}
                   </td>
-                  <td className="px-3 py-2">{estadoBadge(r.estado)}</td>
+                  <td className="px-3 py-2">
+                    {estadoBadge(r.estado)}
+                    <div className="mt-1 font-body text-xs text-oliveGray flex items-center gap-1">
+                      {r.enviado_em ? (
+                        <>
+                          <CheckCircle className="w-3 h-3 text-success" />
+                          Enviado por email
+                        </>
+                      ) : (
+                        <>
+                          <Clock className="w-3 h-3" />
+                          Por enviar
+                        </>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-3 py-2 text-right">
-                    {r.pdf_url && (
-                      <a
-                        href={r.pdf_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    {r.pdf_path && (
+                      <button
+                        onClick={() => handlePdf(r.id)}
+                        disabled={pending}
                         className="inline-flex items-center gap-1 text-sm text-ink hover:text-oliveGray transition-colors mr-3"
                       >
                         <Download className="w-3.5 h-3.5" />
                         PDF
-                      </a>
+                      </button>
+                    )}
+                    {r.estado === "emitido" && !r.enviado_em && (
+                      <button
+                        onClick={() => handleEnviar(r.id)}
+                        disabled={pending}
+                        className="text-sm text-ink hover:text-oliveGray transition-colors mr-3"
+                      >
+                        {pending ? "A enviar…" : "Enviar por email"}
+                      </button>
                     )}
                     {r.estado === "emitido" && (
                       <button
@@ -643,6 +681,30 @@ function TabConfiguracao({ configuracao }: { configuracao: ConfiguracaoFinanceir
             min={0}
             className="w-full px-3 py-2 border border-warmBeige/30 bg-paper font-body text-sm text-ink"
           />
+        </div>
+
+        <div className="flex items-start gap-3 border border-warmBeige/30 p-4">
+          <input
+            id="recibo_auto_email"
+            type="checkbox"
+            name="recibo_auto_email"
+            defaultChecked={configuracao?.recibo_auto_email ?? true}
+            className="mt-1"
+          />
+          <div>
+            <label
+              htmlFor="recibo_auto_email"
+              className="block font-body text-xs tracking-widest uppercase text-ink mb-1"
+            >
+              Recibo automático por email
+            </label>
+            <p className="font-body text-xs text-oliveGray">
+              Quando um pagamento é confirmado, o sistema emite o recibo,
+              gera o PDF e envia-o por email aos contactos da fração com um
+              ligação para download (válido 7 dias). Falhas ficam visíveis
+              na lista de recibos como &quot;por enviar&quot;.
+            </p>
+          </div>
         </div>
 
         <button
