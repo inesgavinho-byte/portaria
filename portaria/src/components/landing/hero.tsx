@@ -1,66 +1,68 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { DoorKeeperMonogram } from "@/components/brand/doorkeeper-marks";
+
+const PRINCIPIOS = [
+  ["01", "Operação", "O dia-a-dia num só lugar"],
+  ["02", "Memória", "Decisões com contexto"],
+  ["03", "Clareza", "Informação para todos"],
+] as const;
 
 export function LandingHero() {
   return (
-    <section className="min-h-svh overflow-hidden bg-softCream">
-      <div className="container-page grid min-h-svh items-center gap-14 pb-16 pt-32 lg:grid-cols-[1.1fr_0.72fr] lg:gap-20 lg:pb-12 lg:pt-28">
-        <div className="max-w-3xl lg:py-16">
-          <p className="hero-enter mb-7 font-body text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-doorkeeperTurquoise">
-            Gestão operacional de condomínios
-          </p>
-          <h1 className="hero-enter max-w-[10ch] font-title text-[clamp(3.7rem,7.6vw,7rem)] font-normal leading-[0.86] text-ink [animation-delay:100ms]">
-            O edifício, finalmente em ordem.
-          </h1>
-          <p className="hero-enter mt-9 max-w-xl font-body text-base leading-7 text-ink/65 md:text-lg [animation-delay:220ms]">
-            Operação diária, arquivo e comunicação no mesmo lugar — com contexto para quem administra e clareza para quem vive no condomínio.
-          </p>
+    <section className="relative min-h-svh overflow-hidden bg-graphite text-white">
+      <div aria-hidden className="absolute inset-y-0 right-0 w-1.5 bg-doorkeeperTurquoise md:w-2" />
 
-          <div className="hero-enter mt-10 flex flex-wrap items-center gap-6 [animation-delay:340ms]">
-            <Link
-              href="/contactos"
-              className="group inline-flex items-center gap-3 bg-doorkeeperTerracotta px-7 py-4 font-body text-sm font-semibold text-white transition-colors hover:bg-doorkeeperBrown"
-            >
-              Ver demonstração
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/login"
-              className="border-b border-ink/30 pb-1 font-body text-sm font-semibold text-ink transition-colors hover:border-doorkeeperTurquoise hover:text-doorkeeperTurquoise"
-            >
-              Entrar na área reservada
-            </Link>
+      <div className="container-page flex min-h-svh flex-col pb-8 pt-32 md:pb-10 md:pt-36">
+        <div className="flex flex-1 items-center py-12 md:py-16">
+          <div className="w-full">
+            <p className="hero-enter mb-7 flex items-center gap-4 font-body text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-doorkeeperTurquoise">
+              Gestão operacional de condomínios
+              <span className="h-px w-14 bg-doorkeeperTurquoise/50" />
+            </p>
+
+            <h1 className="hero-enter max-w-[10ch] font-title text-[clamp(4.15rem,9.4vw,8.75rem)] font-normal leading-[0.82] text-white [animation-delay:100ms]">
+              O edifício,
+              <br />finalmente
+              <br />em ordem.
+            </h1>
+
+            <div className="mt-10 grid gap-9 border-t border-white/15 pt-7 md:mt-12 md:grid-cols-[minmax(0,31rem)_auto] md:items-end md:justify-between md:gap-14 md:pt-8">
+              <p className="hero-enter font-body text-base leading-7 text-white/58 md:text-lg [animation-delay:220ms]">
+                Operação diária, arquivo e comunicação no mesmo lugar — com contexto para quem administra e clareza para quem vive no condomínio.
+              </p>
+
+              <div className="hero-enter flex flex-wrap items-center gap-6 [animation-delay:340ms]">
+                <Link
+                  href="/contactos"
+                  className="group inline-flex items-center gap-3 bg-doorkeeperTerracotta px-7 py-4 font-body text-sm font-semibold text-white transition-colors hover:bg-white hover:text-graphite"
+                >
+                  Ver demonstração
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  href="/login"
+                  className="border-b border-white/30 pb-1 font-body text-sm font-semibold text-white/75 transition-colors hover:border-doorkeeperTurquoise hover:text-doorkeeperTurquoise"
+                >
+                  Área reservada
+                </Link>
+              </div>
+            </div>
           </div>
-
-          <dl className="hero-enter mt-16 grid max-w-xl grid-cols-2 border-y border-ink/15 py-5 [animation-delay:460ms]">
-            <div className="border-r border-ink/15 pr-5">
-              <dt className="font-body text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-ink/45">Um sistema</dt>
-              <dd className="mt-1 font-title text-xl text-ink">Toda a operação</dd>
-            </div>
-            <div className="pl-5">
-              <dt className="font-body text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-ink/45">Uma memória</dt>
-              <dd className="mt-1 font-title text-xl text-ink">Todo o contexto</dd>
-            </div>
-          </dl>
         </div>
 
-        <div className="hero-enter relative mx-auto w-full max-w-[30rem] [animation-delay:260ms] lg:ml-auto">
-          <div aria-hidden className="absolute -right-4 -top-4 h-full w-full border border-ink/20 md:-right-6 md:-top-6" />
-          <div className="relative aspect-[5/4] overflow-hidden bg-doorkeeperGreen p-6 sm:aspect-[4/3] md:p-8 lg:aspect-[4/5]">
-            <div className="flex justify-between font-body text-[0.62rem] font-semibold uppercase tracking-[0.17em] text-white/55">
-              <span>The DoorKeeper</span>
-              <span>01 / Entrada</span>
+        <div className="hero-enter grid border-y border-white/15 [animation-delay:460ms] sm:grid-cols-3">
+          {PRINCIPIOS.map(([numero, titulo, texto]) => (
+            <div
+              key={numero}
+              className="grid grid-cols-[2rem_1fr] gap-3 border-b border-white/15 py-4 last:border-b-0 sm:block sm:border-b-0 sm:border-r sm:px-5 sm:py-5 sm:first:pl-0 sm:last:border-r-0 sm:last:pr-0"
+            >
+              <span className="font-body text-[0.62rem] font-semibold tracking-[0.16em] text-doorkeeperTurquoise">{numero}</span>
+              <div className="sm:mt-4">
+                <p className="font-title text-lg text-white">{titulo}</p>
+                <p className="mt-1 font-body text-xs text-white/42">{texto}</p>
+              </div>
             </div>
-            <DoorKeeperMonogram
-              tone="turquoise"
-              priority
-              className="absolute bottom-[10%] right-[9%] h-[58%] w-[58%]"
-            />
-            <p className="absolute bottom-7 left-6 max-w-[9rem] border-l border-white/35 pl-3 font-body text-[0.68rem] leading-5 text-white/65 md:bottom-8 md:left-8">
-              A porta de entrada para um edifício bem gerido.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </section>
