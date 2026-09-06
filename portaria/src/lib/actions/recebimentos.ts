@@ -10,6 +10,7 @@ import {
   type SugestaoFracao,
   type SugestaoQuotas,
 } from "@/lib/financeiro/recebimentos";
+import { processarReciboAutomatico } from "@/lib/actions/recibo-automatico";
 
 export type MovimentoRecebimento = MovimentoCredito & {
   pagamentoId: string | null;
@@ -274,6 +275,9 @@ export async function registarPagamentoDeMovimento(formData: FormData): Promise<
   }
 
   revalidar();
+  // Recibo automático (PDF + email) — efeito pós-confirmação; nunca
+  // altera o resultado da reconciliação (captura as próprias falhas).
+  await processarReciboAutomatico(pagamentoId);
   return { ok: true };
 }
 

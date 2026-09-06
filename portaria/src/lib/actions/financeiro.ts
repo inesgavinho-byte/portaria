@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin, getCurrentUserInTenant } from "@/lib/supabase/tenant";
+import { emitirReciboCore } from "@/lib/financeiro/emitir-recibo";
+import { processarReciboAutomatico } from "@/lib/actions/recibo-automatico";
 import type {
   ConfiguracaoFinanceira,
   QuotaMensal,
@@ -84,6 +86,7 @@ export async function configurarFinanceiro(
     email_financeiro: String(formData.get("email_financeiro") ?? "").trim() || null,
     moeda: String(formData.get("moeda") ?? "EUR"),
     taxa_juros_mora: parseFloat(String(formData.get("taxa_juros_mora") ?? "0")) || 0,
+    recibo_auto_email: formData.get("recibo_auto_email") === "on",
   };
 
   const { error } = await supabase
@@ -268,6 +271,9 @@ export async function registarPagamento(
   }
 
   revalidatePath("/configuracao/financeiro");
+  // Recibo automático (PDF + email) — efeito pós-confirmação; nunca
+  // rebenta o registo do pagamento nem devolve erro ao utilizador.
+  await processarReciboAutomatico(data.id);
   return { success: true, id: data.id };
 }
 
@@ -323,69 +329,13 @@ export async function emitirRecibo(
 
   const supabase = await createClient();
 
-  // Buscar pagamento
-  const { data: pagamento } = await supabase
-    .from("pagamentos")
-    .select("*, fracoes!inner(codigo, proprietario_nome)")
-    .eq("id", pagamentoId)
-    .eq("tenant_id", ctx.tenant.id)
-    .single();
-
-  if (!pagamento) return { error: "Pagamento não encontrado." };
-
-  // Obter próximo número de recibo
-  const { data: numeroRecibo, error: numError } = await supabase.rpc(
-    "obter_proximo_numero_recibo",
-    { p_tenant_id: ctx.tenant.id }
-  );
-
-  if (numError || !numeroRecibo) {
-    return { error: "Erro ao gerar número de recibo." };
-  }
-
-  // Calcular período das quotas
-  let periodoInicio: string | null = null;
-  let periodoFim: string | null = null;
-
-  if (pagamento.quota_ids && Array.isArray(pagamento.quota_ids) && pagamento.quota_ids.length > 0) {
-    const { data: quotas } = await supabase
-      .from("quotas_mensais")
-      .select("ano, mes")
-      .in("id", pagamento.quota_ids)
-      .order("ano", { ascending: true })
-      .order("mes", { ascending: true });
-
-    if (quotas && quotas.length > 0) {
-      const primeiro = quotas[0];
-      const ultimo = quotas[quotas.length - 1];
-      periodoInicio = `${primeiro.ano}-${String(primeiro.mes).padStart(2, "0")}-01`;
-      periodoFim = `${ultimo.ano}-${String(ultimo.mes).padStart(2, "0")}-01`;
-    }
-  }
-
-  // Criar registo do recibo (PDF será gerado separadamente)
-  const { data: recibo, error: insertError } = await supabase
-    .from("recibos")
-    .insert({
-      tenant_id: ctx.tenant.id,
-      fracao_id: pagamento.fracao_id,
-      pagamento_id: pagamentoId,
-      numero: numeroRecibo,
-      valor_cents: pagamento.valor_cents,
-      periodo_inicio: periodoInicio,
-      periodo_fim: periodoFim,
-      estado: "emitido",
-    })
-    .select()
-    .single();
-
-  if (insertError || !recibo) {
-    console.error("Erro emitir recibo:", insertError);
-    return { error: "Erro ao emitir recibo." };
-  }
+  // Core partilhado com a automação — idempotente por pagamento (se o
+  // pagamento já tem recibo, devolve o existente em vez de duplicar).
+  const emitido = await emitirReciboCore(supabase, ctx.tenant.id, pagamentoId);
+  if (!emitido.ok) return { error: emitido.error };
 
   revalidatePath("/configuracao/financeiro");
-  return { success: true, id: recibo.id };
+  return { success: true, id: emitido.reciboId };
 }
 
 export async function anularRecibo(
